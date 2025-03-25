@@ -1,0 +1,45 @@
+# ---------- Stage 1: Build the React App ----------
+FROM node:18-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code
+COPY . .
+
+# Build the app for production
+RUN npm run build
+
+# ---------- Stage 2: Nginx for serving the built app ----------
+FROM nginx:stable-alpine AS production
+
+# Copy custom Nginx config (Optional, if you need it)
+# COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy built app from builder stage to Nginx HTML directory
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# Expose port 80
+EXPOSE 80
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
+
+
+# 🔑 Explanation of Each Stage:
+#     1️⃣ Stage 1 (Builder Stage)
+#     Uses Node.js official image.
+#     Installs dependencies.
+#     Builds the app with npm run build.
+#     Output: /app/build directory (static files).
+#     2️⃣ Stage 2 (Production/Final Stage)
+#     Uses Nginx to serve static files.
+#     Only copies necessary output (/app/build).
+#     No Node.js runtime in final image — small, secure, production-ready image.
+#     Nginx serves files on port 80.

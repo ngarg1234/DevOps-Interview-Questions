@@ -1,0 +1,2 @@
+The template_file data source renders a template from a template string, which is usually loaded from an external file.
+

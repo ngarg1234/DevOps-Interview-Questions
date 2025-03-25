@@ -1,0 +1,121 @@
+1️⃣ Pod & Container Resource Usage (CPU, Memory, Disk)
+✅ Check Pod CPU & Memory Usage
+-- Inside a Specific Pod:
+$$ kubectl exec -it <pod-name> -n <namespace> -- cat /sys/fs/cgroup/memory/memory.usage_in_bytes
+$$ kubectl exec -it <pod-name> -n <namespace> -- cat /sys/fs/cgroup/cpu/cpuacct.usage
+🔹 Shows current memory and CPU usage in bytes.
+
+From Node Level (For All Pods)
+$$ kubectl top pod -n <namespace>
+🔹 Shows CPU & Memory usage of all pods in the namespace.
+
+For Nodes
+$$ kubectl top node
+🔹 Displays CPU and memory usage of all nodes.
+
+
+2️⃣ Network Connectivity & Latency Checks
+✅ Check Pod-to-Pod Connectivity
+1. Ping Another Pod
+$$ kubectl exec -it <pod-name> -- ping <target-pod-ip>
+🔹 Tests basic network connectivity.
+
+2. Curl a Service From Inside a Pod
+$$ kubectl exec -it <pod-name> -- curl http://<service-name>:<port>
+ Ensures service discovery is working.
+
+3. Check DNS Resolution
+$$ kubectl exec -it <pod-name> -- nslookup <service-name>
+🔹 Validates if DNS resolution works correctly inside the cluster.
+
+
+3️⃣ Logs & Debugging
+✅ Check Pod Logs
+$$ kubectl logs <pod-name> -n <namespace>
+🔹 View logs of a pod's main container.
+
+2. Stream Live Logs
+$$ kubectl logs -f <pod-name> -n <namespace>
+🔹 Continuously watch logs in real-time.
+
+3. Check Logs of a Specific Container in a Multi-Container Pod
+$$ kubectl logs <pod-name> -c <container-name> -n <namespace>
+
+
+
+4️⃣ Health Probes & Liveness
+✅ Check Readiness, Liveness, Startup Probes
+$$ kubectl describe pod <pod-name> -n <namespace> | grep -A5 "Liveness"
+$$ kubectl describe pod <pod-name> -n <namespace> | grep -A5 "Readiness"
+🔹 Shows the health probe details.
+
+2. Manually Test Health Probe
+$$ kubectl exec -it <pod-name> -- curl http://localhost:<probe-port>/health
+🔹 Mimics the Kubernetes probe manually.
+
+
+5️⃣ Persistent Volume (PV) & Storage Checks
+✅ Check Mounted Volumes in a Pod
+$$ kubectl exec -it <pod-name> -- df -h
+🔹 Displays disk usage and mounted storage.
+
+2. Check Available Storage Space
+$$ kubectl exec -it <pod-name> -- du -sh /mnt/<mount-path>
+🔹 Shows used space in the volume mount.
+
+
+6️⃣ Security & Access Control
+✅ Check RBAC Permissions
+$$ kubectl auth can-i <verb> <resource> --as=<user>
+
+🔹 Example:
+$$ kubectl auth can-i get pods --as=developer
+🔹 Checks if developer can view pods.
+
+List All Role Bindings
+$$ kubectl get rolebinding -n <namespace>
+$$ kubectl get clusterrolebinding
+🔹 Displays permissions assigned in the cluster.
+
+
+7️⃣ Admission Controllers & Pod Security
+✅ Check Pod Security Context
+$$ kubectl get pod <pod-name> -o yaml | grep securityContext -A10
+🔹 Shows applied security settings.
+
+2. Check if Pod Security Admission (PSA) is Enforced
+$$ kubectl describe pod <pod-name> | grep -i "pod-security.kubernetes.io"
+🔹 Verifies applied security policies.
+
+
+8️⃣ Service & Load Balancer Debugging
+✅ Check Kubernetes Services
+$$ kubectl get svc -n <namespace>
+🔹 Lists all services & their cluster IPs.
+
+2. Describe Service for More Details
+$$ kubectl describe svc <service-name> -n <namespace>
+
+3. Test if Service is Accessible
+$$ kubectl exec -it <pod-name> -- curl <service-name>:<port>
+🔹 Confirms internal service reachability.
+
+4. Check Load Balancer Public IP
+$$ kubectl get svc <service-name> -n <namespace> -o wide
+🔹 Displays external IP of LoadBalancer services.
+
+
+9️⃣ Cluster-Level Health & Events
+✅ Check Node Health
+$$ kubectl get nodes -o wide
+$$ kubectl describe node <node-name>
+🔹 Shows the status, labels, and resources of nodes.
+
+2. View Recent Events in the Cluster
+$$ kubectl get events --sort-by=.metadata.creationTimestamp
+🔹 Displays all recent events across the cluster.
+
+
+
+
+

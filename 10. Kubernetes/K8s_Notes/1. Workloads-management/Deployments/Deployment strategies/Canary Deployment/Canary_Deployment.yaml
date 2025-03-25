@@ -1,0 +1,79 @@
+# ✅ Step 1: Stable Deployment (Current Version)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-stable
+spec:
+  replicas: 4  # Most of the traffic
+  selector:
+    matchLabels:
+      app: my-app
+      version: stable
+  template:
+    metadata:
+      labels:
+        app: my-app
+        version: stable
+    spec:
+      containers:
+      - name: my-app
+        image: nginx:1.21  # Stable version
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
+---
+
+# ✅ Step 2: Canary Deployment (New Version)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-canary
+spec:
+  replicas: 1  # Small percentage of traffic
+  selector:
+    matchLabels:
+      app: my-app
+      version: canary
+  template:
+    metadata:
+      labels:
+        app: my-app
+        version: canary
+    spec:
+      containers:
+      - name: my-app
+        image: nginx:1.24  # New version for testing
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
+---
+# ✅ Step 3: Service (Routing Traffic to Both Stable and Canary)
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-service
+spec:
+  selector:
+    app: my-app  # Common selector for both stable and canary
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer  # Or ClusterIP/NodePort depending on use case
+
+# ➡️ Since both deployments share app: my-app label, the Service will distribute traffic to all Pods from both versions.

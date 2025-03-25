@@ -1,0 +1,10 @@
+Below is the syntax of conditional expression
+
+condition ? true-value : false value
+terraform.workspace == "dev" ? "t2.micro" : "t2.large"
+
+examples
+
+example1: instance_type = terraform.workspace == "dev" ? "t2.micro" : "t2.large"
+
+example2: count = var.env == "dev" ? 2 : 4

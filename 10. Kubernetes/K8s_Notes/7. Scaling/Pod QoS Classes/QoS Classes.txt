@@ -1,0 +1,62 @@
+🔑 What are QoS Classes?
+-> Quality of Service (QoS) Classes define pod priority under resource pressure (e.g., CPU, memory contention). [Node experiencing Node Pressure.]
+-> Kubernetes uses QoS to decide which pods to evict first during node pressure.
+
+⚙️ Types of QoS Classes:
+1. Guaranteed: Best guarantee; most preferred; won't evict easily. Requires CPU and memory requests equal to limits, defined for all containers.
+-> Pods that are Guaranteed have the strictest resource limits and are least likely to face eviction. 
+-> They are guaranteed not to be killed until they exceed their limits or there are no lower-priority Pods that can be preempted from the Node. 
+-> They may not acquire resources beyond their specified limits. 
+-> These Pods can also make use of exclusive CPUs using the static CPU management policy.
+
+Criteria:
+-> For a Pod to be given a QoS class of Guaranteed:
+-- Every Container in the Pod must have a memory limit and a memory request.
+-- For every Container in the Pod, the memory limit must equal the memory request.
+-- Every Container in the Pod must have a CPU limit and a CPU request.
+-- For every Container in the Pod, the CPU limit must equal the CPU request.
+
+** Explanation: Since "requests == limits" for both CPU and memory, Kubernetes marks this pod as Guaranteed.
+
+-----------------------------------------------------------------------------
+2. Burstable: Partial guarantee; flexible. Happens when requests are less than limits, or some containers have incomplete resource specs.
+
+Criteria
+-> A Pod is given a QoS class of Burstable if:
+-- The Pod does not meet the criteria for QoS class Guaranteed.
+-- At least one Container in the Pod has a memory or CPU request or limit.
+
+** Explanation: Requests < Limits
+
+-------------------------------------------------------------------------------------
+3. BestEffort: Lowest priority; evicted first under resource pressure. No resource requests or limits defined.
+-> For example, if you have a node with 16 CPU cores available to the kubelet, and you assign 4 CPU cores to a Guaranteed Pod, then a Pod in the BestEffort QoS class can try to use any amount of the remaining 12 CPU cores.
+
+-> The kubelet prefers to evict BestEffort Pods if the node comes under resource pressure.
+
+Criteria
+-- A Pod has a QoS class of BestEffort if it doesn't meet the criteria for either  Guaranteed or Burstable. 
+-- In other words, a Pod is BestEffort only if none of the Containers in the Pod have a memory limit or a memory request, and none of the Containers in the Pod have a CPU limit or a CPU request. 
+-- Containers in a Pod can request other resources (not CPU or memory) and still be classified as BestEffort.
+
+** Explanation: No resources specified — lowest priority, evicted first under node pressure.
+
+------------------------------------------------------------------------------
+✅ Why QoS Class is important for HA?
+Scenario				                Eviction Order
+1. Node under Memory/CPU pressure	BestEffort pods evicted first, then Burstable, Guaranteed last
+2. Pod survival under resource limits	Guaranteed pods stay longest, ensuring app uptime
+
+
+✅ Check Pod QoS Class:
+kubectl get pod <pod-name> -o jsonpath='{.status.qosClass}'
+
+
+⚙️ Best Practices for Scheduling & HA
+✅ Use PDBs for all critical apps to avoid downtime during maintenance.
+✅ Set appropriate QoS Classes via requests & limits for all pods:
+-- Use Guaranteed for critical apps (e.g., databases, ingress).
+-- Use Burstable/BestEffort for non-critical/batch jobs.
+✅ Combine Node Affinity and PodAntiAffinity to spread pods across nodes for better HA.
+✅ Monitor PDB violations using kubectl describe pdb.
+✅ Use HorizontalPodAutoscaler (HPA) with PDB to handle load spikes safely.

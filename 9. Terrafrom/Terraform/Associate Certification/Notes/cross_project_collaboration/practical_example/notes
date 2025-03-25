@@ -1,0 +1,43 @@
+in this example,
+
+=>  network_project creates an elastic ip and output the ip
+
+=> in security project we will create a security group that whitlist the elastic_ip created by network_project
+
+for referrencing the elastic_ip inside the security_project,
+
+    you need to create a terraform_remote_state date source
+
+    the configuration block is show below,
+
+data "terraform_remote_state" "eip" {
+    backend = "s3"
+    config = {     
+        bucket = "shyam-terraform"
+        key    = "network_project/eip.tfstate"
+        region = "us-east-1"
+    }
+}
+
+==> referring to the data source in a terraform config
+
+ cidr_blocks      = ["${data.terraform_remote_state.eip.outputs.eip_id}/32"] 
+
+ here we are using outputs.eip_id
+
+ outputs ==> this is becase we are referring to the outputs block in statefile 
+
+ look at the below statefile,
+
+ {
+  "version": 4,
+  "terraform_version": "0.15.2",
+  "serial": 1,
+  "lineage": "408b7746-594a-3928-e3e7-f1260e28dfad",
+  "outputs": {       #####################################>>>   we are referring to this output 
+    "eip_id": {
+      "value": "44.219.3.92",
+      "type": "string"
+    }
+  },
+ }

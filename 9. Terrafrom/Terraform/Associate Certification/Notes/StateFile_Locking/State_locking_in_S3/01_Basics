@@ -1,0 +1,38 @@
+By default s3 doesn't support statefile locking 
+
+You need to make use of DynamoDB for achieveing statelocking 
+
+
+
+For using dynamoDb for state locking,
+
+Create a dynamoDb with primary key as LockID(String) , 
+
+in the backend configuration, specify the dynamodb_table,
+
+example,
+
+i created a dynamoDB, terraform_lock, with LockID as the primary key,
+
+backend.tf,
+
+terraform {
+    backend "s3" {
+        bucket = "terraform-shyam"
+        key = "demo/demo.tfstate"
+        region = "us-east-1"
+        dynamodb_table = "terraform_lock"
+    }
+}
+
+ Error: Error acquiring the state lock
+│ 
+│ Error message: ConditionalCheckFailedException: The conditional request failed
+│ Lock Info:
+│   ID:        460c3fde-fde1-0ad2-928a-162a90a8e4d2
+│   Path:      terraform-shyam/demo/demo.tfstate
+│   Operation: OperationTypeApply
+│   Who:       shyamjith_sa@EPINCHEW00D1
+│   Version:   0.15.2
+│   Created:   2023-09-17 06:37:46.326102 +0000 UTC
+│   Info:

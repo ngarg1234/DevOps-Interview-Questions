@@ -1,0 +1,45 @@
+
+Dealing with larger information
+
+Case 1, 
+
+Suppose that you have a larger that has 100+ resources and all of the resources are managed by a single terraform configuration
+
+example: infra.tf -> contains 100+ resources,
+
+    in this case, if you do a terraform plan, it will refresh the 100+ resources-> this makes large number of API calls to the AWS,
+    and also refresh the state of all the resorces, it will slow down tha processs.
+
+    To overcome it,
+
+    method 1
+
+        you can divide the infra.tf into -> ec2/ec2.tf, s3/s3.tf, sg/sg.tf etc.. so that you can do terraform plan only for the particular resource you want 
+
+    method 2 
+
+        you can turn off terraform refresh
+
+        terraform refresh attempts to find any resources held in the state file and update with any drift that has happened in the provider outside of Terraform since it was last ran.
+
+        terraform plan -refresh=false 
+    
+
+    method 3
+
+        you can target resource and do terraform plan for only that particular resource
+
+            terraform plan -target=aws_instance.demo
+
+    
+    you can perform method 2 & 3 together
+
+        terraform plan -refresh=flase -target=aws_instance.demo
+
+
+NOTE: it is not recommended use the method 2 and 3 on production 
+
+
+
+
+    

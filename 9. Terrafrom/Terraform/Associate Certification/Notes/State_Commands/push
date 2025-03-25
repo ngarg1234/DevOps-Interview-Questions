@@ -1,0 +1,4 @@
+terraform state push
+
+
+used to manually push the state file into remote backend 

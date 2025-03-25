@@ -1,0 +1,43 @@
+Default variable setup
+ In deafult variable set up, if no value is explicitly specified, default value will be picked up
+
+default value setup
+
+you can define the varibles inside variable.tf file or any other .tf file 
+
+        example: variable.tf
+
+                        variable "eip" {
+                            deafult = "10.192.168.0"
+                        }
+
+                main.tf
+
+                    resource "aws_security_group" "allow_tls" {
+                    name        = "allow_tls"
+                    description = "Allow TLS inbound traffic"
+                    
+                    ingress {
+                    
+                        from_port   = 443
+                        to_port     = 443
+                        protocol    = "-1"
+                        cidr_blocks = [var.eip/32]   # variable reference 
+                    }
+
+NOTE: Command line variable,
+
+        you can supply the variable value when you run a terraform plan
+
+            terraform plan -var="eip=192.168.10.0" 
+            in the above case it will override the default value S
+
+
+
+    
+NOTE: what will happen if you don't specify a default value for a variable
+
+variable "eip" {}
+
+in the above case, when you run the terraform plan, you will get a prompt to manually enter the value of eip on command line 
+        

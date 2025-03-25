@@ -1,0 +1,194 @@
+1, What is an ASG
+2, What is minimum capacity
+3, What is desired capacity
+4, WHat is maximum capacity
+5, What are the benefits of Amazon EC2 Auto Scaling?
+6, What is Rebalancing activities?
+7, What are the lifecycle of an ASG
+8, Is it possible to configure lifecycle hooks while creating ASG?
+9, What are lifecycle hooks?
+10, What is Heartbeat timeout?
+11, what is complete-lifecycle-action
+12, What are the lifecycle hook actions / What is default lifecycle hook action
+13, What is the complete lifecycle when enabled lifecycle hook
+14, Difference between launch template and launch configuration.
+15, What is warm pools?
+16, How to use multiple launch templates.?
+17, How to set up mixed instance types ?
+18, How to use spot instances?
+19, What is an instance refresh?    
+20, What are the Instance replacement methods while doing an instance refresh?
+21, What is Minimum healthy percentage?
+22, What are the scaling policies
+23, What is Target Tracking policies
+24, In case of Target tracking policy, what happens if the number of instances touches maximum capacity
+25, What is cool down period ?
+26, What is scheduled action ?
+27, What is predictive scaling?
+28, What is simple and step scaling
+29, How to use multiple instance types
+30, How to enable spot instance
+31  What is health check grace period?
+32, What are Instance maintenance policies?
+33, What is Instance scale-in protection
+34, What is Instance warmup
+35, what is Skip matching
+36, What is auto rollback of instance refresh
+37, What is the use of checkpoint in case of instance refresh?
+38, What is the default setting and value of check point ?
+39, How to stop instance refresh?
+40, How to roll back an instance refresh ?
+41, What are the instance state in which a health check consider it as unhealthy?
+42, How to View the reason for health check failures?
+43, What is scale in cool down?
+44, What is Instance scale-in protection?
+45, Specifying subnet for launch template ?
+46, Horizontal vs Vertical scaling ?
+48, What is IAM instance profile?
+49, Placement group?
+
+
+1. What is an ASG?
+-> Auto Scaling Group (ASG) is a service that allows you to automatically adjust the number of Amazon EC2 instances in response to changes in demand. It ensures you have the right amount of compute resources available at any given time.
+
+2. What is minimum capacity?
+->  Minimum capacity refers to the lowest number of instances that the ASG will maintain to ensure availability, even during low traffic periods.
+
+3. What is desired capacity?
+-> Desired capacity is the ideal number of EC2 instances that you want in your Auto Scaling Group. This is the target number, and Auto Scaling will adjust the group size to meet this number.
+
+4. What is maximum capacity?
+-> Maximum capacity is the upper limit of the number of instances your ASG can scale out to. It prevents the group from scaling beyond a predefined limit, even under high demand.
+
+5. What are the benefits of Amazon EC2 Auto Scaling?
+-> Benefits include 
+    1. improved application availability, 
+    2. cost optimization (by adjusting the number of instances based on demand), 
+    3. automation, and 
+    4. fault tolerance.
+
+6. What is Rebalancing activities?
+-> Rebalancing ensures that instances are evenly distributed across availability zones to improve fault tolerance and maintain performance, especially after scaling events or instance terminations.
+
+-> AZ rebalancing and capacity rebalancing
+    a. AZ Rebalancing: In circumstances where an Availability Zone becomes unhealthy or unavailable, the distribution of instances might become unevenly distributed across the Availability Zones. When the Availability Zone recovers, Amazon EC2 Auto Scaling automatically rebalances the Auto Scaling group. It does this by launching instances in the enabled Availability Zones with the fewest instances and terminating instances elsewhere.
+    b. Capacity Rebalancing: ou can turn on Capacity Rebalancing for your Auto Scaling groups when using Spot Instances. This lets Amazon EC2 Auto Scaling attempt to launch a Spot Instance whenever Amazon EC2 reports that a Spot Instance is at an elevated risk of interruption.
+ 
+
+7. What are the lifecycle of an ASG?
+-> The lifecycle of an ASG includes creating, scaling, updating, and terminating instances based on the Auto Scaling policies and triggers.
+
+8. Is it possible to configure lifecycle hooks while creating ASG?
+-> Yes, you can configure lifecycle hooks when creating an ASG to control the process of instance launching or terminating by pausing the instance during specific stages of the lifecycle.
+
+9. What are lifecycle hooks?
+-> Lifecycle hooks allow you to take custom actions (e.g., running scripts or sending notifications) when instances are launched or terminated in an ASG, allowing for more granular control during the lifecycle of an instance.
+
+10. What is Heartbeat timeout?
+-> Heartbeat timeout is the time interval that Amazon EC2 Auto Scaling waits for a signal (heartbeat) from the instance before taking the next action (like proceeding with instance termination or continuing with instance creation).
+
+11. What is complete-lifecycle-action?
+-> The complete-lifecycle-action command is used to tell Auto Scaling that a lifecycle action (like pausing an instance) has been completed, which allows the instance lifecycle to continue.
+
+What are the lifecycle hook actions? / What is default lifecycle hook action?
+Lifecycle hook actions are custom actions like running a script or delaying instance termination. The default action is typically the terminate action when a lifecycle hook expires or completes.
+
+What is the complete lifecycle when enabling lifecycle hook?
+The complete lifecycle includes steps such as: 
+1) Instance is launched or terminated, 
+2) Lifecycle hook is invoked, 
+3) Custom action (e.g., waiting for a signal) occurs, 
+4) Instance proceeds to its final state after the action is complete.
+
+Difference between launch template and launch configuration?
+Launch templates are more flexible and allow for versioning, whereas launch configurations are static and cannot be modified once created. Launch templates also allow advanced options like setting key pairs or instance types.
+
+What is warm pools?
+Warm Pools are sets of EC2 instances that are pre-warmed and ready to be added to an Auto Scaling Group when needed, which reduces the scaling time.
+
+How to use multiple launch templates?
+You can use multiple launch templates by specifying them when creating or updating an ASG to allow for greater flexibility in instance configurations.
+
+How to set up mixed instance types?
+Mixed instance types allow you to use a combination of On-Demand, Reserved, and Spot instances by specifying a list of instance types and sizes in your launch template or configuration.
+
+How to use spot instances?
+Spot instances can be used by defining a mixed instance policy within your Auto Scaling Group that includes both On-Demand and Spot instances, helping reduce costs.
+
+What is an instance refresh?
+Instance refresh allows you to update or replace instances in an ASG to apply changes, such as a new AMI or a launch template version.
+
+What are the Instance replacement methods while doing an instance refresh?
+Instance replacement methods can include rolling (replacing instances gradually) or parallel (replacing multiple instances simultaneously).
+
+What is Minimum healthy percentage?
+The minimum healthy percentage specifies the minimum percentage of healthy instances that must be maintained in the ASG during scaling activities.
+
+What are the scaling policies?
+Scaling policies define how Auto Scaling should adjust the number of instances in an ASG, based on metrics like CPU usage, memory, etc.
+
+What is Target Tracking policy?
+Target tracking automatically adjusts the number of instances to maintain a target metric value (e.g., keeping average CPU utilization at 50%).
+
+In case of Target tracking policy, what happens if the number of instances touches maximum capacity?
+If the number of instances reaches the maximum capacity, Auto Scaling will stop adding instances even if the metric (e.g., CPU usage) continues to indicate the need for more resources.
+
+What is cool down period?
+The cool down period is the time that Auto Scaling waits after scaling activity before making additional scaling decisions to allow previous actions to take effect.
+
+What is scheduled action?
+Scheduled actions allow you to scale your ASG at a specific time, either up or down, based on predicted demand.
+
+What is predictive scaling?
+Predictive scaling uses machine learning to predict future traffic patterns and automatically adjusts the capacity of the ASG to handle forecasted changes in demand.
+
+What is simple and step scaling?
+Simple scaling adjusts the group size by a specific amount based on a threshold. Step scaling allows more granular scaling, where different thresholds trigger different scaling actions.
+
+How to use multiple instance types?
+You can use multiple instance types in a mixed instance policy, where you specify multiple instance types and sizes for your Auto Scaling group.
+
+How to enable spot instance?
+To enable Spot Instances, you would select Spot as part of your ASG’s mixed instance policy, along with a maximum price per instance.
+
+What is health check grace period?
+The health check grace period is the time Auto Scaling waits before performing health checks on newly launched instances.
+
+What are Instance maintenance policies?
+Instance maintenance policies define how to handle scheduled maintenance events (e.g., system updates) for instances in an ASG.
+
+What is Instance scale-in protection?
+Scale-in protection prevents an instance from being terminated during a scale-in event, useful for critical instances that you don't want to lose.
+
+What is Instance warmup?
+Instance warmup is the period Auto Scaling waits after launching or terminating an instance to ensure it's fully operational before taking further scaling actions.
+
+What is Skip matching?
+Skip matching allows an Auto Scaling group to skip the matching process when selecting instances during scaling activities, for example, during instance refreshes.
+
+What is auto rollback of instance refresh?
+Auto rollback ensures that if a problem occurs during an instance refresh (e.g., new instances fail health checks), the ASG automatically reverts to the previous configuration.
+What is the use of checkpoint in case of instance refresh?
+Checkpoint is used to save progress during instance refresh operations, ensuring that Auto Scaling can resume from the last successful state in case of an interruption.
+What is the default setting and value of checkpoint?
+The default value for checkpoints is disabled (no checkpoints saved), but you can enable it when performing instance refresh to allow rollback.
+How to stop instance refresh?
+You can stop an instance refresh by using the stop-instance-refresh command or the console to cancel the ongoing refresh.
+How to roll back an instance refresh?
+You can rollback an instance refresh via the AWS Management Console or CLI by stopping the refresh or reverting the changes to the previous configuration.
+What are the instance states in which a health check considers it as unhealthy?
+Health checks consider instances unhealthy if they are in the terminated or stopped state, or if they fail the health check criteria (e.g., failing to respond to HTTP requests).
+How to view the reason for health check failures?
+The reason for health check failures can be viewed in the Auto Scaling or EC2 instance details in the AWS Console, which shows the status and any error messages.
+What is scale-in cool down?
+Scale-in cool down is the waiting period after a scale-in event to prevent Auto Scaling from terminating instances too quickly.
+What is Instance scale-in protection?
+Instance scale-in protection prevents an instance from being terminated during scaling down events, ensuring critical instances are preserved.
+Specifying subnet for launch template?
+When creating a launch template, you can specify a subnet under network configuration, which determines the VPC and subnet in which the instances will be launched.
+Horizontal vs Vertical scaling?
+Horizontal scaling involves adding or removing instances to meet demand, while vertical scaling involves upgrading or downgrading an instance’s hardware resources (e.g., CPU, memory).
+What is IAM instance profile?
+An IAM instance profile is an IAM role that grants permissions to EC2 instances to access other AWS services, like S3 or DynamoDB.
+Placement group?
+A placement group is a logical grouping of instances within a single Availability Zone to ensure high network throughput, low latency, and fault tolerance.

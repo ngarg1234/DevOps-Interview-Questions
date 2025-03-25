@@ -1,0 +1,93 @@
+Common #kubernetes pod related errors and ways to mitigate 🤔 ☸
+ 
+➡ ImagePullBackOff
+This error appears when #k8s isn't able to "retrieve the image" for one of the #containers of the Pod.
+There are three common culprits:
+     ✅ The image name is invalid 
+     ✅ You specified a non-existing tag for the image.
+     ✅ The image that you're trying to retrieve belongs to a private  registry and the cluster doesn't have credentials to access it.
+-> The first two cases can be solved by correcting the image name and tag.
+-> For the last, one should add the credentials to your private registry in a Secret and reference it in the Pods
+
+➡ RunContainerError
+The error appears when the container is unable to start before application
+    Common causes:
+     ✅ Mounting a not-existent volume such as ConfigMap or Secrets 
+     ✅ Mounting a read-only volume as read-write
+More detailed aspect can be found by describing the 'failed' pod
+
+➡ CrashLoopBackOff
+If the container can't start, then #Kubernetes shows the CrashLoopBackOff message as a status.
+Usually, a container can't start when:
+  ✅   There's an error in the application that prevents it from starting.
+  ✅   You misconfigured the container.
+  ✅   The Liveness probe failed too many times.
+The "CrashLoopBackOff" error in Kubernetes is usually caused by:
+-> Incorrect container image
+-> Container image pulled from a private registry that is not accessible to the cluster
+-> Insufficient resources (e.g. memory or CPU)
+-> Application crashing or exiting with non-zero status code
+-> Incorrect environment variables
+-> Misconfigured liveness/readiness probes
+-> Persistent disk failure
+-> Networking issues between containers.
+
+➡ Pods in a Pending state
+Assuming that the  scheduler component is running fine, here are the causes:
+  ✅   The cluster doesn't have enough resources such as CPU and memory to run the Pod.
+  ✅   The current Namespace has a ResourceQuota object and creating the Pod will make the Namespace go over the quota.
+  ✅   The Pod is bound to a Pending PersistentVolumeClaim.
+
+The best option is to inspect the Events section in the "kubectl describe"
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+Crash loop backoff error:  is a Kubernetes state representing a restart loop that is happening in a Pod: 
+-> A container in the Pod is started, but crashes and is then restarted, over and over again. 
+-> Kubernetes will wait an increasing back-off time between restarts to give you a chance to fix the error.
+
+*Container is failing beacuse of images is not present.
+
+Types production errors in k8s:
+*  Steps to help troubleshoot(commands) and fix the error:
+1. Check the container's logs: The first step is to check the logs of the container that is crashing. 
+    "kubectl logs <pod-name>". The logs may provide information about the cause of the crash.
+-> $$ "kubectl exec" command to run a command in a specific container in a pod.
+-> $$ "kubectl get events" command to view recent events related to a pod and the resources in its namespace.
+2. Check resource limits: Make sure that the container has enough resources allocated to it. 
+    "kubectl describe pod <pod-name>" to check the resource limits and usage.
+3. Check the readiness and liveness probes: The readiness and liveness probes can be used to detect and respond to container failures. Check the configuration of these probes and make sure they are configured correctly.
+4. Check the environment variables: Make sure that the environment variables passed to the container are correct and that the container has access to the necessary resources.
+5. Check the container image: Make sure that the container image is the correct version and that it is not corrupt. 
+   Try pulling the image again to ensure it is up to date.
+6. Check the application code: If none of the above steps resolve the issue, check the application code 
+   for any bugs or issues that may be causing the crash.
+7. Last option is to delete the pod and let it recreate.
+
+-> Use Prometheus and Grafana for monitoring and alerting, it helps to get more visibility on resource usage and performance metrics.
+-> Use "Kubernetes events" to get more information about the state of the pod.
+-> Use the Kubernetes dashboard, which provides a web-based interface for monitoring and managing pods and other resources in the cluster.
+
+Q. What common commands for performing maintenance activities on a Kubernetes node?
+-> Upgrading the node's operating system and Kubernetes software:
+	$$ sudo apt-get update && sudo apt-get upgrade -y
+-> Monitoring the node's resource usage:
+	$$ kubectl describe nodes <node-name>
+	$$ kubectl top nodes <node-name>
+-> Checking for and removing unused or evicted pods:
+	$$ kubectl get pods --all-namespaces
+	$$ kubectl delete pod <pod-name> --namespace=<namespace>
+-> Running a security scan on the node:
+	$$ docker run -it --net host --pid host --cap-add audit_control -e DOCKER_CONTENT_TRUST=$DOCKER_CONTENT_TRUST -v 
+    /var/lib:/var/lib -v 
+    /var/run/docker.sock:/var/run/docker.sock -v 
+    /usr/lib/systemd:/usr/lib/systemd -v /etc:/etc --label 
+    docker_bench_security docker/docker-bench-security
+-> Backing up important data:
+	$$ kubectl get pods --all-namespaces -o json > pod-backup.json
+
+https://helm-chart123.s3.us-east-2.amazonaws.com/helmcharts/
+arn:aws:s3:::helm-chart123
+https://helm-chart123.s3.us-east-2.amazonaws.com/index.yaml
+
+===========================================================================================================================================
+

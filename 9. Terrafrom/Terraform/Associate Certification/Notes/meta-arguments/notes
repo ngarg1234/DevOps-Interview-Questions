@@ -1,0 +1,7 @@
+the following are the meta arguments in terraform
+
+count
+for_each
+depends_on
+lifecycle
+provider

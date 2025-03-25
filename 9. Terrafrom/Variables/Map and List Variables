@@ -1,0 +1,26 @@
+-> Terraform allows you to use maps and lists as variable types. Maps store key-value pairs, while lists store ordered sequences of values.
+Example (Map):
+variable "tags" {
+  type = map(string)
+  default = {
+    environment = "dev"
+    app_name    = "my_app"
+  }
+}
+Example (List):
+variable "subnet_ids" {
+  type = list(string)
+  default = ["subnet-1", "subnet-2"]
+}
+
+LIST:
+variable "size" {
+  type    = map
+  default = ["t2.micro", "t2.medium", "t2.large"]
+}
+
+resource "aws_instance" "test-var" {
+    instance_type = var.size[0]
+}
+
+MAP:

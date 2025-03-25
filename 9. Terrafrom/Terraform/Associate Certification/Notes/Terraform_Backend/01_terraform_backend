@@ -1,0 +1,22 @@
+By default terraform stores the state files on the default backend called local(as a local file on the disk)
+
+terraform.tfstate -> is the the local terraform statefiles
+
+
+
+In a real time environment, the ideal archetecture is,
+
+-> terraform scripts are stored in a git repo
+-> statefiles are stored in central backend
+
+some popular backends are,
+
+    s3,
+    Consul
+    Azurerm
+    Kubernetes
+    HTTP
+    ETCD etc..
+
+    
+

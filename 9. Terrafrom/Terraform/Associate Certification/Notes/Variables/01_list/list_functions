@@ -1,0 +1,50 @@
+
+<--------------------------->
+
+-> element()
+
+variable "example_list" {
+  type    = list(string)
+  default = ["value1", "value2", "value3"]
+}
+
+element1 = element(var.example_list, 0)  # "value1"
+element2 = element(var.example_list, 1)  # "value2"
+
+<--------------------------->
+
+lenght()
+
+variable "example_list" {
+  type    = list(string)
+  default = ["value1", "value2", "value3"]
+}
+
+list_length = length(var.example_list)  # 3
+
+<--------------------------->
+
+index:
+The index function returns the index of the first occurrence of a specified value in the list.
+
+
+variable "example_list" {
+  type    = list(string)
+  default = ["apple", "banana", "orange", "banana"]
+}
+
+banana_index = index(var.example_list, "banana")  # 1
+
+
+<--------------------------->
+
+flatten:
+The flatten function takes a list of lists and returns a single flattened list.
+
+
+variable "nested_list" {
+  type    = list(list(string))
+  default = [["apple", "banana"], ["orange", "grape"]]
+}
+
+flattened_list = flatten(var.nested_list)  # ["apple", "banana", "orange", "grape"]

@@ -1,0 +1,45 @@
+# 2️⃣ Enforce Allowed Container Images (Restrict to Approved Registries)
+# 🚫 Prevent users from deploying containers from unknown/untrusted registries.
+
+# 🔹 ConstraintTemplate
+
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sallowedregistries
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sAllowedRegistries
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sallowedregistries
+
+        allowed_registries := {"mycompany.com", "gcr.io"}
+
+        violation[{"msg": sprintf("Container image %v is not from an allowed registry", [image])}] {
+          image := input.review.object.spec.containers[_].image
+          not startswith(image, allowed_registries[_])
+        }
+
+
+---
+# 🔹 Constraint (Specify Allowed Registries)
+
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sAllowedRegistries
+metadata:
+  name: only-approved-registries
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    allowedRegistries:
+      - "mycompany.com"
+      - "gcr.io"
+
+# ✅ What it does: Blocks Pods with images from unapproved registries.

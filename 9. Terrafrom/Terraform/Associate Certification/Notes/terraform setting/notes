@@ -1,0 +1,24 @@
+
+simple terraform{} block is used to configure some behaviour of terraform
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1, Terraform version
+
+terraform version should be defined inside terraform{} block
+
+terraform {
+    required_version = "> 0.12.0"
+}
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+2, Provider version 
+
+terraform {
+    required_providers {
+        aws = "~> 2.0"
+        
+    }
+}

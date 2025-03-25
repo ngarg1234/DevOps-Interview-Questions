@@ -1,0 +1,31 @@
+when you do a terraform apply (for the sleep.tf) , you can see a file called ".terraform.tfstate.lock.info " getting created inside   .terraform folder
+
+the content of the file is - {"ID":"cf8d0132-46b4-2648-e64a-28e0cb12be92","Operation":"OperationTypeApply","Info":"","Who":"shyamjith_sa@EPINCHEW00D1","Version":"0.15.2","Created":"2023-09-11T07:42:38.821361Z","Path":"terraform.tfstate"}
+
+basically this file contains the state lock information 
+
+When you do a terraform apply for the file sleep.tf, it will sleep for 5 mins, during this time if you open a new terminal and do a terraform plan from the same folder "DevOps-notes-MAC/Terraform/Associate Certification/Notes/StateFile_Locking /Testing_statelock" , you will get the below error 
+
+
+│ Error: Error acquiring the state lock
+│ 
+│ Error message: resource temporarily unavailable
+│ Lock Info:
+│   ID:        cf8d0132-46b4-2648-e64a-28e0cb12be92
+│   Path:      terraform.tfstate
+│   Operation: OperationTypeApply
+│   Who:       shyamjith_sa@EPINCHEW00D1
+│   Version:   0.15.2
+│   Created:   2023-09-11 07:42:38.821361 +0000 UTC
+│   Info:      
+│ 
+│ 
+│ Terraform acquires a state lock to protect the state from being written
+│ by multiple users at the same time. Please resolve the issue above and try
+│ again. For most commands, you can disable locking with the "-lock=false"
+│ flag, but this is not recommended.
+
+
+so basically, when a terraform apply is perfomed, terraform automatically lock the statefile.(otherwise, if 2 people perform a terraform apply at the same time(for a same resource) statefile will be corrupted)
+
+The statefile locking happens automatically on all operation that could write a state. you won't see any message that it is happening 

@@ -1,0 +1,29 @@
+
+create a new workspace with cli-driven workflow option(NOTE: don't choose VCS. you can't use VCS with cli-driven flow)
+
+here, terraform configuration needs to be in your local disk(you can keep the code on a seperate repo but yo can't connect the repo with Terraform cloud)
+
+backend configuration
+
+terraform {
+  cloud {
+    organization = "my-org"
+    workspaces {
+      tags = ["networking"]
+    }
+  }
+
+
+IMP: YOU HAVE TO LOGIN TO TERRAFORM CLOUD FROM YOUR TERMINAL USING -> "TERRAFORM LOGIN" COMMAND
+
+IT WILL OPEN A PROMT AND ALLOW YOU TO GENERATE A TOKEN AND COPY PASTE THAT TOKEN ON YOUR TERMINAL PROMPT 
+
+terraform {
+  cloud {
+    organization = "Terraform_shyam"
+
+    workspaces {
+      name = "remote_backend"
+    }
+  }
+}

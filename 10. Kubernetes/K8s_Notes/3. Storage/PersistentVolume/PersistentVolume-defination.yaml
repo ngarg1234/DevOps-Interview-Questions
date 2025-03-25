@@ -1,0 +1,46 @@
+# Problem here is you must create the disk in google cloud or aws before PV creation manually.
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-vol1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity: 
+     storage: 1Gi
+  hostPath:
+    path: /tmp/data
+# host path is not used in production environment so we followe below method
+# or
+  awsElasticBlockStore:
+    volumeID: <volumeID>
+    fsType: ext4
+# or
+  gcePersistentDisk:
+    pdName: pd-disk
+    fsType: ext4
+
+# kubectl create -f pv-defiantion.yaml
+# kubectl get persistentvolume
+
+########################################################################
+# Create a Persistent Volume with the given specification.
+# Volume Name: pv-log
+# Storage: 100Mi
+# Access Modes: ReadWriteMany
+# Host Path: /pv/log
+# Reclaim Policy: Retain
+
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: pv-log
+# spec:
+#   persistentVolumeReclaimPolicy: Retain
+#   accessModes:
+#     - ReadWriteMany
+#   capacity:
+#     storage: 100Mi
+#   hostPath:
+#     path: /pv/log

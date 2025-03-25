@@ -1,0 +1,142 @@
+HELM CHARTS:
+------------
+
+-> helm: package manager, charts: bundle of yaml playbooks
+-> Helm helps you manage Kubernetes applications — Helm Charts help you define, install, manage the lifecycle and upgrade even the most complex Kubernetes application. 
+-> Charts are easy to create, version, share, and publish — so start using Helm and stop the copy-and-paste.
+-> Helm uses a packaging format called charts, which are collections of Kubernetes manifests that describe the resources needed to run an application.
+-> It simplifies the process of deploying and managing applications on Kubernetes by providing pre-configured templates for resources like Pods, Services, and more.
+
+$$ helm create my-chart
+
+-> Charts include:
+1. Charts.yaml: A file called Chart.yaml that contains metadata about the chart, such as its name, version, and description.
+2. values.yaml: A file called values.yaml that contains default configuration values for the chart. These values can be customized during installation.
+3. templates/: A directory called templates that contains the Kubernetes manifests for the resources defined in the chart.
+4. charts/: A folder for any dependent charts.
+5. LICENSE and README.md: Optional files that provide licensing and
+documentation.
+
+-> Why do we use Helm charts in Kubernetes?
+1. Helm is a package manager for Kubernetes that makes it easy to take applications and services that are either highly repeatable or used in multiple scenarios and deploy them to a typical K8s cluster.
+2. Charts can be used to deploy applications, libraries, or any other type of workload on a Kubernetes cluster.
+
+Q. What are helm hooks
+-> There are different types of helm hooks, pre install, post install, pre delete, post delete, pre upgrade, post upgrade etc..
+-- suppose you want to set up a cron job before installing your chart, you can use pre install hook
+-- suppose you want to run a back up job after installing  a chart, you can use post install hook
+-- you can create k8s resource and use it as helm hook
+ 
+1. Install Helm
+Helm is a package manager for Kubernetes that simplifies application deployment and management
+
+For Linux/macOS:
+curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee
+/usr/share/keyrings/helm.gpg > /dev/null
+sudo apt-get install apt-transport-https --yes
+echo "deb [arch=$(dpkg --print-architecture)
+signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/
+all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+sudo apt-get update
+sudo apt-get install helm
+
+Helm version
+
+2. Create a New Helm Chart
+-> To create a new Helm chart, run:
+
+$$ helm create my-chart
+
+This generates a folder structure with default files:
+● Chart.yaml: Chart metadata.
+● values.yaml: Default configuration values.
+● charts/: Folder for dependencies.
+● templates/: Kubernetes resource templates
+
+3. Customize the Chart's Metadata
+-> Edit the Chart.yaml file to include metadata for your chart:
+
+apiVersion: v2
+name: my-chart
+description: A Helm chart for Kubernetes resources
+version: 0.1.0
+appVersion: "1.0"
+
+
+6. Deploy the Application
+Package the Helm Chart
+To package the Helm chart, run:
+helm package ./flask-app-chart
+
+Testing
+1. Validate the Helm chart before applying:
+helm template flask-app ./simple-flask-helm
+
+2. Install the Helm chart:
+helm install flask-app ./simple-flask-helm
+
+3. Verify the Service and Pod labels match:
+kubectl get services
+kubectl get pods --show-labels
+
+mkdir HelmCharts
+helm create simple-flask-helm
+cd simple-flask-helm/
+helm install flask-app ./simple-flask-helm
+helm list
+helm uninstall flask-app
+helm upgrade myappdemo1 ./my-chart
+helm history myappdemo1
+helm lint ./my-chart
+helm show values ./my-chart
+helm status myappdemo1
+helm rollback myappdemo1 2
+helm plugin list
+
+
+HELM REPO:
+----------
+1. AWS CLI installed: 
+$$ aw configure
+
+2. Create S3 bucket:
+$$ aws s3 mb s3://your-helm-repo-bucket --region <your-region>
+
+3. Package Your Helm Charts:
+$$ cd ./your-helm-chart
+Package the chart into a .tgz file:
+helm package ./my-chart
+# Output: my-chart-1.0.0.tgz
+
+4. Create an index.yaml
+-- Use Helm to generate or update the index.yaml file:
+   $$ helm repo index . --url https://your-bucket-name.s3.amazonaws.com
+
+5. Upload Files to S3
+$$ aws s3 cp ./index.yaml s3://your-helm-repo-bucket/
+$$ aws s3 cp ./my-chart-1.0.0.tgz s3://your-helm-repo-bucket/
+
+6. Access the Helm Repository
+
+7. Add the Repository to Helm
+$$ helm repo add my-helm-repo https://your-bucket-name.s3.amazonaws.com
+$$ helm repo update
+
+8. Test the Repository
+-- Search for charts in your repository:
+$$ helm search repo my-helm-repo
+
+-- Install a chart from the repository:
+$$ helm install my-app my-helm-repo/my-chart
+
+9. Automate Updates
+a. Package the new chart:
+$$ helm package ./new-chart
+
+b. Update the index.yaml file:
+$$ helm repo index . --merge s3://your-helm-repo-bucket/index.yaml --url https://your-bucket-name.s3.amazonaws.com
+
+c. Upload the updated files to S3:
+$$ aws s3 sync ./ s3://your-helm-repo-bucket/
+
+

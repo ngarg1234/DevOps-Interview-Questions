@@ -1,0 +1,6 @@
+###
+
+terraform validate command checks whether the terraform code is syntactically correct or not
+
+
+>>> terraform validate 

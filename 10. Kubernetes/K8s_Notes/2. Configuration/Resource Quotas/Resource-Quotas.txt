@@ -1,0 +1,169 @@
+Resource quotas and limitaions:
+===============================
+-> When several users or teams share a cluster with a fixed number of nodes, there is a concern that one team could use more than its fair share of resources.
+
+->  Resource-Quotas are used to limit the total amount of resources that can be consumed by all the objects (like Pods, Services, etc.) within a particular namespace. 
+-> This helps administrators ensure that no single namespace consumes more resources than the cluster can handle and helps manage resource usage within the cluster.
+
+-> A Resource-Quota defines constraints on the amount of CPU, memory, number of Pods, and other resources that a namespace can use. It can be applied to various resource types, such as:
+1. CPU and memory requests and limits
+2. Number of Pods, Services, and Persistent Volume Claims (PVCs)
+3. Number of ConfigMaps, Secrets, etc.
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-resources-quota
+  namespace: my-namespace
+spec:
+  hard:
+    requests.cpu: "4"           # Limit the total CPU requested to 4 CPUs
+    requests.memory: "8Gi"      # Limit the total memory requested to 8Gi
+    limits.cpu: "8"             # Limit the total CPU limit to 8 CPUs
+    limits.memory: "16Gi"       # Limit the total memory limit to 16Gi
+    pods: "10"                  # Limit the total number of Pods in the namespace to 10
+    services: "5"               # Limit the total number of Services to 5
+    persistentvolumeclaims: "5" # Limit the total number of PersistentVolumeClaims to 5
+    configmaps: "10"            # Limit the total number of ConfigMaps to 10
+    secrets: "10"               # Limit the total number of Secrets to 10
+    deployments.apps: "10"
+
+
+** Enforcing Resource Quotas:
+-> Once a Resource-Quota is created, Kubernetes will enforce these limits in the specified namespace. 
+-> If any object (such as a Pod, Deployment, or Service) in that namespace exceeds the defined limits, the Kubernetes API server will reject the creation or modification of those objects.
+
+** Viewing ResourceQuota Usage:
+kubectl get resourcequota -n my-namespace
+
+output:
+NAME                      HARD            		USED
+compute-resources-quota    requests.cpu=4  		2
+                          requests.memory=8Gi  		4Gi
+                          limits.cpu=8     		4
+                          limits.memory=16Gi  		8Gi
+                          pods=10         		 5
+                          services=5      		 3
+                          persistentvolumeclaims=5 	 2
+                          configmaps=10    		 6
+                          secrets=10      	         8
+
+Q. Resource Types You Can Limit with Resource-Quota:
+-> Here’s a list of common resources you can limit using a ResourceQuota:
+
+1. CPU and Memory:
+requests.cpu: Total CPU requested across all Pods in the namespace.
+requests.memory: Total memory requested across all Pods in the namespace.
+limits.cpu: Total CPU limit across all Pods in the namespace.
+limits.memory: Total memory limit across all Pods in the namespace.
+
+2. Count Limits:
+pods: Number of Pods allowed in the namespace.
+services: Number of Services allowed in the namespace.
+secrets: Number of Secrets allowed in the namespace.
+configmaps: Number of ConfigMaps allowed in the namespace.
+persistentvolumeclaims: Number of PersistentVolumeClaims allowed in the namespace.
+replicationcontrollers: Number of ReplicationControllers allowed in the namespace.
+deployments: Number of Deployments allowed in the namespace.
+statefulsets: Number of StatefulSets allowed in the namespace.
+
+Resource Types You Can Limit with ResourceQuota:
+Here’s a list of common resources you can limit using a ResourceQuota:
+
+CPU and Memory:
+requests.cpu: Total CPU requested across all Pods in the namespace.
+requests.memory: Total memory requested across all Pods in the namespace.
+limits.cpu: Total CPU limit across all Pods in the namespace.
+limits.memory: Total memory limit across all Pods in the namespace.
+Count Limits:
+
+pods: Number of Pods allowed in the namespace.
+services: Number of Services allowed in the namespace.
+secrets: Number of Secrets allowed in the namespace.
+configmaps: Number of ConfigMaps allowed in the namespace.
+persistentvolumeclaims: Number of PersistentVolumeClaims allowed in the namespace.
+replicationcontrollers: Number of ReplicationControllers allowed in the namespace.
+deployments: Number of Deployments allowed in the namespace.
+statefulsets: Number of StatefulSets allowed in the namespace.
+
+
+Resource Limits:
+---------------
+-> Resource requirements: Three Node K8s cluster
+-> Each node has set of CPU and memory resources.
+1. Node01: 2CPU and 1Memory
+2. Node02
+3. Node03
+
+-> Scheduler check for sufficient resources and assign pods.
+-> If their is no sufficient resources available on any of nodes, scheduler will not assign pods to any nodes and would get an error saying; "pod is pending", under event we can see "Insufficient CPU"
+
+-> We can specify required amount of CPU and Memory like 1CPU and !Gi Memory.
+-> 1CPU: 0.1=100m
+   1 AWS vCPU
+   1 GCP Core
+   1 Azure Core
+   1 Hyperthread
+-> MEM: 1Gi
+   1G (Gigabyte), 1M(Megabyte), 1K(Kilobyte)
+   1Gi(Gibibyte), 1Mi(Mebibyte), 1Ki(Kibibyte)
+
+-> Set limit to resource usage for pods otherwise containers will go on using resources.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: myapp
+    type: front-end
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx
+      ports:
+        - containerPort: 80
+      resources:
+        requests:
+          memory: "1Gi"		# Minimum amount of memory requested
+          cpu: 1		# Minimum amount of CPU requested (500m = 0.5 CPU cores)
+        limits:
+          memory: "2Gi"		# Maximum amount of memory allowed
+          cpu: 2		# Maximum amount of CPU allowed (1 core)
+
+
+Q. What happens when resource limit exceeds by pod?
+-> A container cannot use more CPU resources than its limit. 
+-> But in case of memory, container can use more memory than its limit and pod will be terminated with "OOM error" in the logs. 
+OOM: OutOfMemory
+
+-> By default K8s does not have limits for CPU and Memory, so pod will go on consuming resources.
+-> Lets say two pods(Container) are competing in using resources, so without resource or limit set, one pod can consume all the CPU resources on the node and prevent second pod of required resources.
+
+Q. Scenario-2: We have request specified, but no limits specified.
+-> In this case K8s will automatically sets requests to same as limits.
+-> Lets say we have requested 1vCPU, so each pod limit will be set to 1vCPU.
+
+SETTING REQUESTS, BUT NO LIMITS:
+-> With requests, limits will be set. As limits are not set any pod can consume as many CPU cycles as available. 
+
+Behaviour - CPU:
+No Requests -> No Limits
+No Requests -> Limits
+Requests -> Limits
+Requests -> No limits
+
+** Lets say two pods are competing for memory resources, without request and limit set one pod can consume all the memory resources on the node and prevent other to prevent from having resources. this is not a ideal case. 
+-> Lets look at the case where we have no requests specified, but we have limits specified, K8s will automatically sets request to the same as limits. 
+-> Next one is where requests and limits are assumed to be three gigabytes, and each pod is guaranteed 3Gi, and no more as limits is also the same. So pod can reach the limit not more than that.
+-> Requests are set, so each pod is guaranteed 1Gi, however because limits are not set when available, any pod can consume as much memory as available.
+And if pod 2 request more memory to free up pod1, the only option is to kill pod1. Unlike CPU, we can not throttle memory. once memory is assigned to a pod, the only way to kind of retrieve is to kill the pod and free up all the memory. 
+
+-> By default K8s does not have resource request or limits configure for pods. So limit ranges can help you define default value to be set for containers in pods that are created without a requests or limit specified n the pod definition files. This applicable at "namespace level".
+
+-> To set limit for all pod together, we should set quotas for namespace level. We can hard limit for requests and limits.
+
+$$ kubectl get pod elephant -o yaml > elephant.yaml
+-> Update elephant.yaml with latest limit
+$$ kubectl replace -f elephant.yaml --force
+ 
+

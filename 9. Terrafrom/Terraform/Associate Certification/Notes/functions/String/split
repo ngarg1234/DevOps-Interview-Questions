@@ -1,0 +1,18 @@
+split produces a list by dividing a given string at all occurrences of a given separator.
+
+split(separator, string)
+
+> split(",", "foo,bar,baz")
+[
+  "foo",
+  "bar",
+  "baz",
+]
+> split(",", "foo")
+[
+  "foo",
+]
+> split(",", "")
+[
+  "",
+]

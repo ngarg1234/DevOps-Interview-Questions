@@ -1,0 +1,169 @@
+-> PowerShell is a powerful scripting language widely used in DevOps for automation, configuration management, and infrastructure as code (IaC).
+
+Key Areas to Focus On:
+1. PowerShell Basics
+Cmdlets (Get-Command, Get-Help, Get-Process)
+Variables and Data Types ($var, $myArray = @(1,2,3))
+Operators (-eq, -ne, -gt, -lt, -match)
+Loops (for, foreach, while, do-while)
+Conditional Statements (if-else, switch)
+
+2. PowerShell Scripting
+Writing and executing scripts (.ps1 files)
+Functions and Parameters (Function MyFunc { Param([string]$Name) })
+Error Handling (Try-Catch-Finally)
+Logging (Write-Output, Start-Transcript)
+Scheduled Tasks Automation
+
+3. System Administration
+Managing Services (Get-Service, Start-Service, Stop-Service)
+Managing Processes (Get-Process, Stop-Process)
+User and Group Management (Get-LocalUser, New-LocalUser)
+Registry Editing (Get-ItemProperty, Set-ItemProperty)
+
+4. File and Directory Management
+Creating, reading, writing, and deleting files (New-Item, Set-Content, Remove-Item)
+Copying and moving files (Copy-Item, Move-Item)
+Working with CSV, JSON, XML files
+
+5. PowerShell for Cloud Automation
+AWS CLI with PowerShell
+Installing AWS.Tools
+Managing EC2, S3, IAM (Get-EC2Instance, New-S3Bucket)
+Azure PowerShell
+Installing Az module
+Managing Virtual Machines, Storage, and Networking
+Google Cloud SDK with PowerShell
+
+6. PowerShell in CI/CD
+Using PowerShell in GitHub Actions and Azure DevOps
+Automating builds and deployments
+Managing infrastructure as code with Terraform and Ansible
+
+7. PowerShell Security
+Execution Policies (Get-ExecutionPolicy, Set-ExecutionPolicy)
+Credential Management (Get-Credential, ConvertTo-SecureString)
+Windows Defender and Security Logs
+
+8. Advanced PowerShell
+PowerShell Remoting (Enter-PSSession, Invoke-Command)
+Background Jobs (Start-Job, Get-Job)
+Working with APIs (Invoke-RestMethod, Invoke-WebRequest)
+Creating Custom Modules
+
+==========================================================
+1️⃣ PowerShell Basics
+✅ List all running processes
+$$ Get-Process | Select-Object ProcessName, Id, CPU
+
+✅ Get system information
+$$ Get-ComputerInfo | Select-Object OsName, OsArchitecture, CsModel, WindowsVersion
+
+✅ Loop through an array
+$services = @('wuauserv', 'bits', 'spooler')
+foreach ($service in $services) {
+    Get-Service -Name $service
+}
+
+
+
+2️⃣ PowerShell Scripting
+✅ Writing a function
+Function Get-CPUUsage {
+    Get-WmiObject win32_processor | Select-Object LoadPercentage
+}
+Get-CPUUsage
+
+
+✅ Try-Catch Error Handling
+Try {
+    Get-Process -Name "NonExistentProcess"
+} Catch {
+    Write-Host "Error: Process not found!" -ForegroundColor Red
+}
+
+
+3️⃣ System Administration
+✅ Check if a service is running, start if stopped
+$serviceName = "Spooler"
+$service = Get-Service -Name $serviceName
+If ($service.Status -ne "Running") {
+    Start-Service -Name $serviceName
+    Write-Host "$serviceName started."
+} Else {
+    Write-Host "$serviceName is already running."
+}
+
+✅ Create a new local user
+$$ New-LocalUser -Name "DevOpsUser" -Password (ConvertTo-SecureString "P@ssw0rd!" -AsPlainText -Force) -FullName "DevOps Engineer" -Description "User for automation tasks"
+
+
+4️⃣ File and Directory Management
+✅ Create a new directory and file
+New-Item -Path "C:\DevOpsLogs" -ItemType Directory
+New-Item -Path "C:\DevOpsLogs\log.txt" -ItemType File
+
+✅ Read and write to a file
+Set-Content -Path "C:\DevOpsLogs\log.txt" -Value "Hello, DevOps!"
+Get-Content -Path "C:\DevOpsLogs\log.txt"
+
+
+5️⃣ PowerShell for Cloud Automation
+✅ AWS CLI in PowerShell (List EC2 instances)
+Install-Module AWS.Tools.EC2 -Force
+Get-EC2Instance | Select-Object InstanceId, State
+
+✅ Azure PowerShell (Create a new VM)
+Connect-AzAccount
+New-AzVM -ResourceGroupName "DevOpsRG" -Name "DevOpsVM" -Location "EastUS" -Image "Win2022Datacenter"
+
+
+6️⃣ PowerShell in CI/CD
+✅ Run a PowerShell script in GitHub Actions
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Run PowerShell Script
+        run: |
+          Get-Process | Select-Object -First 5
+
+
+7️⃣ PowerShell Security
+✅ Set execution policy
+$$ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+✅ Securely store credentials
+$SecurePassword = Read-Host "Enter Password" -AsSecureString
+ConvertFrom-SecureString -SecureString $SecurePassword | Out-File "C:\securepass.txt"
+
+
+8️⃣ Advanced PowerShell
+✅ Remote execution on multiple servers
+$$ Invoke-Command -ComputerName "Server1", "Server2" -ScriptBlock { Get-Service }
+
+✅ Background job for long-running tasks
+Start-Job -ScriptBlock { Start-Sleep -Seconds 30; Write-Host "Job Done" }
+Get-Job | Receive-Job
+
+✅ Invoke a REST API
+Invoke-RestMethod -Uri "https://api.github.com/users/octocat" -Method GET
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

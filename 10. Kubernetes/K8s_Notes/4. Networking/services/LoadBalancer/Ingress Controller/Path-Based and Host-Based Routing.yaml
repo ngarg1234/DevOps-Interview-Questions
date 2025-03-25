@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: combined-routing
+  namespace: default
+spec:
+  rules:
+  - host: app1.example.com     # Host for app1
+    http:
+      paths:
+      - path: /api/*            # Path for API requests of app1
+        pathType: Prefix
+        backend:
+          service:
+            name: app1-api-service  # Service for API of app1
+            port:
+              number: 80
+      - path: /web/*            # Path for Web requests of app1
+        pathType: Prefix
+        backend:
+          service:
+            name: app1-web-service  # Service for Web of app1
+            port:
+              number: 80
+  - host: app2.example.com     # Host for app2
+    http:
+      paths:
+      - path: /                  # Path for app2 (root path)
+        pathType: Prefix
+        backend:
+          service:
+            name: app2-service    # Service for app2
+            port:
+              number: 80

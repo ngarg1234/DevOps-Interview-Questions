@@ -1,0 +1,30 @@
+a map can be defined as follows
+
+variable "exmaple_map" {
+    type = map
+    default = {
+        key1 =" item1"
+        key2 = "item2"
+        key3 = "item3"
+    }
+}
+
+
+accessing map elements
+
+resource "aws_instance" "demo" {
+    ami = "wedwda"
+    instance_type "t2.micro"
+    tags {
+        name = var.exmaple_map["key1"]
+    }
+}
+method 2
+
+resource "aws_s3_bucket" "example_buckets" {
+    count = length(keys(var.example_map))
+    bucket = element(keys(var.example_map), count.index)
+    tags = {
+      Name = lookup(var.example_map, element(keys(var.example_map), count.index))
+    }
+  }

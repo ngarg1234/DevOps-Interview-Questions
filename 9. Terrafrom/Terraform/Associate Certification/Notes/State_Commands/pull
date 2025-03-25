@@ -1,0 +1,5 @@
+==> terraform state pull
+
+terraform state pull command is used to manually download and output the statefile from the remote backend
+
+eg: terraform state pull

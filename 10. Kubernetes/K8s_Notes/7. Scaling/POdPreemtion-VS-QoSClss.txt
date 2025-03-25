@@ -1,0 +1,32 @@
+Pod Preemption vs QoS Classes
+
+-> Both Pod Preemption and QoS Classes are about deciding which pods to evict when there are not enough resources — but they are different mechanisms and serve different purposes in Kubernetes scheduling. 
+
+✅ What is common?
+-- Both are involved in evicting pods.
+-- Both help ensure high availability for important workloads.
+-- Both are related to resource shortage scenarios.
+
+🔑 Key Difference between Pod Preemption and QoS Class:
+
+1. Aspect: Pod Preemption
+-- When does it act? When a high-priority pod is waiting to be scheduled, but no resources are free.
+-- Who makes the decision? Scheduler: Looks for space for a high-priority pod and preempts (removes) lower-priority pods to make room.
+-- Based on? PriorityClass assigned to pods.
+-- Main goal? Prioritize important pods so they always get scheduled.
+
+2. Aspect: QoS Class
+-- When does it act? When a node is under resource pressure (like out of memory or CPU), and needs to evict running pods to free up space.
+-- Who makes the decision? Kubelet (Node agent): Manages running pods on the node and evicts low-QoS pods when node runs out of resources.
+-- Based on? Resource requests/limits in pod spec → QoS levels: Guaranteed, Burstable, BestEffort.
+-- Main goal? Handle node resource pressure by removing less critical pods.
+
+
+🎯 Simple analogy to remember:
+Pod Preemption:
+➡️ "A VIP (high-priority pod) arrives at a full hotel (cluster), so some regular guests (low-priority pods) are asked to leave to make space."
+➡️ Scheduler does this.
+
+QoS Class:
+➡️ "The hotel (node) is overloaded and can't serve everyone, so the guests with no reservation (BestEffort) are asked to leave first."
+➡️ Kubelet on the node does this.

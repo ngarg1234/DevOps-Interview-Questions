@@ -1,0 +1,8 @@
+keys takes a map and returns a list containing the keys from that map.
+
+> keys({a=1, c=2, d=3})
+[
+  "a",
+  "c",
+  "d",
+]

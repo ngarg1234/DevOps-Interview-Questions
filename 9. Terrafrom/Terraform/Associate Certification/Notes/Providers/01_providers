@@ -1,0 +1,89 @@
+providers block in a terraform code helps to download the required provider plugin 
+
+example 
+
+        provider aws {
+            region ="us-east-2"
+        }
+
+        provider azurerm{}
+
+
+you can have multiple providers in same terraform configuration
+
+provider plugin will be downloaded to .terraform folder 
+
+IMP: for terraform to download provider plugin, you should run 'terraform init' command 
+
+
+--------------  Provider Maintainers 
+
+    There are mainly 3 types of provider maintainers 
+
+    Official  ->    Owned and Maintained by Hashicorp
+
+    Partner   ->    Owned and maintained by technology company that maintaines direct partnership with hashicorp
+                    eg: Alibaba Cloud, Oracle cloud etc..
+
+    Community ->    Owned and maintained by individual contributers
+
+
+
+--->    Provider namespace 
+
+        official -> hashicorp
+
+                    Any official provider, that has been release by hashicorp will have the namespace - hashicorp
+
+                    example:
+                            hashicorp/aws
+                            hashicorp/azurerm
+        partner ->  third party organization
+                    eg: mongodb/mongodbatlas
+                        oracle/oci
+
+        Community -> Individul contributers
+                        Devia/gsuite
+
+        
+----->>>
+
+    Terraform requires explict source information for any provider that are not officially maintained by terraform
+
+    it can be done using a required_provider nested block inside a terraform configuration block
+
+    Syntax:
+        terraform{
+            required_providers{
+                digitalocean = {
+                    source = "digitalocean/digitalocean"
+                }
+            }
+        }
+        provider "digitalocean"{
+            token = "sffsfs"
+        }
+
+NOTE: Hashicorp maintainer providers can also be declared inside required_provoder block
+
+example
+
+terraform{
+    required_providers{
+        aws ={
+            source = "hashicorp/aws"
+            version = "~> 4.0"
+        }
+    }
+}
+provider "aws"{}
+
+
+
+It is not mandatory to use required_provider block for Hashicorp mainatained providers, however you can use it if you need to customize things
+
+provider "aws"{
+    region = "us-east-1
+}
+
+provider azurerm{}

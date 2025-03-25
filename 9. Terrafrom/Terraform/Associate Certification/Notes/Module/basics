@@ -1,0 +1,15 @@
+
+how to refer to a module?
+
+    module "example_module" {
+        source = ../modules/ec2 #(this is just an example of how to provide the path to module. basically you have to provide the path to module)
+        instance_type = t2.micro ## you can pass variable values if it is defined inside the module
+    }
+
+
+IMP:
+#using one module output in another module 
+
+
+
+

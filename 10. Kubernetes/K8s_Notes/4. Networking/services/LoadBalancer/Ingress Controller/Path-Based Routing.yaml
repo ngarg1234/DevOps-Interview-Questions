@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: path-based-routing
+  namespace: default
+spec:
+  rules:
+  - host: myapp.example.com  # The domain to route traffic to
+    http:
+      paths:
+      - path: /app1             # Path for app1
+        pathType: Prefix        # All paths starting with /app1
+        backend:
+          service:
+            name: app1-service  # Service for app1
+            port:
+              number: 80
+      - path: /app2             # Path for app2
+        pathType: Prefix        # All paths starting with /app2
+        backend:
+          service:
+            name: app2-service  # Service for app2
+            port:
+              number: 80
+
+# Path-based routing routes traffic to different services based on the URL path. For example, if a request is made to /app1, it would be routed to app1-service, and if the request is made to /app2, it would be routed to app2-service.

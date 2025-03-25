@@ -1,0 +1,19 @@
+digraph {
+	compound = "true"
+	newrank = "true"
+	subgraph "root" {
+		"[root] aws_instance.map_test_instance (expand)" [label = "aws_instance.map_test_instance", shape = "box"]
+		"[root] aws_instance.test_instance (expand)" [label = "aws_instance.test_instance", shape = "box"]
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"]" [label = "provider[\"registry.terraform.io/hashicorp/aws\"]", shape = "diamond"]
+		"[root] var.instance_type" [label = "var.instance_type", shape = "note"]
+		"[root] var.map_of_instance_type" [label = "var.map_of_instance_type", shape = "note"]
+		"[root] aws_instance.map_test_instance (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
+		"[root] aws_instance.map_test_instance (expand)" -> "[root] var.map_of_instance_type"
+		"[root] aws_instance.test_instance (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
+		"[root] aws_instance.test_instance (expand)" -> "[root] var.instance_type"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] aws_instance.map_test_instance (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] aws_instance.test_instance (expand)"
+		"[root] root" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)"
+	}
+}
+

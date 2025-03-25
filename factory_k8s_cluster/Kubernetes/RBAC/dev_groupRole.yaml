@@ -1,0 +1,30 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: dev_group_role
+  # "namespace" omitted since ClusterRoles are not namespaced
+rules:
+  - apiGroups: [""] #indicates the core API group 
+    resources: ["nodes", "pods"]
+    verbs: ["get", "list"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "daemonsets", "statefulsets", "replicasets"]
+    verbs: ["get", "list", "create"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dev_group_binding
+subjects:  # You can specify more than one "subject"
+  - kind: Group ## kind can be user or group
+    name: developers  ##This name must be used for binding IAM ROle with aws-auth configmap
+    apiGroup: rbac.authorization.k8s.io   ## NOTE - this is apiGroup not apiGroups
+roleRef:
+  kind: ClusterRole
+  name: dev_group_role
+  apiGroup: rbac.authorization.k8s.io  ## NOTE - this is apiGroup not apiGroups

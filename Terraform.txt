@@ -1,0 +1,365 @@
+Terraform:
+
+Provider: Terraform relies on plugins called providers to interact with cloud providers, SaaS providers, and other APIs.
+
+Terraform configurations must declare which providers they require so that Terraform can install and use them.
+
+Terraform Init will download plugins associated with Provider.,
+
+Terraform Target flag allows us to destroy specific resources..
+
+> terraform destroy -target aws_instance.myec2
+
+resource "aws_instance" "myec2" 
+
+aws_instance --> Resource type
+my_ec2 --> local resource name
+
+Terraform State Files : terraform stores the state of the Infrastructure, that is being created from the TF File.
+
+This state allows terraform to map real world resource to your existing configuration..
+
+Current State is the actual state of a resource that is already deployed..
+
+terraform tries to ensure that deployed infrastructure is based on the desired state/ match the resources as in desired state..
+
+If there is a difference in the two, terraform plan presents a description of the changes necessary to achieve the desired state..  
+
+Best Practice --
+
+During Terraform init, if version argument is not specified, the most recent provider will be downloaded during initialization..
+
+For Production use, you should constrain the acceptable provider versions via configurations, 
+to ensure that new versions with breaking chnages will not be automatically installed.
+
+When you create contsraints, it creates terraform lock file..then tf looks at this lock file for constraints..
+
+you need to delte this file, if contstarinst you wnat to chnage, otherise it will keep looking at this lock file....
+
+One way you can avoid this by adding .. > terraform init --upgrade 
+
+it will rechevk tj constraints and update the lock file..
+
+Outputs: Output the resource attributes,,  output ( which we used to see in Console) in Command Prompt..
+
+terraform variable :: either from files (best practices in production.. .tfvars ( providing variable.tf values) ,,
+and have default values as well ) , from variables or from env variables
+
+env variables syntax from cp: setx varibale_name value
+
+Use Data Types define.. in variables.tf ( defines variables) with default values..
+
+Data Types:
+
+1. String - "hello naman"
+2. List - ["mumbai","singapore"]
+3. Map - {name = "Mabel", age = 52}
+4. Number - 200
+
+Count Parameter : Simplify Configurationd and let you scale resources..
+
+Challenges related to it will same resource name..Later it will be very Difficult to Identify :( .. Solution Below:: :) :)
+
+count.index -- In resource Block, where count is set, an additional count object is available in expressions, 
+so you can modify the configurations of each Instance.
+
+:):)
+
+You can use List data type plus count.index to give more sensable names ( var.list[count.index] , list = [dev,qa,pprod,prd] )
+
+Conditional Expression : 1(fortestingpurpose)?2(dev server):3(production server)
+
+Local Values : assign a name to an expression, allowing it to be used multiple times within a module without repeating it., 
+
+terraform Functions : built in functions to transfer and combine values
+max()
+min()
+lookup()
+
+Data Source : https://www.bitslovers.com/terraform-data/
+
+terraform manages data sources to retrieve information from cloud provider APIs, such as availability zone IDs or data about the peace of your infrastructure through the outputs(mind it) of different Terraform states..
+
+Terraform When to use Data
+The best use case for Data Source is when we are hardcoded information that could change and decrease the maintainability of our code.
+
+Debugging Terraform :
+
+Terraform has detailed logs which can be enabled by setting the TF_LOG environment variable to any value : TRACE(default and most verbose), 
+DEBUG, INFO, WARN, ERROR to change the verbosity of the logs.
+
+> export TF_LOG=TRACE
+
+> export TF_LOG_PATH=/tmp/terraform_carsh.log -- storing path
+
+terraform fmt command - format the code for readibilty.. then do terraform plan or whatever..
+
+Terraform Validate -- this is a Comm -- chck the syntatically valid configuration or not..
+
+Dynamic Blocks are needed in case of Security Block.. Dynamic Block allows us to dynamically construct repeatable 
+nested blocks which is supported inside resource
+,data,
+
+Statement - Dynamic blocks can be used when defining modules to create repeatable nested blocks in an efficient manner. 
+
+
+Combined with conditional logic, this forms a very powerful set of tools for the more advanced Terraform user!
+provider and proviosioner block
+
+dynamic "ingress" {
+
+for_each = var.sg_ports
+iterator  = port
+content {
+
+}
+
+}
+
+Tainted Resources :
+
+Scenario : Users made a lot of changes manually ones in infra as well as inside server..
+
+Two ways to deal with this .. 1) terraform important
+2) Delete and Recreate the resource..
+
+Terraform taint command manually marks a terraform-managed resource as tainted, forcing it to be destroyed and recreated on next apply..
+
+https://buildvirtual.net/how-to-use-terraform-taint-and-untaint/
+
+> terraform taint aws_instance.myec2
+
+taint command modifies the state file not the infra..  
+
+Splat -- *
+
+lb[*] --> fetch all the attribites list..
+
+Terraform Graph -- garphical representation of configurstion plan.. / resources to be created
+
+> terraform graph > graph.dot
+
+Visualize it via GraphViz
+
+convert this .dot to .svg
+
+cat graph.dot | dot -Tsvg > graph.svg and see it in G.Chrome/
+
+Terraform Plan can be saved to a file.. > terraform plan --out=/mydemotoclient_11thNovember
+
+and trhen use this file while applying > terraform apply mydemotoclient_11thNovember
+
+> terraform output is used to extarct the value of an output variable from state files
+> terraform output iam_names
+
+To limit api calls to aws .. use > terraform plan --refresh=false
+
+autoapprove .. < -auto-approve
+
+List are Ordered, Chnagebale nd allow duplicate values
+
+SET - same as List -- {"apple","mangoe"}
+but unordered and no duplicate allowed..
+
+toSetFunction
+
+SET used in for_each .. 
+
+Count is used where resources are almost identical, if distince values are needed in the argument, usage of for_each is recommended..
+https://jeffbrown.tech/terraform-count-foreach/#:~:text=You%20cannot%20use%20count%20and%20for_each%20at%20the,arguments.%20When%20instances%20are%20almost%20identical%2C%20use%20count.
+Here are a couple of things to keep in mind when working with Terraform count and for each:
+
+You cannot use count and for_each at the same time in the same module or resource block.
+When using for_each, the keys of the map must be known values, and sensitive values are not allowed as arguments.
+When instances are almost identical, use count.
+If some arguments required distinct values that cannot be derived from the count integer, use for_each instead. Example:
+
+......................................................
+
+Sure! Here's an example to demonstrate the last point where `for_each` is preferred over `count` due to needing distinct values for some arguments.
+
+### Scenario:
+You want to create AWS security groups for different environments (e.g., dev, staging, prod). Each environment has distinct settings, and you need to pass specific tags to each security group that are unique for each environment.
+
+### Using `for_each`:
+Here’s an example where we use `for_each` to create distinct security groups with unique tags for each environment.
+
+```hcl
+variable "environments" {
+  type = map(object({
+    description = string
+    vpc_id      = string
+  }))
+  default = {
+    dev = {
+      description = "Development Environment"
+      vpc_id      = "vpc-12345678"
+    },
+    staging = {
+      description = "Staging Environment"
+      vpc_id      = "vpc-87654321"
+    },
+    prod = {
+      description = "Production Environment"
+      vpc_id      = "vpc-11223344"
+    }
+  }
+}
+
+resource "aws_security_group" "sg" {
+  for_each = var.environments
+
+  name        = "sg-${each.key}"
+  description = each.value.description
+  vpc_id      = each.value.vpc_id
+
+  tags = {
+    Environment = each.key
+  }
+}
+```
+
+...................................................................................
+
+### Explanation:
+
+- **`for_each`**: We're iterating over a map of environments (`dev`, `staging`, `prod`).
+- **Distinct Values**: Each security group needs a distinct description and VPC ID, which differ for each environment. These values are passed through `each.value.description` and `each.value.vpc_id`.
+- **Security Groups**: The security group name is dynamic and based on the environment key (`each.key`), ensuring the name is unique.
+- **Tags**: The `Environment` tag is also dynamically set based on the environment key.
+
+### Why `for_each` is used here:
+- If you were to use `count`, all security groups would end up with the same configuration, since `count` only gives you an index (e.g., 0, 1, 2). You wouldn't be able to pass distinct tags and descriptions without extra logic.
+  
+This is a perfect scenario for `for_each` as it allows you to handle unique arguments for each resource instance based on a map.
+
+
+Terraform Provisioners:
+
+Proviosners are used to execute script son local and remote machine as part of rresioruce craetion/destrcution preocess...
+
+types : local exec or remote exec
+
+local exec : allow us to invoke local executable after resource is created.. 
+(used to get the ip details of the reasources created and you can exho it to your local machine)
+
+Remote exec : allow to invoke scripts directly on remote server..  
+
+Local exec- used to run ansible playbooks on the created server after the resource is created..
+ executed in the same machine from where the terraform is invoked from ( same machine)
+
+provisioner "local-exec" {
+
+}
+
+Types of Privisioners --> Creation-Time Provisioners(only run during creation,if it fails, it will be mark as tainted and
+
+Destroy-Time Provisioners --> run before the resource is destroyed ) --> we need to add like
+ when = destroy while defualt creation is there where priviosner keyworkd is wused..
+
+on_failure --> continue--> ignore the error and continue with creating or destruction , fail--> Raise an error and stop applyling..
+
+https://k21academy.com/terraform-iac/terraform-provisioner
+s/#:~:text=Terraform%20Provisioners%20are%20used%20for%20executing%20scripts%20or,Why%20provisioners%20are%20used%20as%20a%20last%20resort%3F
+
+Null Resource : used not muched, but in hacky situtations.. https://www.bitslovers.com/terraform-null-resource/
+
+null resource does not corresponds to a real physical resource, used to execute any script or any task when certain condition is met ( using triggers ), e
+x. deploy configMap when cluster provisioning done succesfully.
+
+terraform module -- create odule for each resource and source it in your files..
+
+What does a module do?
+
+A Terraform module allows you to create logical abstraction on the top of some resource set. 
+In other words, a module allows you to group resources together and reuse this group later, possibly many times. 
+
+Rwgistry in Terraform::
+
+terraform Registry is a repository of modules written by terraform community..
+
+Terraform Workspace allows us to have multiple workspaces, with each of the workspace can have different set of environment variables associated..
+
+> terraform workspace show/list/select/new/delete/..
+
+Terraform stores tf state file in difeerent workspace..
+https://medium.com/devops-mojo/terraform-workspaces-overview-what-is-terraform-workspace-introduction-getting-started-519848392724
+
+Password which you think is not pushing to giyt, it is actually in tf state.. i need to stored somewhere else in git..
+
+.gitignore - which all files should be ignored .. 
+.terraform,terraform.tfvars ( as it may contain some sensitive information ) ,terraform.tfstate( should be stored in remote mode )
+
+crash.log ( If terraform crashes, the logs are stored in a filed named crash.log )
+
+Team Collaboration - use ths keyword.. importance of centaral backend/s3..
+
+State Locking
+
+https://medium.com/clarusway/how-to-use-s3-backend-with-a-locking-feature-in-terraform-to-collaborate-more-efficiently-fa0ea70cf359
+
+When you do write operation, terraform would lock the state file..
+
+This is very import as otherwiese during your ongoing terraform apply operations, if others try for the same, it can corrupt your state files..
+
+How terrform knows an operations is performaing using rerraform.tfstate.lock.inform.. This file will be removed once opearyions is compoleted.
+
+>force-unlock
+
+Sometimes, unlocking does not succeded, and it fails even if opertaion is completed....
+ you need to unlock manual with above command ( if terfaorm is failing to do so )
+
+State Locking in S3, S3 does not support state locking functionality by D, 
+You need to ake use of DynamoDB Table to achieve state locking functionality..
+
+tf state stores in s3, lock file in DyanmoDB..
+
+Terraform State Management : list, mv,pull,push,rm,show..
+
+> terraform state list
+
+> terraform import( deoes not create config file like .tf and all only yf. stae file it im portys) ..
+creating tf files similar to configuration youj did manually..
+
+Terraform Profiles:
+
+Single Provider multiple Configuration - Multiple Regions
+
+1. One account different Regions -- Use alias with provider, provider 1 , provider 2 .. alias = mumbai.... and in resource.. 
+use provider=aws.mumbai in second resource use provider=aws.la
+
+https://stackoverflow.com/questions/48632797/using-terraform-to-manage-multiple-aws-regions
+
+https://towardsaws.com/multi-region-deployment-in-aws-with-terraform-35763efacff
+
+2. Multiple Account / users -- in provider , give Profile name.. profile = "account1/account2/dev/qa/pprd/prd" 
+
+You can assume_role .. in provider..
+
+Security:: in the output block ..
+
+sensitivity=true
+
+It will not show the output in cli output or on cloud tf state.. but it will not encrypt the password..
+
+Hashicorp Vault:: 
+
+Vault Provider allows terraform to read from; write to ; and configure HashiCorp Valult..
+
+provider "vault" {
+  address = "http://127.0.0.1:8200"
+}
+
+data "vault_generic_secret" "demo" {
+ path = "secret/db-creds"
+}
+
+output "vault_secrets" {
+ value = data.vault_generic_secret.demo.mydata
+ sensitive = "true"
+}
+
+Interacting with Valult from Terraform causes any secrets that you read and write to be persisted in both Terraform's state file..
+
+https://medium.com/@mitesh_shamra/terraform-security-using-vault-ed0fa1db4e09
+

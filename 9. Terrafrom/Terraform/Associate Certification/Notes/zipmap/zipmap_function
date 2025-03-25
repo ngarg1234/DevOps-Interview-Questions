@@ -1,0 +1,22 @@
+
+
+# variable "list1"{
+#     type = list
+#     default = ["a","b","c"]
+# }
+
+# variable "list2"{
+#     type = list
+#     default = ["aa","bb","cc"]
+# }
+
+# output "combined"{
+#     value = zipmap(var.list1, var.list2)
+# }
+
+# Changes to Outputs:
+#   + combined = {
+#       + a = "aa"
+#       + b = "bb"
+#       + c = "cc"
+#     }

@@ -1,0 +1,132 @@
+
+
+
+issues faced during terraform upgrade, once statefile is upgraded we cannot run older versions 
+
+
+
+
+
+
+providers should also compatibile 
+
+
+
+First thing  we put a condition in jenkins pipeline to swicth between terraform version. we have 80+ configs and whichever 
+got upgraded, we marks the new version on a file and groovy script switches the terraform version using tfenv
+
+Terraform v0.11.14 introduced a temporary helper command terraform 0.12checklist, which analyzes your configuration to 
+detect any required steps that will be easier to perform before upgrading.
+
+Change the terraform version to 0.12 in code 
+
+Once terraform apply shows no changes pending(version 0.11), switch over to a Terraform v0.12 release and run terraform 
+init again to upgrade the working directory metadata to v0.12 format
+
+
+
+
+Terraform v0.12 includes a new command terraform 0.12upgrade that will read the configuration files for a module written for 
+Terraform 0.11 and update them in-place to use the cleaner Terraform 0.12 syntax and also adjust for use of features that have 
+changed behavior in the 0.12 Terraform language.
+
+run terraform plan to see the effect of those changes.
+
+In most cases, terraform plan should report that no changes are required, because the updated configuration is equivalent to before.
+
+
+we do the upgrade 
+
+push the code 
+
+
+
+you have to upgrade the dependent modules too 
+
+
+From Terraform v0.12, the Terraform language no longer distinguishes between integer and float types, instead just having a single "number" type that can represent high-precision floating point numbers
+
+# Example for older versions of Terraform; not valid for v0.12
+  example = ["${var.any_list}"]
+
+
+  example = var.any_list
+
+
+In order to take backup of all the statefiles, we created a new s3 bucket and pointed remote backed to choose the new 
+s3 bucket so that the upgraded statefiles will be stored there. and older code will still point to the older s3 bucket. 
+we have done this coz there are scenarios such as once terraform statefileis upgraded,, you can’t run the previous version 
+code in that workspace,(as part of release processs we used to run previos version code) so in this case your older code is 
+still reffering to the older s3 bucket which contain previos versionb statefile. 
+
+We copied all the statefiles from older s3 to new s3 
+
+
+
+
+====>>>    error in running init command after terraform upgrade 
+
+
+Error: Failed to decode current backend config
+
+The backend configuration created by the most recent run of "terraform init"
+could not be decoded: unsupported attribute "lock_table". The configuration
+may have been initialized by an earlier version that used an incompatible
+configuration structure. Run "terraform init -reconfigure" to force
+re-initialization of the backend.
+
+ubuntu@ip-172-31-27-248:~/shyam/ec2$ terraform init -reconfigure
+
+
+
+ubuntu@ip-172-31-27-248:~/shyam/ec2$ terraform init
+
+Initializing the backend...
+Error refreshing state: state snapshot was created by Terraform v0.14.0, which is newer than current v0.13.0; upgrade to Terraform v0.14.0 or greater to work with this state
+
+
+
+formatlist produces a list of strings by formatting a number of other values according to a specification string.
+
+
+> formatlist("Hello, %s!", ["Valentina", "Ander", "Olivia", "Sam"])
+[
+  "Hello, Valentina!",
+  "Hello, Ander!",
+  "Hello, Olivia!",
+  "Hello, Sam!",
+]
+> formatlist("%s, %s!", "Salutations", ["Valentina", "Ander", "Olivia", "Sam"])
+[
+  "Salutations, Valentina!",
+  "Salutations, Ander!",
+  "Salutations, Olivia!",
+  "Salutations, Sam!",
+
+]
+
+
+
+
+join produces a string by concatenating all of the elements of the specified list of strings with the specified separator
+
+> join("-", ["foo", "bar", "baz"])
+"foo-bar-baz"
+> join(", ", ["foo", "bar", "baz"])
+foo, bar, baz
+> join(", ", ["foo"])
+foo
+
+
+
+replace searches a given string for another given substring, and replaces each occurrence with a given replacement string.
+replace(string, substring, replacement)
+
+
+
+
+
+
+
+
+

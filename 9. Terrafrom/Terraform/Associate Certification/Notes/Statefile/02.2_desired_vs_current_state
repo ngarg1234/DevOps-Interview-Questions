@@ -1,0 +1,24 @@
+Desired state and current state
+
+Desired state = the state present in the terraform configuration(ie nothing but whatever configuration present in the terraform code )
+
+current state = the state of infrastructure present on the cloud(or corresponging provider)
+
+
+
+IMP NOTE: terraform always try to match the desired state with current state but, it only matches whatever written inside the code
+
+    ie: suppose you create an ec2 instance using terraform and you didn't specify the SG, the ec2 instance will get associated to deafult SG,
+
+            later if you change the deafult SG to a custom SG manually on the console, and if do a terraform refresh, you can see that the statefile
+            will change to new custom SG name, beacase terraform always try to match desired state with curernt state. and in your code SG is not specified
+
+                example:
+
+                resource "aws_instance" "example" {
+                ami           = "ami-0c55b159cbfafe1f0"  # Replace with your desired AMI ID
+                instance_type = "t2.micro"
+                key_name      = "my-keypair"  # Replace with the name of your existing EC2 key pair
+                }
+             
+        

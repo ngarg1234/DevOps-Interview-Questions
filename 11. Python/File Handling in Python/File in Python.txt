@@ -1,0 +1,47 @@
+-> File handling refers to the process of performing operations on a file such as creating, opening, reading, writing and closing it, through a programming interface. It involves managing the data flow between the program and the file system on the storage device, ensuring that data is handled safely and efficiently.
+
+Opening a File in Python:
+-------------------------
+-> To open a file we can use open() function, which requires file path and mode as arguments:
+# Open the file and read its contents
+with open('geeks.txt', 'r') as file:
+
+
+File Modes in Python:
+---------------------
+-> When opening a file, we must specify the mode we want to which specifies what we want to do with the file. Here’s a table of the different modes available:
+
+r: Read-only mode: Opens the file for reading.
+rb: Read-only in binary mode: Opens the file for reading binary data.
+r+: Read and Write: Opens the file for both reading and writing.
+w: Write mode: Opens the file for writing. Creates a new file or truncates the existing file.
+wb: Write in binary mode: Opens the file for writing binary data. Creates a new file or truncates the existing file.
+w+: Write and read mode: Opens the file for both writing and reading. Creates a new file or truncates the existing file.
+wb+: Write and read in binary mode: Opens the file for both writing and reading binary data. Creates a new file or truncates the existing file.
+a: Append mode: Opens the file for appending data. Creates a new file if it doesn’t exist.
+a+
+ab+
+x
+xb
+x+
+xb+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,108 @@
+
+location in which provider plugins are downloaded to 
+    .terraform/provider
+
+2, VCS supported by Terraform cloud 
+
+        github enterprise
+        github.com
+        bitbucket
+        azure repo
+
+3, Terraform is immutable and declarative 
+
+4, how many resources can terraform creates concorrecntly
+
+            10, 
+    this setting can be chnaged by adding the configuration block
+
+        terraform {
+            parallelism = 20
+        }
+
+    above seeting will allow 20 parallel executions 
+
+5, have a look at how to use multiple providers
+        using alias
+
+        provider=aws.prod
+
+6, Where does terraform store local statefile for workspaces
+
+        terraform.tfstate.d/<workspace_name>
+
+
+7, how to set environment variable for passing value to a terraform variable
+
+    environment variable must be in the format TF_VAR_<variable_name>
+
+    eg 
+        varibale "demo" {
+        type = string
+        }
+    export TF_VAR_demo="somevalue"
+    terraform apply 
+
+8, what are the block types in terraform?
+
+        resource, data, provider, terraform and output
+
+9, platform in which terraform available
+
+        ubuntu. macos, windows, solaris, freebsd
+
+10, what are the commands to download a module
+
+        terraform init and terraform get 
+
+11, configuration for provider specification 
+
+        required_providers (IMP: not - required_provider)
+
+12, use of Terraform show command 
+
+13, locals vs local 
+
+14, why to specify module version ?
+
+16, learn about sentinal and cost estimation in tf cloud 
+
+17, most verbose = TRACE
+
+18, below action will be blocked when statefile is locked
+
+        terraform destroy
+
+19, below action will not be blocked when statefile is locked
+
+        
+20, specifying backend config file
+
+        terraform init -backend-config=config.remote.tfbackend
+
+21, what is a backend config file
+
+    # config.remote.tfbackend
+workspaces { name = "workspace" }
+hostname     = "app.terraform.io"
+organization = "company"
+
+
+22,
+
+following are the key principle of infrastructure as code?
+A. Versioned infrastructure
+C. Idempotence
+D. Self-describing infrastructure
+
+
+23,
+
+terraform fmt -check -recursive
+
+                
+24, lookup and elements functions 
+
+25, variable precedence
+
+https://developer.hashicorp.com/terraform/language/values/variables#:~:text=Variable%20Definition%20Precedence 

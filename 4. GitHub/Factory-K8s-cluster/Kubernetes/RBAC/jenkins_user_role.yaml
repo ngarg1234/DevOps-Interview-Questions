@@ -1,0 +1,85 @@
+## Yaml file for creating a Role and binding it with a USer
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role 
+metadata:
+  name: jenkins-user-role
+  namespace: jenkins-test
+rules:
+  - apiGroups:
+      - ""
+      - extensions
+      - apps 
+    resources:
+      - deployments
+      - replicasets
+      - pods
+    verbs:
+      - create
+      - get 
+      - list 
+      - update
+      - delete 
+      - watch
+      - patch
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding 
+metadata: 
+  name: jenkins_role_binding
+  namespace: jenkins-test
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: eks_developer_role
+subjects:  # You can specify more than one "subject"
+  - kind: User
+    name: jenkins_user
+    apiGroup: rbac.authorization.k8s.io
+
+
+
+
+
+# To grant permissions across a whole cluster, you can use a ClusterRoleBinding. The following ClusterRoleBinding allows any user in the group "manager" to read secrets in any namespace.
+
+# apiVersion: rbac.authorization.k8s.io/v1
+# # This cluster role binding allows anyone in the "manager" group to read secrets in any namespace.
+# kind: ClusterRoleBinding
+# metadata:
+#   name: read-secrets-global
+# subjects:
+# - kind: Group
+#   name: manager # Name is case sensitive
+#   apiGroup: rbac.authorization.k8s.io
+# roleRef:
+#   kind: ClusterRole
+#   name: secret-reader
+#   apiGroup: rbac.authorization.k8s.io
+
+
+# For a user named alice@example.com:
+
+# subjects:
+# - kind: User
+#   name: "alice@example.com"
+#   apiGroup: rbac.authorization.k8s.io
+# For a group named frontend-admins:
+
+# subjects:
+# - kind: Group
+#   name: "frontend-admins"
+#   apiGroup: rbac.authorization.k8s.io
+# For the default service account in the "kube-system" namespace:
+
+# subjects:
+# - kind: ServiceAccount
+#   name: default
+#   namespace: kube-system
+
+# After you create a binding, you cannot change the Role or ClusterRole that it refers to. If you try to change a binding's roleRef, you get a validation error. If you do want to change the roleRef for a binding, you need to remove the binding object and create a replacement.
+
+# There are two reasons for this restriction:
+
+# Making roleRef immutable allows granting someone update permission on an existing binding object, so that they can manage the list of subjects, without being able to change the role that is granted to those subjects.
+# A binding to a different role is a fundamentally different binding. Requiring a binding to be deleted/recreated in order to change the roleRef ensures the full list of subjects in the binding is intended to be granted the new role (as opposed to enabling or accidentally modifying only the roleRef without verifying all of the existing subjects should be given the new role's permissions).

@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto17
+    commands:
+      - sudo apt-get update
+      - sudo apt-get install -y maven
+
+  pre_build:
+    commands:
+      - project_code
+      - pwd
+      - mvn clean
+
+  build:
+    commands:
+      - cd project_code
+      - mvn install
+
+artifacts:
+  files: project_code/target/*.war

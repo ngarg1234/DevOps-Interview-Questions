@@ -1,0 +1,32 @@
+➡️ Before you dream of Kubernetes auto pilot, you should have this covered:
+
+🔣 CI/CD pipelines? Done
+🔣 Per app IAM roles? Done
+🔣 Pod security policies? Done
+🔣 Load balancing rules? Done
+🔣 Secrets management? Done
+🔣 Cluster health checks? Done
+🔣 CRDs for extensibility? Done
+🔣 Disaster recovery plans? Done
+🔣 High availability setups? Done
+🔣 Role-based access control? Done
+🔣 Multi-tenancy architectures? Done
+🔣 Proactive capacity planning? Done
+🔣 Persistent storage solutions? Done
+🔣 Cost management strategies? Done
+🔣 Service mesh implementation? Done
+🔣 Network wide service discovery? Done
+🔣 Apps Dependency management? Done
+🔣 Container vulnerability scanning? Done
+🔣 Per app network security policies? Done
+🔣 Resource monitoring and logging? Done
+🔣 Zero downtime Update strategies? Done
+🔣 Machine pool isolation for services? Done
+🔣 Compliance and governance checks? Done
+🔣 Pod communication network policies? Done
+🔣 Deployment versioning and rollbacks? Done
+🔣 Fleet-wide config updates in real-time? Done
+🔣 Path-based HTTP routing within cluster? Done
+🔣 Efficient resources labeling and tagging? Done
+🔣 Economical deployment on spot instances? Done
+🔣 Auto-scaling based on performance metrics? Done

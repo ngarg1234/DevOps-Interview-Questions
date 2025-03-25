@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: myapp
+    type: front-end
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx
+      ports:
+        - containerPort: 80
+
+# To create pod: kubectl run nginx --image=nginx 
+# To list pods: kubectl get pods
+# To describe pod/check containers: kubectl describe pod webapp
+# To delete pod: kubectl delete pod  webapp
+# To create kubectl run redis --image=redis123 --dry-run=client -o yaml > redis-definition.yaml
+

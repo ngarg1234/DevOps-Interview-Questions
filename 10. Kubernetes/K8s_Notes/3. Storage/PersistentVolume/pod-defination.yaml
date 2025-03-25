@@ -1,0 +1,30 @@
+
+# Once you create a PVC use it in a POD definition file by specifying the PVC Claim name under persistentVolumeClaim section in the volumes section like this:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  namespace: production
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - mountPath: "/usr/share/nginx/html" # Mount target path
+      name: nginx-storage
+  volumes:
+  - name: nginx-storage
+    persistentVolumeClaim:
+      claimName: my-app-pvc # Referencing PVC created above
+
+
+# Notes:
+# Pod will use the PVC to persist data in /usr/share/nginx/html.
+# Ensure pod and PVC are in the same namespace (here production).
+
+# The same is true for ReplicaSets or Deployments. Add this to the pod template section of a Deployment on ReplicaSet.
+
+# Reference URL: [https://kubernetes.io/docs/concepts/storage/persistent-volumes/#claims-as-volumes\](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#claims-as-volumes)

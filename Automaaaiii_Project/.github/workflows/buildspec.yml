@@ -1,0 +1,76 @@
+#AWS CodePipeline Configuration
+#Create an AWS CodePipeline
+
+#Go to the AWS CodePipeline console and create a new pipeline.
+#Pipeline Stages
+
+#Source Stage:
+
+#Provider: GitHub
+#Repository: Select your GitHub repository.
+#Branch: Specify the branch to monitor.
+#Build Stage:
+
+##Create a new CodeBuild project or use an existing one. Below is an example buildspec.yml for CodeBuild.
+#Build Specification (buildspec.yml)
+
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Installing dependencies...
+      - apt-get update
+      - apt-get install -y unzip
+      - curl "https://d1uj6qtbmh3dt5.cloudfront.net/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+      - unzip awscliv2.zip
+      - sudo ./aws/install
+      - pip install docker-compose
+      - curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+      - chmod +x ./kubectl
+      - sudo mv ./kubectl /usr/local/bin/kubectl
+      - aws --version
+  pre_build:
+    commands:
+      - echo Logging in to Docker Hub...
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+  build:
+    commands:
+      - echo Building the Docker image...
+      - docker build -t my-app:latest .
+      - echo Build complete.
+      - echo Running Maven build...
+      - aws s3 cp s3://my-source-bucket/my-file.zip my-file.zip
+      - unzip my-file.zip -d extracted
+      - cd extracted
+      - mvn clean install
+      - cd ..
+      - echo Uploading build artifacts to S3...
+      - aws s3 cp target/my-app.jar s3://my-destination-bucket/my-app.jar
+  post_build:
+    commands:
+      - echo Pushing Docker image...
+      - docker tag my-app:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/my-app:latest
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/my-app:latest
+      - echo Deploying to Kubernetes...
+      - kubectl config set-cluster my-cluster --server=$KUBECONFIG_URL
+      - kubectl config set-credentials my-user --token=$KUBECONFIG_TOKEN
+      - kubectl config set-context my-context --cluster=my-cluster --user=my-user
+      - kubectl config use-context my-context
+      - kubectl apply -f k8s/pod.yaml
+      - kubectl apply -f k8s/service.yaml
+      - kubectl apply -f k8s/deployment.yaml
+
+artifacts:
+  files:
+    - target/my-app.jar
+
+
+
+
+#Artifacts: Uploads build artifacts to an S3 bucket.
+#Docker: Build, tag, and push Docker images to a container registry.
+#Kubernetes: Configures kubectl and applies Kubernetes manifests.
+#Deploy Stage:
+
+#Provider: AWS CodeDeploy or AWS Lambda if you want to deploy using a different method. Typically, for Kubernetes, the deployment would be handled directly in the build phase of CodeBuild or separately.

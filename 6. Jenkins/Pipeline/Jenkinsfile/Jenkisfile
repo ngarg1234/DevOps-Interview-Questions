@@ -1,0 +1,164 @@
+pipeline {
+    agent any
+
+    environment {
+        VERSION = "1.0.0"
+        DB_HOST = credentials('DB_HOST')
+        DB_USER = credentials('DB_USER')
+        DB_PASS = credentials('DB_PASS')
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_REGION = credentials('AWS_REGION')
+        SONAR_TOKEN = credentials('SONAR_TOKEN')
+        SONAR_HOST_URL = credentials('SONAR_HOST_URL')
+        JFROG_USER = credentials('JFROG_USER')
+        JFROG_PASS = credentials('JFROG_PASS')
+        AWS_ECR_REGISTRY = credentials('AWS_ECR_REGISTRY')
+        AWS_ECR_REPO = credentials('AWS_ECR_REPO')
+    }
+
+    parameters {
+        string(name: 'db_database_name', defaultValue: '', description: 'DB name')
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Setup JDK') {
+            steps {
+                script {
+                    // Setup Java 17
+                    sh 'sudo apt-get update'
+                    sh 'sudo apt-get install -y openjdk-17-jdk'
+                }
+            }
+        }
+
+        stage('Generate Version') {
+            steps {
+                script {
+                    def commitid = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                    def semanticVersion = "1.0.0"
+                    def version = "${semanticVersion}-${commitid}"
+                    env.VERSION = version
+                    echo "VERSION=${version}"
+                }
+            }
+        }
+
+        stage('Build with Maven') {
+            environment {
+                DB_NAME = params.db_database_name
+            }
+            steps {
+                script {
+                    // Build with Maven
+                    dir('project_code') {
+                        sh 'mvn clean install'
+                    }
+                    sh 'ls target'
+                    echo "${params.db_database_name}"
+                }
+            }
+        }
+
+        stage('Upload to GitHub Workspace') {
+            steps {
+                script {
+                    // Upload artifact to GitHub workspace
+                    archiveArtifacts allowEmptyArchive: true, artifacts: "project_code/target/**/*.war", followSymlinks: false
+                }
+            }
+        }
+
+        stage('Configure AWS Credentials') {
+            steps {
+                script {
+                    sh "aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}"
+                    sh "aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}"
+                    sh "aws configure set region ${AWS_REGION}"
+                }
+            }
+        }
+
+        stage('Upload Artifact to S3') {
+            steps {
+                script {
+                    // Define the path and bucket name
+                    def s3BucketName = "pipeline-shyam/Github_Pipeline"
+                    def artifactPath = "project_code/target/**/*.war"
+                    def s3ObjectKey = "debitcardapp-${env.VERSION}.war"
+                    
+                    // Upload the artifact to S3
+                    sh "aws s3 cp ${artifactPath} s3://${s3BucketName}/${s3ObjectKey}"
+                }
+            }
+        }
+
+        stage('Install Docker') {
+            steps {
+                script {
+                    sh 'sudo apt-get update'
+                    sh 'sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common'
+                    sh 'curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -'
+                    sh 'sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"'
+                    sh 'sudo apt-get update'
+                    sh 'sudo apt-get install -y docker-ce docker-ce-cli containerd.io'
+                    sh 'sudo systemctl start docker'
+                    sh 'sudo systemctl enable docker'
+                    sh 'docker --version' // Verify Docker is installed
+                }
+            }
+        }
+
+        stage('Get Commit Hash') {
+            steps {
+                script {
+                    def commitHash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                    currentBuild.description = "Commit Hash: ${commitHash}"
+                    echo "Commit Hash: ${commitHash}"
+                }
+            }
+        }
+
+        stage('Get Timestamp') {
+            steps {
+                script {
+                    def timestamp = sh(script: 'date +\'%Y-%m-%d-%H-%M\'', returnStdout: true).trim()
+                    echo "Timestamp: ${timestamp}"
+                }
+            }
+        }
+
+        stage('Login to Amazon ECR') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'AWS_ECR_CREDS', usernameVariable: 'AWS_ECR_USER', passwordVariable: 'AWS_ECR_PASS')]) {
+                        sh 'aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin ${AWS_ECR_REGISTRY}'
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    def imageTag = "${env.VERSION}-${BUILD_NUMBER}"
+                    sh "docker build -t debitcardapp:${imageTag} ."
+                    sh "docker tag debitcardapp:${imageTag} ${AWS_ECR_REGISTRY}/${AWS_ECR_REPO}:${imageTag}"
+                    sh "docker push ${AWS_ECR_REGISTRY}/${AWS_ECR_REPO}:${imageTag}"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Cleanup or notifications if needed
+        }
+    }
+}

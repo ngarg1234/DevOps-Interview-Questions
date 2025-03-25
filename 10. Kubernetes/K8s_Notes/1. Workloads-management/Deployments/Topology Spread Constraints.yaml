@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-deployment
+  namespace: example-namespace
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: example-app
+  template:
+    metadata:
+      labels:
+        app: example-app
+    spec:
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: "topology.kubernetes.io/zone"
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: example-app
+      - maxSkew: 2
+        topologyKey: "kubernetes.io/hostname"
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: example-app
+      containers:
+      - name: example-container
+        image: nginx:1.21.6
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+
+# maxSkew:The maximum difference in the number of pods allowed between the most and least loaded domains.
+# Example: If maxSkew=1, the difference between the number of pods in any two domains must not exceed 1.
+
+
+# topologyKey: The label key to group nodes into topological domains, such as kubernetes.io/hostname, topology.kubernetes.io/zone, or custom node labels.
+
+
+# whenUnsatisfiable: Specifies what to do when the constraint is violated:
+  # DoNotSchedule: Prevents scheduling a pod if it violates the spread constraint.
+  # ScheduleAnyway: Allows scheduling but does not guarantee compliance with the constraint.
+
+
+# labelSelector: Used to select which pods are considered for the topology spread.

@@ -1,0 +1,56 @@
+aws -- iam, ec2, s3, orgnaisation to organisation managment, control policies, boundaries, security, how to improve, well architect - PROCESS
+
+https://aws.amazon.com/architecture/well-architected/?wa-lens-whitepapers.sort-by=item.additionalFields.sortDate&wa-lens-whitepapers.sort-order=desc&wa-guidance-whitepapers.sort-by=item.additionalFields.sortDate&wa-guidance-whitepapers.sort-order=desc
+
+Client Dealing
+
+containerization - volumes/ state ful vs stateless.. readyness probe/ liveliness probe
+
+developer/azure fundamentals - 
+
+DevOps - branching strategy, Jenkins, terraform..
+
+terarform, python, aws expert, 
+
+-- route 53, pyhton -data types.. dicntvs sets vs operation on dictorary,, , 
+
+-- terraform - > state files,, manage workspaces,, 
+
+-- SDLC lifecycle, ITIL, Problem vs Risk Management vs incient management , DevOps Startegy,
+
+-- Conflicst management,
+
+-- waht is devops/cicd, 
+
+-- 
+
+
+Today and Tomorrow topics
+
+IAM - done
+Organisation Control Policy, IAM Permission Boundaries, Access Analyzer - 6
+Control Tower, Landing Zone - 6
+Security - 
+HA - knowledge India - https://www.youtube.com/watch?v=tD9vDv0uyI8&list=PLTyrc6mz8dg_O_F2pdL1jGvGjkiRE-dgq
+Route 53 - techincal guru - done
+Cloud Front -tchnical Zone - done https://www.youtube.com/watch?v=dyPI37FQWW4 and https://www.youtube.com/watch?v=YwAPrf2tMjs and https://www.youtube.com/watch?v=ufRxrPihooE
+Deployment Starategy - Done cananry .. https://docs.aws.amazon.com/whitepapers/latest/overview-deployment-options/deployment-strategies.html
+Cost Saving  - Done https://www.youtube.com/watch?v=YvZ4seVgyYY&list=PLTyrc6mz8dg9AIAuZocHAqekMgA0eDfQb and https://aws.amazon.com/premiumsupport/knowledge-center/ec2-instance-choose-type-for-workload/
+
+
+Next week
+
+Docker - 2 days
+terraform - 2 days
+Kubernetes - 2 days
+Python data Types - 1 day
+CICD Startegy - 2 Days
+Ansible - 2 Days
+DeVops  - https://www.bing.com/videos/search?q=amsile+tutorial+nana&ru=%2fvideos%2fsearch%3fq%3damsile%2520tutorial%2520nana%26qs%3dn%26form%3dQBVR%26%3d%2525eManage%2520Your%2520Search%2520History%2525E%26sp%3d-1%26pq%3damsile%2520tutorial%2520nana%26sc%3d0-20%26sk%3d%26cvid%3d1F4F9AF6DDC6452D8E128D2341B10476%26ghsh%3d0%26ghacc%3d0%26ghpl%3d&view=detail&mid=6C7503B3F9CE1107EE996C7503B3F9CE1107EE99&&FORM=VDRVRV
+
+
+
+
+
+
+

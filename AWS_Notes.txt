@@ -1,0 +1,1664 @@
+1. primary and key skills such as Cloud.AWS, Containerisation, CI/CD, and IaC.
+2. CI/CD stages & quality gates concept
+3.  most common 0-downtime deployment strategies.
+4.  standard SDLC methodologies
+5. Networking and Security principles (organization, Service, ) in AWS
+6. high available and cost-effective setups.
+7. experience with Python
+8. infrastructure as a code approach
+9. Terraform experience and readiness to follow best practices
+10. Hands-on experience with Linux containers and Kubernetes
+11. Soft skills
+12. ITIL
+13. DevOps - Cloud watch, Splunk,, Monitoring Tool -- Metric, Application - Response, Error rate,, client side error, 
+14. DB - Rds --, replication, standby, failover recover.. https://medium.com/awesome-cloud/aws-difference-between-multi-az-and-read-replicas-in-amazon-rds-60fe848ef53a
+15. Production Deployment, Strategy and if any issue what you will do.. Monitoring-> Root Cause Analysis / Postmortem / Dev / Prod
+
+RM - , Presentation -- 10 min.. , Discussion, 
+
+IAM
+
+User, Group, Policy
+
+Never use Root account, create IAM user with required permissions.. set MFA ..
+
+Policy - collection of different permissions which we can assign it to a user or a group
+
+Inline Policy -- to a particular Identity ( User or Role )
+Management Policy - to reuse across multiple user
+
+Role - make use of Roles when authorizing one AWS Service to call another AWS Service, We choose Trusted Entities who can choose this role. 
+
+We should not use IAM user credentials in our code , instead use Role to do this.
+
+Cross Account Access - using IAM Role -- https://aws.amazon.com/blogs/security/how-to-enable-cross-account-access-to-the-aws-management-console/
+
+https://medium.com/awesome-cloud/aws-vpc-endpoints-overview-intro-getting-started-guide-91ca23b5af8d
+
+required Account need to assume role from destination account ( add the source account here while creating role -- add another account option )
+
+then click Switch role from source account and provide detainationa ccount no and role name.. 
+
+-- dry run .. parameters to be used in aws commands 
+
+--recursive s3 copy
+
+AWS IAM Key Rotation -- Automation -- scripts we can use..
+lambda scheduled by CloudWatch Events.. and we will mail the new Key to intended users not even to Admin User ( if not needed )
+
+AWS Encryption Keys -- KMS  To use AWS KMS, you typically create keys, grant permissions, and integrate the keys with the 
+services that require encryption. This helps ensure the security and privacy of your data within the AWS ecosystem.
+
+Route 53 -- Register new Domain, Transfer existing Domain, 
+Route traffic from your domain to your AWS or vice-versa and external Resources monitor the health of your resources.
+
+Features --
+
+DNS Management,
+Traffic Management,
+Availability Monitoring,
+Domain Registration
+
+Technical Gufgtu Domain Name --> DNS Resolver --> Root Name Server ( com org are top level domain ), --> internally communcates to provide the IP ..
+
+, geographic local domain (. us, in, pk)
+
+Name Server - 4
+
+When you register a Domain, it creates a Hosted zone .. that has same name as domain name .. it assigns four sets of name servers,
+unique to the account.
+
+Route 53 is Global service ( not region specific ), supports IP6 Address.
+
+AWS provides Generic domain ( .com. .org) and geographic domain ( .in, .us, .cn, .pk, .uk )
+
+max 500 histed zones. .1000 resources
+
+hosted zone- [ ( public vs private( with vpc accesible) ] has record set
+
+two hosted zone can have same name
+
+Routing Policy - 
+
+Simple Routing ( Defualt, 1 server -- 1 ip addresss), 
+Failover Rotuing ( active(primary) passive(stanbdy) if issue with primary, forward to standby ... High availability ),
+Geo Location Rotuing ( if origin from india, response from india if so much traffic indi also),
+Multi Value Answer Routing (multiple server) ,
+Latency Based (mainitains low latency, if indian server are down, it will srver from china if it is having lesser traffc) ,
+Weighted ( 20,80 or whatever) , used for cananary deloyent startegy, 
+Geo-proximity ( shrink, east west north south india.. if north is busy , send some calls from delhi to chennai) ,
+
+Record Set Types -- 
+
+A Record (32 Bit) - Address Record .. IP Address -- Maps Domain name to IP Address
+AAAA Record (128 Bit) - IP6 Address
+CNAME - Canonical Name Record ---> Maps an Alias -- Resolves A Domain Name .. alias of another record.. hide identity .. 
+NS Record - delegate it to name server
+SOA Record - owner of DOMAIN, DOMAIN DETAILS
+MX Record - Mail Exchange . register your email id 
+
+Record set has Routing policy..  
+
+AWS Organization::
+
+-- account managEment service that enables you to consolidate multiple AWS account into an organization that you create and centrally manage.
+-- Consolidate Billing, security compliance and 
+-- Administrator can create accounts in your organization, invite existing account to your organization.
+-- Create Account from organizations.. will be very easy.. no credit information again and again.
+-- Create Manage policies across Accounts.
+
+Service control policies (SCPs) are a type of organization policy that you can use to manage permissions in your organization. 
+SCPs offer central control over the maximum available permissions for all accounts in your organization. 
+SCPs help you to ensure your accounts stay within your organization’s access control guidelines. 
+
+organization -- from where you create organization , that is Master account.. you create many accounts from amaster account .. 
+that are caled as member accounts..
+
+organization UNIT (OU) -- Logical group of accounts.. group has members accounts and attach service control policy ( SCP ) to OU..
+
+ou can have multilple accounts.. or one ou can be part of one ou only 
+
+Monitor activity in  the master account using AWS Cloud Trail. ( memebre account put logs to master account - s3 )
+
+-- Global Service
+
+SCP -- Service Control Policies
+
+-- used to manage our organizations.. SCP are applied at OU level.. 
+
+-- BlackList and Whitelist Policies 
+
+in blacklist, actions are allowed by default, you specify which services and actiosna are allowed..
+
+in whitelist, vice-versa of blacklist..
+
+Summary:
+AWS Control Tower = Service to deploy a Landing Zone quickly with automation.
+AWS Landing Zone = Approach to design and implement secure AWS environments (can be manual or automated).
+
+AWS Landing Zone : approach
+a landing zone refers to a set of guidelines, best practices, and resources designed to help organizations
+ set up a secure, scalable, and well-architected environment in the AWS cloud.
+ The goal of a landing zone is to provide a foundation
+ for workloads in AWS that aligns with an organization's security and compliance requirements.
+A landing zone is a well-architected, multi-account AWS environment that is scalable and secure. AWS
+ LAndinz Zone is a solution with best practices that helps customer more quickly set up a secure, 
+multi account adn scalable AWS environemnt based on AWS Best practices.
+
+we can have account -- 1 for log monitoring, one for security account,
+
+-- enables extension of the default landing zone deployment with custome rspecific add on solutions..
+
+Introducing a Landing Zone :
+Separation of concerns get more important and also difficult as companies grow in AWS
+Separate costs for budgets and billing
+Security enforcement, resource isolation
+
+Using A Landing Zone is a…Well-architected multi-account AWS environment that is stable and secure
+
+It is:
+
+The starting point for your cloud journey
+Built on AWS Organization w/ multiple accounts
+
+Landing Zone Automation
+2 Tools to assist here…
+
+AWS Control Tower – service AWS Control Tower offers a straightforward way to set up and govern an AWS multi-account environment, 
+following prescriptive best practices. 
+AWS Control Tower orchestrates the capabilities of several other AWS services, including AWS Organizations, 
+AWS Service Catalog, and AWS IAM Identity Center (successor to AWS Single Sign-On), to build a landing zone in less than an hour.
+Resources are set up and managed on your behalf. AWS Managed Service to setup and govern multi-account env **
+It uses AWS Organizations and a number of other services to automate the orchestration **
+Easier option, minimal customisations; Still allows your to centrally manage governance and 
+has preconfigured best practices
+AWS Organizations – Use this directly, high levels of customisation Personal Note: Check out org-formation or Terraform
+Share
+
+PART 2 - AWS Best Practices for... Organizational Units with AWS 
+
+AWS CONTROL TOWER - Landing Zone deployment
+
+summary, the Landing Zone provides the conceptual foundation and guidelines
+ for setting up a secure AWS environment, the Organization helps in 
+managing multiple AWS accounts, and AWS Control Tower is a service that
+ automates the implementation of Landing Zone principles, leveraging AWS Organization
+s and applying predefined guardrails to ensure security and compliance. Togethe
+r, they form a comprehensive approach to efficiently manage and govern AWS environments at scale.
+
+IAM Permission Boundary - definies the boundaries of permission. more than that, user will not be able to access
+
+Delegating Responsibility to Others , Permission Boundaries to Others.. 
+
+Admin will give a permission boundary to Ops team ( Ops team will not be able to chnage/update Admin boundary) 
+,,.ex. ops team will not able to create user with access to IAM , Billing Section.., user should not be able to remove his own Boundary..
+
+Ops team need to attach Permission boundary before giving permission to new users.. 
+so that boundary is maintained and according to the requirement from Admin.
+
+Ops team should not be able to delete Permission Boundary..
+
+IAM Policies and Permission boundaries can be used together .. very good use case..
+
+Resources(to resource) Based Policy and Identity(IAM user, group or role) Based Policy
+https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_identity-vs-resource.html
+https://docs.aws.amazon.com/IAM/latest/UserGuide/access_controlling.html
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PermissionsBoundarySomeServices",
+            "Effect": "Allow",
+            "Action": [
+                "cloudwatch:*",
+                "dynamodb:*",
+                "ec2:*",
+                "s3:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "PermissionsBoundaryNoConfidentialBucket",
+            "Effect": "Deny",
+            "Action": "s3:*",
+            "Resource": [
+                "arn:aws:s3:::amzn-s3-demo-bucket1",
+                "arn:aws:s3:::amzn-s3-demo-bucket1/*"
+            ]
+        }
+    ]
+}
+
+AWS IAM Access Analyser analyses the resources based policies like s3,iam,kms,lambda,sqs -- 
+Helps us Analyze or Identify the Resources in your organizations or your Accounts such as Amazon S3 or IAM Roles , 
+that are shared with an external entity,
+ This lets you identify unintended access to your resources and data, which is security risk..
+ 
+New update, it will send you a notification if a respurce is used outisde your organization or aws account.,
+
+Cloud Front : 
+
+Cloud Front is a global service, that speed up distribution of your static and dynamic web content, 
+such as .html, .css and image files to your users.
+
+CF delivers your data through Edge Locations.
+
+When a user request a content, the user is routed to the edge location that provides the lowest latency , with best performance. 
+
+If the content is already in the edge location, cf delivers it immediately.
+
+CF also keeps persistant connection with Origin Servers so files are fetched from origin as asap.
+
+Edge Locations are not tied to AZ or regions..
+
+regional Edge Cache/Location - AWS has added Regional EL, they are located bw your owrinal server and rthe glocal EL,,,As objects become popular,
+individual EL remove
+
+s those objects to make room for more popular content. Regional Edge Cache ( we can configure its TTL) to reduce burden on Origin. 
+Regional EL has more bandwidth ( cache ) than Global EL..
+
+To help serve more responses from the cache, CloudFront actually has two tiers of edge location: edge points of presence (POPs) and
+ regional edge caches (RECs). Edge POPs are more numerous and closer to users, but they have smaller cache
+ s. Regional edge caches are fewer and further away, but each one has more storage, so they can cache content for longer. 
+
+The regional edge caches sit between the origin server and the edge POPs. If content isn’t cached in a particular edge POP,
+ it can be retrieved from the regional edge cache without going back to the origin server.
+
+For example, England has one regional edge cache in London, and 11 edge POPs spread across the country. If a user in Manchester visits a site,
+ CloudFront will first try the cache in their nearest edge POP, then the cache in the London REC; only if that doesn’t work will it 
+ go back to the origin server.
+
+Some edge locations are more expensive to run than others, so Amazon split them into a couple of price classes. 
+The default price class includes every edge location.
+ The other price classes only include the edge locations in less expensive regions. 
+
+Route 53 helps us with this process Internally..
+
+Dynamic Content/Proxy method - PUT/POST/PATCH/OPTIONS/DELETE does not got through Regional EL..
+
+Cost Optimization:
+
+1. Right Size : mIgration starts from Lift and Shift.. check on prem server config. same we do in cloud. sometimes on prem was over configured.. 
+2. Delete Unattached EBS Volumes..
+3. Use Reserved Instances -- signifacnt disciunt upto 70 percent. time period - 1 year minimum .. you have to be sure you gonna need them.. 
+4. Stop 24*7 unutlitized Ec2. utilize SPot Instances.. cheapest as compared to reserverd also..  not used for very critical applications..  
+as they may go down if your max prce is lesser than current proce.
+5. Always Check your bill for Top Spend Line Items..
+6. Ec2 instance to Lambda if possible..  
+7. Intelligent Tiering in S3 -- analyse for some time.. move it to Infrequest access Tier /Archive of S3. 
+8. Savings Plan .. similar to Reservered Instances..  applied to ec2,lambda,fargate or ec2 as you choose..
+
+https://www.incredibuild.com/blog/whats-the-difference-between-on-demand-reserved-and-spot-instances
+
+Choose EC2: 
+
+Choose the Amazon EC2 instance family and appropriate size for your instance
+Use the system requirements you gathered and the instance family that best serves your needs to choose a specific instance type.
+ Instance type names are comprised of the family name and the instance size. For example, the t2.micro instance is from the T2 family and
+ is micro-sized.
+
+`Every instance type has the following hardware specifications:
+
+Default vCPUs: The number of virtual CPUs for the instance. For more information, see Optimize CPU options.
+Memory (GiB): For more information, see Amazon EC2 high memory instances.
+Instance storage (GB): The local instance store volumes that are available to the instance. 
+The data in an instance store isn't permanent. Data on instance store volumes is deleted if the instance is stopped or terminated.
+ For more information, see Amazon EC2 instance store.
+Amazon Elastic Block Store (Amazon EBS)-Optimized available: Indicates whether the instance type supports EBS optimization.
+ An EBS-optimized instance provides additional, dedicated throughput for Amazon EBS I/O. This provides improved performance for your 
+Aas Amazon EBS volumes and enables instances to use provisioned IOPs fully. For more information, see Amazon EBS–optimized instances.
+Network Performance: Indicates the performance level of the rate of data transfer. You can enable enhanced networking that provides 
+higher bandwidth, higher packet-per-second (PPS) performance, and consistently lower inter-instance latencies. For more information,
+ see How do I enable and configure enhanced networking on my EC2 instances?
+
+AWS Compute Optimizer:
+
+Makes Recommendation to reduce costs of your workloads hosted in AWS considering your utilization data..
+It can help you choose optimal onfigurations for three types of AWS Resources: Amazon Elastic Compute Cloud (Amazon EC2) instances
+
+Amazon EC2 Auto Scaling groups
+
+Amazon Elastic Block Store (Amazon EBS) volumes
+
+AWS Lambda functions.
+
+It analyses the configuration and resource utilization of your workload.
+AWS Compute Optimizer used Machine Learning in background. default one -->analyses for 14 days..
+ Enhanced Infrastructure Metrices --> paid one --> 3 months to come up with recommendation..
+
+IAM is within a AWS Account..
+
+AWS Networking and HA
+
+https://www.youtube.com/watch?v=LX5lHYGFcnA
+
+in any network, only 251 ip are usable, 5 are reserved, and cannot be used .. 0/1/2/3/255
+
+VPC :
+
+Virtual Private Cloud -- Isolated Cloud Network, create user defined virtual Network ( IPv4/IPv6 )..
+                      -- Allows Control of the networking Environment....
+					  -- Can be connected to existing Data Center ( DC ) over VPN or Direct Connect......
+					  -- Can be peered with other VPCs in AWS........
+
+
+Region
+AZ
+Subnet -- RT
+			
+VPC is in region , one VPC can be in single region.. AZ is in Region. Subnets are in AZ.. Subnet must be attached to RT.. ( VASR )
+
+Region --> VPC      
+AZ --> Subnets--Route Table
+
+ENI - AWS Elastic Network Interface is simply a virtual interface(Network Card) that can be attached to an instance in a Virtual Private Cloud (VPC)
+. Elastic IP are attached to ENI not Ec2 Instance. so if ec2 does down, ..
+we can attach eni to new ec2 instance
+
+https://cloudacademy.com/course/networking-pas-c01-2503/elastic-network-interfaces-enis/
+
+Customer Gateway on Prem --> VPN Connection --> Virtual private Gateway
+
+VPC Endpoint -- allows us to connect to some service privately like s3 ( global endpoint ).. or dynamoDB
+
+VPC Interface Endpoint - same as VPC Endpoint.. ENI are mapped to services.. and private IP are attached to it.. 
+communication is happening via ENI ( VIE ) ..ex - Ec2 API,ELB,Kinesisi,KMS,SNS,CloudWatch Logs....
+
+In summary, the choice between VPC Interface Endpoints and VPC Gateway Endpoints 
+depends on the specific AWS services you are using and the requirements 
+of your
+architecture.
+
+NAT Gateway is used to enable instance in a private subnet to connect to Internet or other aws services, 
+but prevent the internet from initiate the connection to those instances..
+
+Allows your Instances to perform updates/patching whilst still being inside a private subnet..
+Az
+Works for IPv4, for IPv6, use EgressOnly-IG
+
+Resides in public Subnet..
+
+NAT Gateway allows only only Outbound connection and response on same connection.. ( inbound response). 
+directly we cant hit db in private subnet via nat gateway..
+
+IP Address ends with .0,.1,.2,.3,.255 are reserved and cannot be used by users.. in ech subnet of 256.. only 251 availanle because of that..
+
+before VPC, we had classic VPC..
+
+VAS -- VPC, AZ, Subnets -- one inside another.. :).always got confused..
+
+Networking -- ec2 go to router.. router to route table and then based on the condiitions, it will decide what to be done !!!!!!!!
+
+Route Table decids that Subnet is private or public one.. 
+
+How it works
+AWS PrivateLink is a highly available, scalable technology that enables you to privately connect your VPC to services as if they were in your VPC
+. and 
+provides private connectivity between virtual private clouds (VPCs), supported AWS services, and 
+your on-premises networks without exposing your traffic to the public internet. Interface VPC endpoints, powered by PrivateLink,
+connect you to services hosted by AWS Partners and supported solutions available 
+in AWS Marketplace..........
+
+It is possible to expand VPCs........
+
+Internet Gateway Resides in VPC..same for Route Table also  
+
+Security Group vs	NACL (Network Access Control List)
+
+It supports only allow rules, and by default, all the rules are denied. You cannot deny the rule for establishing a connection.	
+It supports both allow and deny rules, and by default, all the rules are denied. You need to add the rule which you can either allow or deny it.
+Stateful: allowed inbound traffic are automatically allowed outbound (and vice versa).
+It is a stateful means that any changes made in the inbound rule will be automatically reflected in the outbound rule. For example, 
+If you are allowing an incoming port 80, then you also have to add the outbound rule explicitly.
+It is a stateless means that any changes made in the inbound rule will not reflect the outbound rule, i.e., 
+you need to add the outbound rule separately. For example, if you add an inbound rule port number 80,
+then you also have to explicitly add the outbound rule.
+
+It is associated with an EC2 instance.
+It is associated with a subnet.
+
+All the rules are evaluated before deciding whether to allow the traffic.
+Rules are evaluated in order, starting from the lowest number.
+
+Security Group is applied to an instance only when you specify a security group while launching an instance.	
+NACL has applied automatically to all the instances which are associated with an subnet.
+
+It is the first layer of defense.	
+It is the second layer of defense.
+
+Security groups are stateful, which means that if an inbound request passes, then the outbound request will pass as well.
+
+Key Differences
+Security Groups 	NACLs
+Instance level	        Subnet level
+Stateful	        Stateless
+Allow only	        Allow and Deny
+Evaluated collectively	Evaluated in order by rule number
+Inbound denied, 
+outbound allowed	Inbound and outbound denied by default
+Instance-specific 
+security	        Subnet-wide traffic filtering
+
+VPC Peering - provides one to one point nw bw VPCs , Transit Gateway - provides one to many nw bw VPCs
+
+Transit Gateway https://www.bing.com/videos/search?q=aws+security+knowldeg+india&ru=%2fvideos%2fsearch%3fq%3daws%2bsecurity%2bknowldeg%2bindia%26FORM%3dHDRSC4&view=detail&mid=7D13CC1C5C878E7E431D7D13CC1C5C878E7E431D&rvsmid=1C5F4F81BA5A141C4A0A1C5F4F81BA5A141C4A0A&FORM=VDRVRV
+
+http://chinomsoikwuagwu.com/2020/04/02/AWS-Connectivity_PrivateLink_VPC-Peering_Transit-gateway_and_Direct-connect/#:~:text=VPC%20Peering%20vs%20Transit%20Gateways%20If%20you%20have,VPC%20B%20to%20VPC%20C%20through%20VPC%20A.
+
+Key Differences Between AWS Direct Connect vs VPN
+Let us discuss some of the major key differences:
+
+Two-port connections are needed in AWS Direct Connect to Virtual Private Cloud whereas only one VPN connection 
+is needed to VPC in AWS managed VPN.
+The performance of VPN is measured till 4GB and less when compared with Direct Connect.
+The performance of Direct Connect starts from 1GB and extends upto 40GB based on the 
+link aggregation group connection.
+Based on the connectivity, there can be only two VPN tunnels in VPN based cloud
+. While in Direct Connect, the entire AWS region is covered with the connection.
+The cost of a VPN is very less when compared with AWS Direct Connect
+. Also, there is an option of VPN per connection hour pricing which is not available with Direct Connect.
+The encrypted connection in Direct Connect is created between 
+the user’s router and AWS Direct Connect’s router. In VPN, the connection is between the user’s network to the VPN network.
+Security concerns are more in VPN as the network is connected to a public network
+. Direct Connect offers more security and is preferred by business 
+that requires more security to their work.
+Access to all the AWS regions is provided in Direct Connect so 
+that VPC and other Amazon services can be utilized well
+. In VPN, access is not provided to the regions and the performance is not always predictable.
+A business that is starting with AWS can use VPN as 
+it is easy to set up and the installation is completed sooner than Direct Connect
+. While the established businesses that require more security and need access to other 
+Amazon services can use Direct Connect. Installation needs the presence of experienced personnel and setup is not as easy as a VPN.
+Network performance is poor in VPN while it seems way better than VPN in Amazon Direct Connect.
+The connection in Direct Connect is through an ethernet fiber optic cable while the connection 
+in VPN is through an encrypted connection.
+
+
+VPC Peering and Transit Gateway: We need to do lot of peering in VPC Peering. n(n-1)/2,, lets say we hav 10 vpc, 10*9/2 = 45 peering connections..
+routes/vpc peering connections are having limitattaions ( 100/125 )
+
+VPC Peering Conditions : no overlapping ip ranges bw two VPCs, we need to update rt in both vpc once peering is done.,
+traffic flows via provate n/w or ip..
+
+Thats why, Transit Gateway Came, tg acts as hub..in tgw we define rules.. ....
+
+A transit gateway enables you to attach VPCs and VPN connections in the same Region and route traffic between them....
+
+AWS Transit Gateway introduces intra-region peering for simplified cloud operations and network connectivity
+Posted On: Dec 1, 2021
+
+Starting today, AWS Transit Gateway supports intra-region peering, giving you the ability to establish peering 
+connections between multiple Transit Gateways in the same AWS Region. With this change, different units in your organization 
+can deploy their own Transit Gateways, and easily interconnect them resulting in less administrative overhead and
+greater autonomy of operation.
+
+https://www.bing.com/videos/search?q=vpc+peering+knowledge+india&&view=detail&mid=2DBC42845891285A89CD2DBC42845891285A89CD&&FORM=VRDGAR&ru=%2Fvideos%2Fsearch%3Fq%3Dvpc%2Bpeering%2Bknowledge%2Bindia%26FORM%3DHDRSC4
+https://www.bing.com/videos/search?q=vpc+peering+knowledge+india&ru=%2fvideos%2fsearch%3fq%3dvpc%2bpeering%2bknowledge%2bindia%26FORM%3dHDRSC4&view=detail&mid=7D13CC1C5C878E7E431D7D13CC1C5C878E7E431D&&FORM=VDRVRV
+
+
+HA Architcture:
+
+https://www.bing.com/videos/search?q=aws+high+availability+architecture++hindi&qft=+filterui%3aduration-long&view=detail&mid=E35EE602C484F821926BE35EE602C484F821926B&&FORM=VRDGAR&ru=%2Fvideos%2Fsearch%3F%3D%2525eManage%2BYour%2BSearch%2BHistory%2525E%26sp%3D-1%26pq%3Daws%2Bhigh%2Bavailability%2Barchitecture%2Bhindi%26sc%3D0-40%26sk%3D%26cvid%3DF20FE817D2EE461D906EA8AB8373B1F6%26ghsh%3D0%26ghacc%3D0%26ghpl%3D%26q%3Daws%2Bhigh%2Bavailability%2Barchitecture%2B%2Bhindi%26qft%3D%2Bfilterui%3Aduration-long%26FORM%3DVRFLTR
+https://medium.com/analytics-vidhya/aws-high-level-architecture-42f049bae6f0
+https://medium.com/the-andela-way/designing-a-three-tier-architecture-in-aws-e5c24671f124
+https://www.bing.com/videos/search?q=hihgh+availabiltiy+hindi&&view=detail&mid=9573CB963E2FC61EA6029573CB963E2FC61EA602&&FORM=VRDGAR&ru=%2Fvideos%2Fsearch%3Fq%3Dhihgh%2Bavailabiltiy%2Bhindi%26FORM%3DHDRSC4
+
+HA and Scalibility::
+
+Scalibility means that an application/system can handle greater load by adapting..
+
+There are two kinds of scalibilty : vertical and Horizontal Scalibility..
+
+Vertical(scale up/down) - Increasing the size of the Instance..used mostly in DB,RDS, Elastic Cache, 
+
+Horizontal Scalibility (scale out/in)- means increasing the number of instances/systems for your application.
+
+High Availability - Running your Application/System in at least 2 AZ, to survive Data Center loss,
+High Availability can be passive for RDS Multiple AZ,
+The High Availability can be active ( horizontal Scaling)..
+
+There are 4 pillars because of which we use cloud and they are: HA --> FT --> SC --> EL  -- Hafta sab se le
+
+1. High availability
+
+- The computer configured and the data around it is available any time the user want. 
+Suppose the user wants to access the computer and its data on a phone, 
+they can quickly access it through phone. At the same time if user wants to access it through a device in some other region, 
+the data is easily available for the user on their system.
+
+2. Fault tolerant
+
+- Fault tolerant go hand to hand with high availability. Suppose,
+ the computer goes down or got corrupted or say got damaged due to natural calamity, 
+ a new computer gets configured retrieving all the specification from the previous one 
+ and be available for the user quickly.
+
+3. Scalability
+
+- If for some reason the demand of server gets increased, the instance (server) on the cloud is automatically configured 
+and added as per the requirement.
+
+4. Elasticity
+
+In case, number of users reduced due to some reason, the cloud (AWS) will have the capability to remove the servers 
+as they are not required any more. It saves a lot of money for the users using cloud servers.
+
+0
+
+
+Both, Scalability and Elasticity refer to the ability of a system to grow and shrink in capacity and resources 
+and to this extent are effectively one and the same. The difference is usually in needs and conditions under which this happens.
+ Scalability is mostly manual, predictive and planned for expected conditions. Elasticity is automatic and reactive to external stimuli 
+ and conditions. Elasticity is automatic scalability in response to external conditions and situations.
+
+
+High Availability: With the traditional data centre, our application is sitting in one geographical location. 
+If there is an earthquake, flooding or even power outage in that location where our application is hosted, 
+our application will not be available. With AWS, we can design our infrastructure to be highly available by hosting 
+our application in different locations known as the availability zones.
+
+Security: We want to design an infrastructure that is highly secured and protected from the prying eyes of hackers.
+ As much as possible, we want to avoid exposing our interactions within the application over the internet. 
+ This simply means that the application will communicate within themselves with a private IP. The presentation
+ (frontend) tier of the infrastructure will be in a private subnet (the subnet with no public IP assigned to its instances)
+ within the VPC. Users can only reach the frontend through the application load balancer. The backend and the database tier 
+ will also be in the private subnet because we do not want to expose them over the internet. We will set up the Bastion host
+ for remote SSH and a NAT gateway for our private subnets to access the internet. The AWS security group helps us limit access
+ to our infrastructure setup.
+
+
+AWS High Availability Best PracticesHere are a few best practices you can follow to improve high availability in the Amazon ecosystem:
+
+Avoid single points of failure—identify elements of your architecture that are critical for applications to function,
+ and ensure they are highly available.
+
+Multi-AZ for critical components—always place at least one load balancer, application server or database in at least two AZs.
+
+Have the ability to absorb AZ failures—ensure you have enough capacity, or the ability to automatically increase capacity,
+ in any of your AZs in case of failure in another AZ.
+
+Use reserved instances—guarantee you can get additional capacity in a specific availability zone and more cost-efficient 
+to support failure scenarios.
+
+Replicate data across AZs—ensure you have a solid strategy for data replication, either by relying on shared Amazon data 
+services like S3 or EFS, or by attaching machines to EBS volumes and replicating them across AZs or regions.
+
+Setup monitoring and alerts—Use Amazon services like CloudWatch, together with application or network monitoring tools,
+ to identify service disruption or performance degradation and immediately inform operations staff.
+
+Automate problem resolution or failover process—AWS provides multiple ways to respond to failure scenarios, 
+including Elastic Load Balancing, autoscaling and automatic failover.
+
+
+RDS -  
+
+https://medium.com/awesome-cloud/aws-difference-between-multi-az-and-read-replicas-in-amazon-rds-60fe848ef53a
+
+
+Terraform:
+
+Provider: Terraform relies on plugins called providers to interact with cloud providers, SaaS providers, and other APIs.
+
+Terraform configurations must declare which providers they require so that Terraform can install and use them.
+
+Terraform Init will download plugins associated with Provider.,
+
+Terraform Target flag allows us to destroy specific resources..
+
+> terraform destroy -traget aws_instance.myec2
+
+resource "Aws_instnce" "myec2" 
+
+aws_instance --> Resource type
+my_ec2 --> local resource name
+
+Terraform State Files : terraform stores the state of the Infrastructure, that is being created from the TF File.
+
+This state allows terraform to map real world resource to your existing configuration..
+
+Current State is the actual state of a resource that is already deployed..
+
+terraform tries to ensure that deployed infratstrure is bsed on the desired state/ match the resources as in desired state..
+
+If there is a difference in the two, terraform plan presents a description of the changes necessary to achieve the desired state..  
+
+Best Practice --
+
+During Terraform init, if version argument is not specified, the most recent provider will be downloaded during initialization..
+
+For Production use, you should constrain the acceptable provider versions via configurations, 
+to ensure that new versions with breaking chnages will not be automatically installed.
+
+When you create contsraints, it creates terraform lock file..then tf looks at this lock file for constraints..
+
+you need to delte this file, if contstarinst you wnat to chnage, otherise it will keep looking at this lock file....
+
+One way you can avoid this by adding .. > terraform init --upgrade 
+
+it will rechevk tj constraints and update the lock file..
+
+Outputs: Output the resource attribiutes,,  output ( which we used to see in Console) in Command Prompt..
+
+terraform variable :: either from files (best practices in production.. .tfvars ( providing variable.tf values) ,,
+and have default values as well ) , from variables or from env variables
+
+env variables syntax from cp: setx varibale_name value
+
+Use Data Types define.. in variables.tf ( defines varibales) with default values..
+
+Data Types:
+
+1. String - "hello naman"
+2. List - ["mumbai","singapore"]
+3. Map - {name = "Mabel", age = 52}
+4. Number - 200
+
+Count Parameter : Simplify Configurationd and let you scale resources..
+
+Challenges related to it will same resource name..Later it will be very Difficult to Identify :( .. Solution Below:: :) :)
+
+count.index -- In resource Block, where count is set, an additional count object is available in expressions, 
+so you can modify the configurations of each Instance.
+
+:):)
+
+You can use List data type plus count.index to give more sensable names ( var.list[count.index] , list = [dev,qa,pprod,prd] )
+
+Conditional Expression : 1(fortestingpurpose)?2(dev server):3(production server)
+
+Local Values : assign a name to an expression, allowing it to be used multiple times within a module without repeating it., 
+
+terraform Functions : built in functions to transfer and combine values
+max()
+min()
+lookup()
+
+Data Source : https://www.bitslovers.com/terraform-data/
+
+Debugging Terraform :
+
+Terraform has detailed logs which can be enabled by setting the TF_LOG environment variable to any value : TRACE(default and most verbose), 
+DEBUG, INFO, WARN, ERROR to change the verbosity of the logs.
+
+> export TF_LOG=TRACE
+
+> export TF_LOG_PATH=/tmp/terraform_carsh.log -- storing path
+
+terraform fmt command - format the code for readibilty.. then do terraform plan or whatever..
+
+Terraform Validate -- this is a Comm -- chck the syntatically valid configuration or not..
+
+Dynamic Blocks are needed in case of Security Block.. Dynamic Block allows us to dynamically construct repeatable 
+nested blocks which is supported inside resource
+,data,
+
+Statement - Dynamic blocks can be used when defining modules to create repeatable nested blocks in an efficient manner. 
+
+
+Combined with conditional logic, this forms a very powerful set of tools for the more advanced Terraform user!
+provider and proviosioner block
+
+dynamic "ingress" {
+
+for_each = var.sg_ports
+iterator  = port
+content {
+
+}
+
+}
+
+Tainted Resources :
+
+Scenario : Users made a lot of chnages manuall ones in infra as well as inside server..
+
+Two ways to deal with this .. 1) terraform important
+2) Delete and Recreate the resource..
+
+Terraform taint command manually marks a terraform-managed resource as tainted, forcing it to be destroyed and recreated on next apply..
+
+https://buildvirtual.net/how-to-use-terraform-taint-and-untaint/
+
+> terraform taint aws_instance.myec2
+
+taine command modifies the state file not the infra..  
+
+Splat -- *
+
+lb[*] --> fetch all the attribites list..
+
+Terraform Graph -- garphical representation of configurstion plan.. / resources to be created
+
+> terraform graph > graph.dot
+
+Visualize it via GraphViz
+
+convert this .dot to .svg
+
+cat graph.dot | dot -Tsvg > graph.svg and see it in G.Chrome/
+
+Terraform Plan can be saved to a file.. > terraform plan --out=/mydemotoclient_11thNovember
+
+and trhen use this file while applying > terraform apply mydemotoclient_11thNovember
+
+> terraform output is used to extarct the value of an output variable from state files
+> terraform output iam_names
+
+To limit api calls to aws .. use > terraform plan --refresh=false
+
+autoapprove .. < -auto-approve
+
+List are Ordered, Chnagebale nd allow duplicate values
+
+SET - same as List -- {"apple","mangoe"}
+but unordered and no duplicate allowed..
+
+toSetFunction
+
+SET used in for_each .. 
+
+Count is used where resources are almost identical, if distince values are needed in the argument, usage of for_each is recommended..
+https://jeffbrown.tech/terraform-count-foreach/#:~:text=You%20cannot%20use%20count%20and%20for_each%20at%20the,arguments.%20When%20instances%20are%20almost%20identical%2C%20use%20count.
+Here are a couple of things to keep in mind when working with Terraform count and for each:
+
+You cannot use count and for_each at the same time in the same module or resource block.
+When using for_each, the keys of the map must be known values, and sensitive values are not allowed as arguments.
+When instances are almost identical, use count.
+If some arguments required distinct values that cannot be derived from the count integer, use for_each instead.
+
+Terraform Provisioners:
+
+Proviosners are used to execute script son local and remote machine as part of rresioruce craetion/destrcution preocess...
+
+types : local exec or remote exec
+
+local exec : allow us to invoke local executable after resource is created.. 
+(used to get the ip details of the reasources created and you can exho it to your local machine)
+
+Remote exec : allow to invoke scripts directly on remote server..  
+
+Local exec- used to run ansible playbooks on the created server after the resource is created..
+ executed in the same machine from where the terraform is invoked from ( same machine)
+
+provisioner "local-exec" {
+
+}
+
+Types of Privisioners --> Creation-Time Provisioners(only run during creation,if it fails, it will be mark as tainted and
+
+Destroy-Time Provisioners --> run before the resource is destroyed ) --> we need to add like
+ when = destroy while defualt creation is there where priviosner keyworkd is wused..
+
+on_failure --> continue--> ignore the error and continue with creating or destruction , fail--> Raise an error and stop applyling..
+
+https://k21academy.com/terraform-iac/terraform-provisioner
+s/#:~:text=Terraform%20Provisioners%20are%20used%20for%20executing%20scripts%20or,Why%20provisioners%20are%20used%20as%20a%20last%20resort%3F
+
+Null Resource : used not muched, but in hacky situtations.. https://www.bitslovers.com/terraform-null-resource/
+
+null resource does not corresponds to a real physical resource, used to execute any script or any task when certain condition is met ( using triggers ), e
+x. deploy configMap when cluster provisioning done succesfully.
+
+terraform module -- create module for each resource and source it in your files..
+
+What does a module do?
+
+A Terraform module allows you to create logical abstraction on the top of some resource set. 
+In other words, a module allows you to group resources together and reuse this group later, possibly many times. 
+
+Rwgistry in Terraform::
+
+terraform Registry is a repository of modules written by terraform community..
+
+Terraform Workspace allows us to have multiple workspaces, with each of the workspace can have different set of environment variables associated..
+
+> terraform workspace show/list/select/new/delete/..
+
+Terraform stores tf state file in difeerent workspace..
+https://medium.com/devops-mojo/terraform-workspaces-overview-what-is-terraform-workspace-introduction-getting-started-519848392724
+
+Password which you think is not pushing to giyt, it is actually in tf state.. i need to stored somewhere else in git..
+
+.gitignore - which all files should be ignored .. 
+.terraform,terraform.tfvars ( as it may contain some sensitive information ) ,terraform.tfstate( should be stored in remote mode )
+
+crash.log ( If terraform crashes, the logs are stored in a filed named crash.log )
+
+Team Collaboration - use ths keyword.. importance of centaral backend/s3..
+
+State Locking
+
+https://medium.com/clarusway/how-to-use-s3-backend-with-a-locking-feature-in-terraform-to-collaborate-more-efficiently-fa0ea70cf359
+
+When you do write operation, terraform would lock the state file..
+
+This is very import as otherwiese during your ongoing terraform apply operations, if others try for the same, it can corrupt your state files..
+
+How terrform knows an operations is performaing using rerraform.tfstate.lock.inform.. This file will be removed once opearyions is compoleted.
+
+>force-unlock
+
+Sometimes, unlocking does not succeded, and it fails even if opertaion is completed....
+ you need to unlock manual with above command ( if terfaorm is failing to do so )
+
+State Locking in S3, S3 does not support state locking functionality by D, 
+You need to ake use of DynamoDB Table to achieve state locking functionality..
+
+tf state stores in s3, lock file in DyanmoDB..
+
+Terraform State Management : list, mv,pull,push,rm,show..
+
+> terraform state list
+
+> terraform import( deoes not create config file like .tf and all only yf. stae file it im portys) ..
+creating tf files similar to configuration youj did manually..
+
+Terraform Profiles:
+
+Single Provider multiple Configuration - Multiple Regions
+
+1. One account different Regions -- Use alias with provider, provider 1 , provider 2 .. alias = mumbai.... and in resource.. 
+use provider=aws.mumbai in second resource use provider=aws.la
+
+https://stackoverflow.com/questions/48632797/using-terraform-to-manage-multiple-aws-regions
+
+https://towardsaws.com/multi-region-deployment-in-aws-with-terraform-35763efacff
+
+2. Multiple Account / users -- in provider , give Profile name.. profile = "account1/account2/dev/qa/pprd/prd" 
+
+You can assume_role .. in provider..
+
+Security:: in the output block ..
+
+sensitivity=true
+
+It will not show the output in cli output or on cloud tf state.. but it will not encrypt the password..
+
+Hashicorp Vault:: 
+
+Vault Provider allows terraform to read from; write to ; and configure HashiCorp Valult..
+
+provider "vault" {
+  address = "http://127.0.0.1:8200"
+}
+
+data "vault_generic_secret" "demo" {
+ path = "secret/db-creds"
+}
+
+output "vault_secrets" {
+ value = data.vault_generic_secret.demo.mydata
+ sensitive = "true"
+}
+
+Interacting with Valult from Terraform causes any secrets that you read and write to be persisted in both Terraform's state file..
+
+https://medium.com/@mitesh_shamra/terraform-security-using-vault-ed0fa1db4e09
+
+https://medium.com/@purnachandrasharma1/advanced-insights-into-terraform-version-constraints-and-pessimistic-operators-6272aba4f93d
+
+Docker -------
+
+Docker is a open source Platform to implement the container and container is a way 
+-- Containerzization is advance version of hypervisor..
+
+-- A way to package application with all the necessary dependencies and configuration, Portable artifcats, easily shared and moved around, 
+make deployment and development more efficient..
+
+-- Docker is an open source platform that enables developers to build, deploy, run, update and manage containers—standardized,
+ executable components that combine application source code with the operating system (OS) libraries and dependencies required 
+ to
+ run that code/application in any environment.
+ 
+-- Devops will work on packaging the appplication in a container, no Environmental configuration needed on server except Docker Runtime.
+ 
+-- Docker writen in Go Language.
+
+Docker is a tool that performs O.S. Level Virtualization, also know as Containerzization..
+
+-- V.imp.. Before Docker, many users faces the problem(platform) that a particular code
+ is running in the devloper's system but not in the user's system..
+
+-- Docker engine runs natively on Linux Administration..
+
+-- Docker is a PaaS..
+
+-- Advantage of Docker -- No preAllocation of RAM.. CI Efficiency, Less Cost, Light in Weight, we can reuse the image, it is fast..
+
+Docker runs on Window 10 or more.. Hypervisor should be enabled..
+
+Disadvantage : Docker does not support Cross-Platform Compatibilty, if application is designed on windows, it can't run on Linux or Vice-Versa..
+
+Os should be same..
+
+Container is a Layered File System..
+
+Docker Client -- We .. we create file.. Dcker user cn connect to docker Server through a Client.uses commands and Rest API..
+
+Docker Server-- docker daemon or docker engine -- Responsible for running containers to manage Docker services..
+
+Docker Hub - Stoare of images ours..
+
+docker images - templates..
+
+Docker-compose..  running multiple containers at a time..
+
+Docker Images are the ready only templates used to create docker containers.
+. or single file with all dependencies and configuration required to run a program.
+
+Ways to create a docker image .. 
+
+1) Take Image from Docker Hub..
+2) Create Image from Dockerfile..
+3) Creating Image from existing Docker Containers..
+
+Cotainer -- Hold the entire package that is needed ot run the application.. or image is a template..container is a copy of that remplate..
+
+Image become container when run on Docker Engine..
+
+>> Comands
+
+> docker images -- show all images in your files..
+> docker serach jenkins .. to serach in docker hub
+> docker pull jenkins
+> docker run ( craete and start ) -it (interactive mode and terminal ) --name bhupinder ubuntu /bin/bash
+> service docker status
+> docker start bhupinder
+> docker attach cntainer_name -- to go inside
+> docker ps  -- running container  .. docker ps -a .. stop as well as running cotainer........
+> docke stop bhupinder
+> docker rm bhupinder
+
+docker attach vs exec : Both are used to explore the running container if 
+you want to do that with the new command process or without exiting the running container use docker exec.
+
+In summary, docker attach is like looking at the live terminal of the con
+tainer, while docker exec is like sending a command to be executed inside the conta
+iner without directly connecting to its terminal. Choose based on whether you want to "see"
+ what's happening inside the container in real-time (docker attach) or if you want to per
+form a specific action or run a command inside the container (docker exec).
+docker attach:
+What it does: Connects your terminal directly to the terminal inside a running Docker container.
+Some Important Commands -- 
+
+Stop all Running Containers
+> docker stop $(docker ps -a -q) 
+Delete all Stopped Containers (bo running and stopped )
+> docker rm $(docker ps -a -q)
+Delete all Images
+> docker rmi $(docker images -q)
+
+--all , -a		Show all containers (default shows just running)
+--quiet , -q		Only display container IDs
+
+docker commit and docker diff commands:
+
+docker run -it --name imagebeforeupdate ubuntu /bin/bash
+cd tmp/
+touch abcd.txt
+docker diff imagebeforeupdate
+now create image from it
+docker commit container-name updateimage (create imeg from container)
+docker images
+docker run -it --name rajcontainer updateimage /bin/bash
+
+Dockerfile : it contains the set of instructions
+
+-- Dockerfile is a simple text file that consists of instructions to build Docker images.
+
+FROM - base image
+RUN - To execute a command, it will create a layer in it..
+MAINTAINER - Author/Owner/Description
+COPY - COPY from local file .. need not to download from internet
+ADD - ineterhet download same as copy.. also we can extract file at image side..
+EXPOSE - to expose port 
+WORKDIR - to set working directory for ayuk  container
+CMD - Execute command but during container creation
+ENTRYPOINT - Simailar to CMD but has higher priority over cmd ,first commands will be executed by CMD only..
+ENV - Environemnt Variables..
+
+MultiStage Builds  
+https://medium.com/capital-one-tech/multi-stage-builds-and-dockerfile-b5866d9e2f84#id_token=eyJhbGciOiJSUzI1NiIsImtpZCI6IjcxM2ZkNjhjOTY2ZTI5MzgwOTgxZWRjMDE2NGEyZjZjMDZjNTcwMmEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2Njg1MjQzNTYsImF1ZCI6IjIxNjI5NjAzNTgzNC1rMWs2cWUwNjBzMnRwMmEyamFtNGxqZGNtczAwc3R0Zy5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjEwMjU3MDUxMzEwODkzODI1NDE1NiIsImVtYWlsIjoiZ2FyZy5uYW1hbjg2QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhenAiOiIyMTYyOTYwMzU4MzQtazFrNnFlMDYwczJ0cDJhMmphbTRsamRjbXMwMHN0dGcuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJuYW1lIjoiTmFtYW4gR2FyZyIsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BTG01d3UyU0tLZEhHM3N4RWpaaUh3bnRVNHgtR2h6Wjh1MHFCWHJQWTUwND1zOTYtYyIsImdpdmVuX25hbWUiOiJOYW1hbiIsImZhbWlseV9uYW1lIjoiR2FyZyIsImlhdCI6MTY2ODUyNDY1NiwiZXhwIjoxNjY4NTI4MjU2LCJqdGkiOiI1NzkyNWM5NTkyNzdhZmFlY2ZkYWQ0ZDNlYmNkZTNhMTVkYTIxNDhlIn0.bcii2A0nc_tRer-fzOX-MD4x-GIjtqQZAOwjEBxwO1fNQHg1xQNH1Kd7sbniFM_FY3PluAko61CYDDpYVaoCG5RyRRYETus3qe51a8FhhEI8B-R_ejRYn3J8z56WcJ-h2EqPr-7i8Y1oX5LRVD3pSjfkhxoXSDgOpK67sYdMKth9PQI1eNMz21t24Rd8N4rpS56tydraDMb4lWUIZwb7K7ZnXAkJDWt1pTB5hYK--zZIViSgYvHsVLIb1qmgqlUTqQZF1ls1fTPbjstEf67rISXWegRa-8_Q78yimlerXFuYx32jM-EkMkJHvMRwCCl3NNGR5X0Gk9dIq5TgJkWa4g
+
+https://overcast.blog/building-efficient-multi-stage-dockerfiles-for-production-055f34c4baed?gi=7de1f870f66b
+
+docker build -t tag_name .
+
+https://www.bing.com/videos/search?q=dockerfile+best+practices&ru=%2fvideos%2fsearch%3fq%3ddockerfile%2bbest%2bpractices%26FORM%3dHDRSC4&view=detail&mid=EE20765543B89C0A4D5AEE20765543B89C0A4D5A&&FORM=VDRVSR
+
+Best Practices :
+
+1. Use Official Docker Images as Base Image.. cleamer dockef file, official and verified image wiht best practcies
+2. By default it will latest tag.. it may take nwer tag in latest tag in next build .. that is why use specifiic version... 
+the more specific the better
+3. Use smaller sized officla images-- less sapce it will take in your hub or local.. easy to transfer.. 
+select alpine images (light weight) -- for example
+4. Optimise Cache Image Layers..  Once a layer chnages.. all the downstream/follwoing layers are re-created as well..  
+Order DockerFile commands from least to most frequently changing commands to take full advantage of Cache layers.
+. copy code should be last as possible as it will have most frequent chnages..
+5. We dont, need everuthing inside Docker Image, auto-generated folders like target,build and ReadMe Files.
+. use .dockerignore for that ..
+6. Which OS layer will be used to start the application? use least prviileaged user.. 
+7. Validate the Build Image for Security Vulnerabilities,,.. Tools we used in Novartis -- Qualsys Scan..
+> docker scan <image-name> .. use synk to do this opration in backend....
+
+
+To reduce the size and build time of your Docker images, you can use a `.dockerignore` file to exclude files and directories from the context sent to the Docker daemon during the build process. This way you can avoid unnecessary files being included in the build context, which can help minimize the image size and speed up builds.
+
+Here's a step-by-step guide on using `.dockerignore`:
+
+1. **Create a .dockerignore file:** In the root directory of your application (where your Dockerfile is located), create a file named `.dockerignore`.
+
+2. **Specify what to ignore:** Add patterns to the `.dockerignore` file to specify which files and directories should be excluded from the build context. The syntax is similar to `.gitignore`. For example:
+   ```
+   **/.git
+   **/.DS_Store
+   node_modules/
+   tmp/
+   logs/
+   ```
+
+3. **Understand the patterns:**
+   - `**/.git` and `**/.DS_Store` ignore all `.git` and `.DS_Store` files in any directory.
+   - `node_modules/` ignores the `node_modules` directory, which is not necessary if dependencies are installed inside the Docker container.
+   - `tmp/` and `logs/` ignore temporary files and log directories, which are typically not needed in the Docker image.
+
+4. **Build your Docker image:** When you build your Docker image using `docker build`, Docker will use the `.dockerignore` file to exclude the specified files and directories from the context. This reduces the context size and can lead to faster build times and smaller Docker images.
+
+5. **Maintain the .dockerignore file:** Regularly review and update the `.dockerignore` file as necessary, especially when you add new types of files or directories to your project that should not be included in your Docker images.
+
+By effectively using a `.dockerignore` file, you can optimize your Docker builds and maintain a lean and efficient set of Docker images.
+
+********************************************************************************************************************************************************************
+
+Docker Volume --
+
+Summary of Key Characteristics
+Volume Type	  Persistence	Host Path Control	Use Case
+Anonymous Volume   Yes	        No	                Temporary data
+Named Volume	   Yes	        No	                Reusable and managed data
+Bind Mount	   Depends	Yes	                Development and debugging
+tmpfs Volume	   No	        No	                Fast, non-persistent access
+External Volume	   Yes	        Yes (via driver)	Distributed or advanced storage solutions
+
+
+Volume will not be included when you create an image out of a container
+shared drive
+mapping in two ways -- a/ container <----> container (anonymous) , container <----> container named volume , b/ host <----> container
+
+Advantage -- On deleting container, volume/data will remain..
+
+docker run -it --name container2  --volumes from container1 ubuntu /bin/bash
+
+Creating Volumes from cmd.. :) -->
+
+docker run -it --name container3 -v /volume2 ubuntu /bin/bash
+
+2. Host Container
+
+docker run -it --name host cont -v /home/ec2-user:/rajput --privileged=true ubuntu /bin/bash
+
+some imp commands below
+
+docker volume ls
+docker volume create <volume-n>
+docker volume rm <volume-n>
+docker volume prune -- it removes all unused volumes.. only unused
+docker volume inspect  <volume-n>
+docker container inspect <con-name>
+docker port <container-name>
+
+Docker exec vs docker attach -- Docker exec creates a new process in the container's environment, while docker attach just connect the standard ip/op of the main
+process inside the container..
+
+publish(-p) > export.. publish ho Gaya to internet se open.. expose Kiya to only internally accessible........
+
+Debugging Docker :
+
+docker logs <container-name>
+
+env command inside docker exec to see all environment variables values....
+
+https://medium.com/edureka/docker-networking-1a7d65e89013
+
+Docker Networking
+
+Bridge: This is a private default internal network created by docker on the host. 
+So, all containers get an internal IP address and these containers can access each other, using this internal IP. 
+The Bridge networks are usually used when your applications run in standalone containers that need to communicate.
+
+Host: This driver removes the network isolation between the docker host and the docker containers to use the host’s networking directly
+. So with this, you will not be able to run multiple web containers on the same host,
+ on the same port as the port is now common to all containers in the host network.
+ 
+None: In this kind of network, containers are not attached to any network and do not have any access to the
+ external network or other containers
+. So, this network is used when you want to completely disable the networking stack on a container and
+, only create a loopback device.
+
+https://medium.com/patrik-bego/docker-networking-practical-examples-23900904486e
+
+> docker network create <network-name>
+
+> docker run -p 27017:27017 -d --network=<network-name> mongo
+
+Docker-compose -- run multiple containers at a time..]\ ,, up/down commands
+
+Adavnataege - Docker compose takessss care of creating a common network for docker container created via docker compose.. 
+
+https://bikramat.medium.com/dockerfile-cmd-vs-entrypoint-78b219d55df0
+
+https://medium.com/bb-tutorials-and-thoughts/docker-entrypoint-vs-cmd-8934cfdf78f3https://medium.com/bb-tutorials-and-thoughts/docker-entrypoint-vs-cmd-8934cfdf78f3
+
+Kubernetes:
+
+Technical Guftgu Videos
+
+-- Kubernetes (/ ˌ k (j) uː b ər ˈ n ɛ t ɪ s,-ˈ n eɪ t ɪ s,-ˈ n eɪ t iː z,-ˈ n ɛ t iː z /, commonly stylized as K8s) 
+is an open-source container orchestration system for automating software deployment, scaling, and management. 
+
+-- It schedules, runs and manages isolated containers which are running on virtual/physical/Cloud Machines..
+
+Docker swarm works with docker only no GUI, no autoscaling , while k8s can work with Rcoker,docer, container.. 
+
+Architecture https://www.youtube.com/watch?v=C69My8d-Hww&list=PLBGx66SQNZ8aPsFDwb79JrS2KQBTIZo10&index=46 - 5.50 se
+
+Master ( Control Plane ) 
+
+API-Server - every request goes to this.
+
+ETCD Cluster - stores the state..
+
+Controller Manager - check whats the actual state and what is desired.. and isntruct schedular to take actions..
+
+Kube Schedular - does the actions.
+
+Node -- Kube proxy( networking ) , Kubelet ( kabhri :) ) manages pods - agent running one node talk to Kubernets master ( api server) ..  
+
+kubelete creating pods creation request..
+;iostens to kubernetes master ( api server ) and send suuces/fauliure info to matser, Docker , Pod
+
+https://www.tutorialspoint.com/kubernetes/kubernetes_architecture.html
+
+IP is assigned to POD not not comtainers
+
+POD is a smallest unit in Kubernetes..
+
+Pod is a group of one or more cotaiers athat are deployed to on the same host.
+
+Volume - Non epeheraml Storage..
+
+Kubernetes Objects -- Pods, Service, Volume , NameSpace, ReplicaSet, Secrets, ConfigMaps, Deployments, Job, DaemonSets..
+
+Pods manages Containers, ReplicaSet manages pods, Services expose pod processes to the outside world....
+
+> kubectl apply -f pod.yaml
+
+> kubectl get pods 
+
+kubectl get nodes
+
+kubectl describe pod < pod - name > (if multiple container) then add ---> -c c00
+ 
+kubectl logs -f <pod-name>
+
+kubectl exec testpod3 -c c00 --hostname
+
+kubectl delete -f pod.yaml
+
+Labels--
+
+Label are the mechanism to organise Organise Kubernetes Objects.. similar to Tags..
+
+we can use them for different Environment - prod, qa, dev.....
+
+kubectl get pods --show-labels
+
+Our labels are attcahed to an object, we would like to narrow down and these are called as label selectors..
+
+Equlaity( = , != ) vs set based ( naman in (naman,priyanshi, yogesh, mummmy, ppapa ) , in, not in, exists.. selected
+
+Node Label and Node Selector..
+
+kubectl describe <pod-nmae>
+
+Replication Controller and Replica Set -- Replication and scalibility are two different terms ..think about it..ex. netflix
+
+Relication Controller -
+
+-- RC is a objetc that enables you to esilay crareta multiple pods, then make sure the desirec pods always exists..
+
+for example -- ghar ke kitch me boxes h .. un boxes ko manigest me template bolte h .. vv imp start calling boxes as templates now :):)
+
+Relica set is next generation Replcatiob contrlelr -- Replication controoler supprt only equalit y based selcor . 
+when in replica set also sport set base operator
+
+Replica Set and Replication Controller is4 not able to do update and Rollback apps in the Cluster..
+
+Deployment Object is in picture now
+, 
+which
+acts as a supervisor which gives us the capability to rolled out ( scaling ), updated or roll back to a previous ststae.
+
+If node hostaung an insatne goes down or pod is deleted, the deployment controller replaces it....
+
+RS will not be replced it is still there.. only deplpument controller will supervise it..
+
+> how to scale command via cmd ( impertative ) > kubectl scale --replicas=1/2/3/4/what.ever deploy mydeployments
+
+https://medium.com/codex/kubernetes-deployment-rolling-updates-and-rollbacks-explained-e3efa6557368
+
+
+If you have a strategy of RollingUpdate on your deployments you can delete the pods in order to replace the pod and refresh it.
+
+About the RollingUpdate strategy:
+
+Users expect applications to be available all the time and developers are expected to deploy new versions of them several times a day. In Kubernetes this is done with rolling updates. Rolling updates allow Deployments' update to take place with zero downtime by incrementally updating Pods instances with new ones.
+kubectl rollout <status/history/undo>
+
+Failed deployment Reasons : Insufficent permissions, readyness proble failures,image pull errors
+, limit ranges,applicationj run time misconfiguration.......
+
+POD is having IP, but container does not....
+
+Netwrokijg bw container in a single pods will be through local host
+
+netwroking bw pod will be through IPS.....
+
+By defualt, pod ip are not accesible outisde NODE..
+
+Services : Each pod get its own IP Address, this lead to a problem as pod might be running now
+, but
+ later it got destroued and new one created,, so new IP again
+agaibn*****
+
+Servuce provide bridege bw end user and pOD -- v.imp..
+
+Internally virtual Ip maps with pod ip .. user connet with vurtual IP..
+
+Services types -- node ip, load balancer , cluster ip,
+
+Cluster ID Service Description - Exposes Virtual I p .. viponly rachable from within a cluser.
+. mnainly used to communicte a betweencompinets of miceroservices
+
+Node Ip - makes a service accsible from outisde the cluster.
+.Exposes the service on the smae port of each selctd node in the cluster using nAT..
+
+https://www.waytoeasylearn.com/learn/ingress-in-kubernetes/
+https://medium.com/devops-mojo/kubernetes-ingress-overview-what-is-kubernetes-ingress-introduction-to-k8s-ingress-b0f81525ffe2
+
+https://jawadhasan80.medium.com/kubernetes-basics-services-938a049203c0#:~:text=Following%20is%20the%20list%20of%20different%20service%20types,as%20an%20alias%20%28proxy%29%20for%20an%20external%20service.
+
+Now, each Pod in a cluster is assigned a unique IP address. Kubernetes
+Pods are created and destroyed to match the state of the cluster. They can live and die
+. So, as the Pods are ephemeral and that’s why we can not rely on Pods IP addresses
+. So, how do we connect to our apps in a reliable manner? meet Services. We can use services for stable networking.
+
+Services can help with internal and/or external access to the Pods.
+A service provides a single point of entry for accessing one or more Pods.
+They lets you expose an application running in Pods to be reachable from outside your cluster.
+You can also use Services to publish application only for consumption inside your cluster.
+v.imp. --------->  Service provide a reliable network endpoint for unreliable Pods.
+They are an abstraction layer which hides the unreliable nature of Pods.
+Services also do Pods load-balancing.
+Labels are used to associate Pods with Services.
+
+
+Final Words
+
+ClusterIP Service
+Your application needs a database so you deploy a
+ MySQL database as a POD and create a service of type ClusterIP called mysql-service to make it accessible to your application.
+ 
+ NodePort Service
+So your application is now working. 
+To make the application accessible to the outside world, you create another service, 
+this time of type NodePort and make your application available on a high-port on the nodes in the cluster.
+
+In this example a port 38080 is allocated for the service.
+ The users can now access your application using the URL http: //<node-ip>:38080.
+
+For example we do not want the users to have to type in IP address every time you configure your 
+DNS server to point to the IP of the nodes your users can now access your application using the URL my-online-store.com and port 38080.
+
+Now you don’t want your users to have to remember port number either. 
+However service node ports can only allocate high numbered ports which are greater than 30000.
+
+So you then bring in an additional layer between the DNS server and your cluster like a proxy server 
+that proxies requests on port 80 to port 38080 on your nodes.
+
+You then point your DNS to this server, and users can now access your application by simply visiting my-online-store.com.
+
+The LoadBalancer has an external IP that can be provided to users to access the application. 
+In this case we set the DNS to point to this IP and users access the application using the URL my-online-store.com.
+
+However in order to share the same cluster resources, you deploy the new application as a separate deployment within the same cluster. 
+You create a service called video-service of type LoadBalancer.
+
+Kubernetes provisions port 38282 for this service and also provisions a Network LoadBalancer on the cloud. 
+The new load balancer has a new IP remember you must pay for each of these load balancers and having many such 
+load balancers can inversely affect your cloud build.
+
+So how do you direct traffic between each of these load balancers based on the URL that the users type in.? 
+Here you need yet another proxy or load balancer that can redirect traffic based on URLs to the different services.
+
+Every time you introduce a new service, you have to reconfigure the load balancer.
+
+Ingress
+Using a single Externally accessible URL, that you can configure to route to different services
+ within your cluster based on the URL path, at the same time implement SSL security as well.
+
+Volume:
+
+-- Container are short lived in nature..
+-- All the data inside the container will get deleted if the container crashes..
+-- To overcome this problem, we need volume..
+-- In k8s, volume is attached to Pods.. and share among containers of pod................
+-- the volume has same life as pod and it outlives the containers of the pod..  
+
+Volume type 
+
+Host path - acces data between pods.. volume is mounted at host storage..( node )..map the staoge path in container to host path
+empty dir - use this when we want to share contents bw multiple containers, on the same pod snd not to the host machine..
+empty dir got created when a pod is assigned to a node.. exists as long pod is living.. data will be lost once pod is removed from  a node.. 
+if container crashes,
+this is a good approach as data remains.
+nfs
+
+A persistent Volume ( PV ) is a cluster-wide resource that you can use to store data in a way that
+it persists beyond the lifetime of a pod.. we generally use EBS/NFS volume and attach it to all nodes/instances..
+
+medium.com/analytics-vidhya/volumes-in-k8s..
+
+:)
+
+all explainiation -- 5 minutes -- persistant volume video..
+
+Request Persistent Volume.. is Persistent Volume Claim ( PVC )
+
+Health Check/Liveliness Probe -- https://medium.com/@AADota/kubernetes-liveness-and-readiness-probes-difference-1b659c369e17
+
+Readyness proble, if pod is not ready, it is removed from service load balancrs/
+
+Resource Quota -- defining the limit of memory/cpu to a container..  max limit is 0.5 to 1 cpu and memory 500 mb to 1 gb..
+
+Horizontal pod Autoscaler -- is an object.. ex. if cpu is more than 20 , create a new one..
+
+Kubernetes has the possibility to automatically scale pods based on Observerd CPU Utilization,
+
+https://phoenixnap.com/kb/kubernetes-daemonset
+
+Pod Stages : Pending, Running, Succeeded, Failed, Completed, unknown..
+
+Config Map - used to store Application configuration details like database url 
+, or all configurations to provide the reusabaility and easy to manage..
+
+Secrets -- are used to store the db credentails or secret data or they base 64 encoded..
+
+Databse applucations hsoule be created with StateFul Sets Objects..not deployment controller..
+
+Namespaces -- organising resources by namespaces..logging.. database.. awe b applicatuion.. bw teams..
+
+Helm - Helm is package managers.. package .. create helm charts .
+. put to helm repos.. use it for your case.. eg. monitoring applications.. > helm install chart name
+
+Kubeconfig  https://medium.com/the-phi/understanding-the-kubeconfig-3ef43e8716d
+
+Ansible Ansible : https://medium.com/swlh/getting-started-with-ansible-ee31be8c6a75  -- adhoc -- copy ,ping, package commands
+
+/etc/ansible/ansible.cfg
+/etc/ansible/hosts
+
+https://www.youtube.com/watch?v=uyFrrKju4Es&list=PLBGx66SQNZ8aPsFDwb79JrS2KQBTIZo10&index=34
+
+https://www.youtube.com/watch?v=2UlTYJMi0YE&list=PLBGx66SQNZ8aPsFDwb79JrS2KQBTIZo10&index=36
+
+https://www.middlewareinventory.com/blog/ansible-facts-list-how-to-use-ansible-facts/
+
+Playbook - composed of one or more modules in a list. Module is a list of configuration files.
+
+File Structure -- host --> Defines the host against which playbooks tasks has to be executed
+ , Variable, Task--> list of modules to run in an order..
+
+Handlers - A handler is exactly the same as a task, but it will run when called by another task.
+. Handlers are just like regular tasks in an ansible playbook, 
+
+but are only run if the task contains a notify directive and indicates that it changed something..
+
+Code --
+
+--- #Handler Playbook handler.yml
+- hosts: demo
+  user: ansible
+  become: use
+  connection: ssh
+  tasks:
+   - name: Install httpd service
+     action: yum name=httpd state=installed
+     notify: restart httpd
+  handlers:
+   - name: restart httpd
+     action: service name=httpd state=restarted
+	 
+Dry run ... ansible-playbook handler.yml --check
+
+Loops:
+
+action: '{{item}}' state=present
+with_items:
+  - httpd:
+  - jenkins
+  - apache
+  - nginx
+  
+Conditions -
+
+when usagaes 
+
+if system is ubuntu, do this otherwise ignore..
+
+Ansible Vault allows keeping sensitive data such as passwords or keys in encrypted files, rather than a plaintext in your playbooks.
+
+Creatign a file to be encrypted
+
+ansible-vault create <playbook-name.yaml>
+
+ansible-vault edit <playbook-name.yaml> ( vi will not work )
+
+ansible-vault rekey <playbook-name.yaml> ( Edit Password )
+
+ansible-vault encrypt <uncryted-playbook.yaml>
+
+ansible-vault decrypt <playbook-name.yaml>
+
+As you might know that while we use Ansible, we must create files like inventory file, Playbooks, Variable files, etc. 
+These files can contain sensitive data like Usernames, Passwords, Port Numbers. E
+exposure to this sensitive data can lead to security breaches in the infrastructure environment
+s. In this topic, we are going to learn about Ansible Vault.
+
+So, we must have some way to protect that data from unauthorized access. To achieve this, we use Ansible Vault, 
+which is a built-in tool in Ansible, it works based on encryption and password-based authentication.
+
+Roles--
+
+----- Roles are good for organizing the tasks and encapsulating data needed to accomplish those tasks.
+
+-- roles -- types -- > Default, files 
+--> file to be moved to target server, handlers 
+->, meta - > data about data, templates, tasks 
+-> contains all task which are there in playbooks 
+
+,vars
+
+
+RDS -  
+
+https://medium.com/awesome-cloud/aws-difference-between-multi-az-and-read-replicas-in-amazon-rds-60fe848ef53a
+
+
+Monitoring - 
+
+1. health check - done vi ahttp endpoinst
+2. Metrices - Numerical representation of data captured at regular intervals..
+3. Log Entries.
+4. End to End Tracing - across servers ( microservices )..
+
+Telemetry -- MELT -- Metrices- Infra Monitoring, Events, Logs, Traces - used for APM
+
+Mtrices - Throughput,Error rate, Request rate, Request Duration
+
+Infra, Log, secuity, RAM , Browser, Synthetic..
+
+Infra Monitoring.
+
+1. register for a new relic account,
+2. Create one AWS account,
+3. Install NewRelic Infra Agent
+4. Visualize a VMs metrices on New Relic One
+
+You can download the script to be run in vm -- step 3 from new relic.. it will start forwarding the metrices to New Relic..
+
+Which all things we can see in Dashboard 
+
+System Related Data
+
+-- CPU %
+-- Load Average Per Minute
+-- Memory Utilization
+-- I/O Read Output..
+
+Network related data
+
+-- Transmit Bytes Per second
+-- Receive Byte per second
+-- Received Error per second
+
+APM Metrices
+
+Are we meeting customer SLA?
+is our app delivering consustent response times across users and geographies?
+Is our site delivering a consistent user experience, regardless of browser type..
+
+Why Performance is critial for Buiness
+
+1 sec delay in response time can reduce conversion by 7%.. most people dont complete purchase if response time is huge..
+
+APM Monitoring Advantage :
+
+1. Business Continuity - Rduced Downtime
+2. Better End user Experience.
+3. High Productivity
+4. Reduced Operational Cost.
+
+Whenever a user a webpage, it redirect to a new page.. so new relic monitor it and we can see it in Transactions..
+
+Transactions --  New Relic ........
+Error Rate
+Throughput
+ Throughput is a measurement of user activity for a monitored application\
+ . New Relic APM throughput and New Relic Browser throughput are measured in different way
+ s: requests per minute (RPM) for APM, and page views per minute (PPM) fo
+ r Browser.
+ 
+ Steps to setup apm
+ 
+ 1. nstall the new relic agent
+ 2. copy the agen dir inside /opt/tomcat
+ 3. modify newrelic.yamlw ith license key
+ 4. cd /opt/tomcat/newrelic
+ 5. java -jar newrelic.jat install
+ 4. sh shutdown.sh
+ 5. sh shartup.sh
+ 
+Create alerts, analyze errors, and speed up requests by uncovering trouble areas.
+
+Synthentic 
+
+Improve quality of builds to ensure availability.
+Simulate traffic across thousands of public locations and private locations to proactively detect and resolve issues 
+Alert on sub-optimal performance of URLs, APIs, and services—then automatically track uptime to simplify reporting
+Make deployments high-performing with new or updated relevant synthetic monitors in build automation and CI/CD pipelines 
+
+
+Security
+
+https://www.bing.com/videos/search?q=AWS+WAF+hindi&ru=%2fvideos%2fsearch%3fq%3dAWS%2520WAF%2520hindi%26qs%3dn%26form%3dQBVR%26%3d%2525eManage%2520Your%2520Search%2520History%2525E%26sp%3d-1%26ghc%3d1%26pq%3daws%2520waf%2520hindi%26sc%3d5-13%26sk%3d%26cvid%3d8A2096E33AEE4748A11E3184A6E368AD%26ghsh%3d0%26ghacc%3d0%26ghpl%3d&view=detail&mid=03D811127C792951E7E403D811127C792951E7E4&&FORM=VDRVSR
+https://medium.com/@comp87/deep-dive-into-the-aws-web-application-firewall-waf-14148ea0d3d
+https://medium.com/aws-architech/use-case-aws-shield-vs-waf-fe920944c04d
+https://digitalcloud.training/aws-waf-shield/#:~:text=AWS%20WAF%20and%20AWS%20Shield%20help%20protect%20your,app%20availability%2C%20compromise%20security%2C%20or%20consume%20excessive%20resources.
+https://www.bing.com/videos/search?q=aws+waf+ddos&&view=detail&mid=2933BEE7304A3B9B8F5D2933BEE7304A3B9B8F5D&&FORM=VRDGAR&ru=%2Fvideos%2Fsearch%3Fq%3Daws%2Bwaf%2Bddos%26FORM%3DHDRSC4
+https://www.bing.com/search?q=ddos+attack&cvid=77c987ed43a34d76b8de8a36b930da22&aqs=edge.1.69i57j0l8j69i11004.1957j0j1&pglt=43&FORM=ANNAB1&PC=DCTS
+https://www.cloudflare.com/learning/security/threats/cross-site-scripting/
+
+https://medium.com/awesome-cloud/aws-difference-between-multi-az-and-read-replicas-in-amazon-rds-60fe848ef53a
+15. Production Deployment, Stargetey and if any issue what you will do.. Monitoring-> Root Cause Analysis / Postmortem / Dev / Prod
+Amazon RDS has two main different types of replicas, Multi-AZ Replica and Read Replica, and it's easily to find their difference.
+A multi-AZ deployment has a Master database in one AZ and a Standby (or Secondary) database in another AZ. O
+nly the Master database serves traffic. If the Master fails, then the Secondary takes over.
+
+A Read Replica is a read-only copy of the database. 
+It is actively running and apps can use it for read-only queries. 
+A Read Replica can be in a different AZ or even in a different region.
+
+volumes/ state ful vs stateless
+
+https://medium.com/bb-tutorials-and-thoughts/understanding-docker-volumes-with-an-example-d898cb5e40d7
+https://www.contino.io/insights/stateless-vs-stateful-containers-whats-the-difference-and-why-does-it-matter
+
+https://aws.amazon.com/architecture/well-architected/?wa-lens-whitepapers.sort-by=item.additionalFields.sortDate&wa-lens-whitepapers.sort-order=desc&wa-guidance-whitepapers.sort-by=item.additionalFields.sortDate&wa-guidance-whitepapers.sort-order=desc
+https://www.bing.com/videos/search?q=aws+well+architecture+framework+hindi&&view=detail&mid=A9EDB5D7B7ACC94A326EA9EDB5D7B7ACC94A326E&&FORM=VRDGAR&ru=%2Fvideos%2Fsearch%3Fq%3Daws%2520well%2520architecture%2520framework%2520hindi%26qs%3Dn%26form%3DQBVR%26%3D%2525eManage%2520Your%2520Search%2520History%2525E%26sp%3D-1%26pq%3Daws%2520well%2520architecture%2520framework%2520hindi%26sc%3D0-37%26sk%3D%26cvid%3D76BB8F2A47934F36B48911CBF74EF643%26ghsh%3D0%26ghacc%3D0%26ghpl%3D
+https://medium.com/hengky-sanjaya-blog/monolith-vs-microservices-b3953650dfd#:~:text=Monolith%20Architecture%20is%20built%20in%20one%20large%20system,of%20small%20services%2C%20each%20with%20their%20own%20code-base.
+
+COP --Q-- RS
+
+kubectl rollout <status/history/undo>
+
+AzureDevOps
+
+https://www.youtube.com/watch?v=aonA7Kb7WGE
+
+Azure Board - Planning
+
+Repos - Storing our code
+
+Pipelines - pipeline to build the artifact	
+
+Test Plans - Trigger Unit Test cases 
+
+Artifacts - Final, Artifact will be stored here
+
+Agents : 
+
+
+DataDog
+
+Monitoring tells you whether a system is working,
+Observability lets you ask why it is not working..
+in order to know the why, we need to look for metrices, events, Logs and Traces..
+
+Observability means assembling all fragments from logs, monitoring tools,and organize them
+in a way which gives actionable knowledge of the whole environment, thus creating an insight..
+
+In order to make the system observable, we need to collect the metrices - cpu/memory utilization, events, logs and trace ( application performance )..
+
+Kubernetes Interview
+
+Docker Swarm vs kubernetes
+
+Swarm - Rollback and Auto Deployment not possible, not bultin tool available with swarm, easy to setup but not rboust..
+
+exposing port 8080 from container, service and ingress and port 80 from browser in kubernetes, how can we achieve that
+
+In summary, while JAR is a general-purpose archiv
+e, WAR is specialized for web applications, and EA
+R is designed for enterprise-level applications that may consist of multiple m
+odules, each serving a specific purpose within the overall application architectur
+e. The choice between JAR, WAR, and EAR depends on the nature and complexi
+ty of the Java application you are developing.
+
+In Kubernetes, a load balancer is a crucial component fo
+r distributing network traffic across multiple instances of a service to e
+nsure high availability, scalability, and reliability. Kubernetes pr
+ovides different ways to implement load balanci
+ng, and one common approach is to use the Kubernetes Service resource.

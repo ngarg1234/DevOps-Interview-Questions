@@ -1,0 +1,16 @@
+The format function produces a string by formatting a number of other values according to a specification string. It is similar to the 
+printf function in C, and other similar functions in other programming languages.
+
+
+format(spec, values...)
+
+> format("Hello, %s!", "Ander")
+Hello, Ander!
+> format("There are %d lights", 4)
+There are 4 lights
+
+
+> format("Hello, %s!", var.name)
+Hello, Valentina!
+> "Hello, ${var.name}!"
+Hello, Valentina!

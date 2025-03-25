@@ -1,0 +1,454 @@
+OSI Model (Open Systems Interconnection) 
+========================================
+> The OSI Model is a conceptual framework that helps understand how network communication works. 
+-> It consists of 7 layers, each with a specific role in data transmission. 
+-> This model was created to standardize networking and ensure different devices and technologies can communicate effectively.
+
+🔹 The 7 Layers of the OSI Model (Bottom to Top)
+1️⃣ Physical Layer (Layer 1)
+-> Deals with the actual hardware (cables, switches, network cards).
+-> Transmits raw binary data (0s and 1s) as electrical or optical signals.
+
+2️⃣ Data Link Layer (Layer 2)
+-> Handles node-to-node communication within a local network.
+-> Uses MAC addresses to identify devices.
+-> Switches operate at this layer.
+
+3️⃣ Network Layer (Layer 3)
+-> Handles routing of data across different networks.
+-> Uses IP addresses for device identification.
+-> Routers work at this layer.
+
+4️⃣ Transport Layer (Layer 34)
+-> Ensures reliable data delivery between devices.
+-> Manages error detection, flow control, and retransmission.
+-> Uses TCP (reliable) and UDP (faster but no error checking).
+
+5️⃣ Session Layer (Layer 5)
+-> Establishes and manages communication sessions.
+-> Allows resuming data exchange after interruptions.
+
+6️⃣ Presentation Layer (Layer 6)
+-> Formats, encrypts, and compresses data for transmission.
+-> Ensures data is readable by the receiving system.
+
+7️⃣ Application Layer (Layer 7)
+-> Provides services to end-users and applications.
+-> Examples: HTTP (web), FTP (file transfer), SMTP (email).
+
+Working Mechanism:
+------------------
+-- When data needs to be transmitted from one device to another over a TCP/IP network, the following steps occur:
+1. The application data is passed to the Transport Layer, where it is divided into smaller chunks called segments (TCP) or datagrams (UDP).
+2. Each segment or datagram is encapsulated with the source and destination port numbers in the Transport Layer header.
+3. The Transport Layer hands the segments or datagrams to the Internet Layer, where it adds the source and destination IP addresses to the packet header.
+4. The packet is then passed to the Link Layer, which encapsulates it into a frame with the source and destination MAC addresses appropriate for the local network medium.
+5. The frame is transmitted over the network, and routers in the network use the destination IP address to forward the packet towards its destination.
+6. When the packet reaches its destination device, it goes through the reverse process of decapsulation at each layer. The application data is delivered to the appropriate application running on the destination device.
+-> This process allows for reliable and efficient data transmission over the internet and other TCP/IP-based networks. TCP/IP is a fundamental protocol suite, enabling global connectivity and communication between a vast array of devices and services.
+
+******************************************************************************************
+✅ How TCP/IP, HTTP/HTTPS and SSL/TLS Connected
+------------------------------------------------------
+-> SSL/TLS, HTTP/HTTPS, and TCP/IP are all part of the networking and security stack that enables secure communication over the internet. Let's break it down:
+
+1️⃣ TCP/IP (Transport & Network Layer - Foundation)
+-> TCP/IP (Transmission Control Protocol/Internet Protocol) is the fundamental communication protocol that enables data transfer over the internet.
+-> TCP ensures reliable, ordered data delivery.
+-> IP handles addressing and routing packets.
+-> It does not provide encryption or security on its own.
+🔹 Example: When you access http://example.com, TCP/IP is responsible for delivering the request and response between your browser and the web server.
+
+2️⃣ HTTP/HTTPS (Application Layer - Web Communication)
+-> HTTP (HyperText Transfer Protocol) is the protocol used for transferring web pages and resources.
+-> HTTPS (HTTP Secure) is just HTTP with SSL/TLS encryption for security.
+-> When using HTTP, data is sent in plaintext, making it vulnerable to attacks.
+-> When using HTTPS, data is encrypted using SSL/TLS, ensuring confidentiality and integrity.
+🔹 Example:
+1. http://example.com → Unencrypted (visible to attackers).
+2. https://example.com → Encrypted (secured via TLS).
+
+3️⃣ SSL/TLS (Security Layer - Encryption & Authentication)
+-> SSL (Secure Sockets Layer) / TLS (Transport Layer Security) encrypts data traveling over TCP/IP.
+-> TLS operates between the Application Layer (HTTP) and Transport Layer (TCP).
+-> It provides encryption, authentication, and data integrity.
+-> Modern web security only uses TLS (SSL is outdated).
+🔹 Example Workflow:
+1. A user enters https://example.com.
+2. The browser initiates a TLS handshake with the server.
+3. The server presents an SSL/TLS certificate to prove its identity.
+4. A secure encrypted channel is established.
+5. The HTTP request and response are securely exchanged over TLS-encrypted TCP.
+
+
+******************************************************************************************
+TLS/SSL AUTHENTICATION:
+=======================
+TLS/SSL
+------
+-> TLS (Transport Layer Security) and SSL (Secure Sockets Layer) are both protocols used to provide secure communication over the internet. 
+-> They are cryptographic protocols that provide security for communication between clients and servers over a network.
+-> SSL was developed by Netscape in the mid-1990s and was widely used for secure communication on the internet until the mid-2000s when it was replaced by TLS. 
+-> TLS is an improved version of SSL and is now widely used for secure communication on the internet.
+
+-> Both SSL and TLS use a combination of "public-key and symmetric-key encryption" to provide confidentiality, integrity, and authenticity. 
+-> When a client connects to a server using SSL/TLS, the server presents a digital certificate that contains its public key. 
+-> The client uses this public key to establish a secure connection with the server and negotiate the symmetric keys used for encryption.
+
+-> TLS is used for a variety of purposes including secure web browsing (HTTPS), email, FTP, and other applications that require secure communication over a network. 
+-> The latest version of TLS is TLS 1.3, which was released in 2018 and provides improved security and performance compared to previous versions.
+
+-> TLS (Transport layer security) / SSL ( secure socket layer ) are the most popularly used encryption algorithms for sensitive/personal data that's transmitted over the internet.
+
+It depends on:-
+1. Asymmetric Key Encryption 
+2. Public key Infrastructure ( PKI )
+3. Certificate Authority ( CA )
+4. Server/ Client Certificates
+
+TLS /SSL Authentication flow: [CA: Certificate Authority]
+1️⃣ Client Hello (Client → Server)
+-> The client initiates the handshake by sending a ClientHello message that includes:
+-- Supported TLS versions (e.g., TLS 1.2, TLS 1.3)
+-- Supported cipher suites (e.g., AES, ChaCha20, RSA, ECDSA)
+-- A randomly generated "Client Random value"
+
+2️⃣ Server Hello (Server → Client)
+-> The server responds with a ServerHello message containing:
+-- The selected TLS version
+-- The chosen cipher suite
+-- A randomly generated "Server Random value"
+-- Server’s SSL/TLS Certificate (issued by a CA) containing:
+	-- Server’s public key
+	-- Server’s domain name
+	-- Digital signature of the CA
+🔹 Certificate Verification: The client verifies the server’s certificate using the Certificate Authority (CA) chain to confirm authenticity.
+
+3️⃣ Key Exchange (Client ↔ Server)
+-> The method depends on the key exchange algorithm (e.g., RSA, Diffie-Hellman, ECDH):
+1. RSA (TLS 1.2 and earlier):
+-- The server sends its public key.
+-- The client generates a "Pre-Master Secret" and encrypts it using the server’s public key.
+-- The server decrypts the "Pre-Master Secret" with its private key.
+2. Diffie-Hellman (DH) / Elliptic Curve Diffie-Hellman (ECDH) (TLS 1.3):
+-- Both client and server exchange ephemeral keys.
+-- A shared secret is derived securely.
+🔹 The shared secret is then used to derive session keys.
+
+4️⃣ Session Key Generation (Both Sides)
+-> Using the Client Random, Server Random, and the Pre-Master Secret, both client and server generate:
+-- Symmetric Session Keys for encryption and decryption
+-- MAC (Message Authentication Code) Keys for integrity verification
+🔹 Both parties now have the same shared secret key.
+
+5️⃣ Finished Messages (Client ↔ Server)
+-> The client sends a Finished message, encrypted with the session key.
+-> The server sends a Finished message back.
+🔹 If both messages are decrypted successfully, the handshake is complete.
+
+6️⃣ Secure Encrypted Communication Begins (Client ↔ Server)
+-> All further communication is encrypted using the session key.
+-> The session remains secure until the connection is closed.
+
+-------------------------------------------------------------------------------
+🔹 How SSL/TLS is Configured?
+------------------------------
+1️⃣ Install an SSL/TLS Certificate on the Server
+-> The server needs an SSL/TLS certificate issued by a "Certificate Authority" (CA) (e.g., Let's Encrypt, DigiCert).
+-> The certificate contains the server’s public key, domain name, and other details.
+/etc/ssl/certs/example.com.crt   # SSL Certificate
+/etc/ssl/private/example.com.key  # Private Key
+
+
+2️⃣ Configure the Web Server (Nginx, Apache, etc.)
+-> Update the web server configuration to enable SSL/TLS.
+-> Example for Nginx: 
+
+Nginx Configuration for SSL/TLS Termination :-
+--------------------------------------------
+
+server {
+ listen 443 ssl;
+ server_name example.com;
+
+ ssl_certificate /etc/nginx/ssl/example.com.crt;
+ ssl_certificate_key /etc/nginx/ssl/example.com.key;
+
+ ssl_protocols TLSv1.2 TLSv1.3;
+ ssl_ciphers HIGH:!aNULL:!MD5;
+
+################### For ssl termination #########################
+ location / {
+ proxy_pass http://backend_server;
+ proxy_set_header Host $host;
+ proxy_set_header X-Real-IP $remote_addr;
+ proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+ }
+}
+################### For ssl termination #########################
+
+🔹 The same process applies to Apache, Kubernetes Ingress, or load balancers.
+
+server {
+ listen 80;
+ server_name example.com;
+ return 301 https://$host$request_uri;
+}
+
+3️⃣ Open Firewall & Allow HTTPS (Port 443)
+-> Ensure the server firewall allows traffic on port 443 (HTTPS)
+$$sudo ufw allow 443/tcp
+
+
+Explanation of Configuration :-
+1. listen 443 ssl; → Enables SSL on port 443.
+2. server_name example.com; → Defines the domain name.
+3. ssl_certificate & ssl_certificate_key → Path to the SSL certificate and private key.
+4. ssl_protocols TLSv1.2 TLSv1.3; → Specifies supported TLS versions.
+5. ssl_ciphers → Defines secure ciphers to use.
+6. proxy_pass http://backend_server; → Forwards requests to an internal backend.
+7. proxy_set_header → Passes client headers to the backend.
+8. The second server block (listen 80;) redirects all HTTP traffic to HTTPS.
+
+----------------------------------------------------------------------------------
+SSL/TLS Termination in Nginx :-
+-----------------------------
+-> SSL/TLS termination means that Nginx handles the encryption and decryption of HTTPS traffic before passing it to the backend servers. 
+-> This improves performance by offloading cryptographic processing from the application servers.
+-> Encryption stops at the proxy/load balancer, reducing CPU overhead for backend servers.
+
+How It Works :-
+1. Client Request: A client (browser or app) sends an HTTPS request to Nginx.
+2. SSL Handshake: Nginx responds with an SSL certificate and establishes a secure connection.
+3. Decryption: Nginx decrypts the request.
+4. Forwarding: The decrypted request is forwarded to the backend application server over HTTP.
+5. Backend Response: The application processes the request and sends the response to Nginx.
+6. Encryption: Nginx encrypts the response and sends it back to the client.
+
+
+Key Differences:
+1️⃣ SSL/TLS Authentication Workflow
+-> This is the full end-to-end process where a client and server establish a secure connection using TLS/SSL.
+-> It includes handshake, certificate verification, key exchange, and encrypted data transmission.
+-> The connection remains encrypted throughout the communication.
+
+2️⃣ SSL/TLS Termination
+-> This happens when a proxy, load balancer, or ingress controller (like Nginx, AWS ALB, or HAProxy) decrypts the incoming TLS traffic before forwarding it to backend services.
+-> After termination, traffic to the backend may be unencrypted (unless re-encryption is enabled).
+-> It helps reduce load on backend servers, as they no longer need to handle encryption.
+
+
+-------------------------------------------------------------------------------------
+What is mTLS (Mutual TLS)?
+**************************
+-> Mutual TLS (mTLS) is an extension of standard TLS (Transport Layer Security) where both the client and the server authenticate each other using certificates. 
+-> In traditional TLS, only the server presents a certificate to the client, but in mTLS, both parties verify each other's identity, ensuring a zero-trust security model.
+
+Q. How is mTLS Different from TLS/SSL?
+Feature		TLS/SSL						Mutual TLS (mTLS)
+Authentication	Server authentication only	Both client and server authenticate each other
+Security	Protects data in transit	Ensures end-to-end trust
+Use Case	Secure websites, APIs		Zero-trust security, API gateways, microservices
+Certificate Usage	Only server has a certificate	Both client and server have certificates
+Common Example	HTTPS websites			Secure API communication, Kubernetes service authentication
+
+** Where is mTLS Used?
+-----------------------
+-> API Security: Ensuring only trusted clients can communicate with APIs.
+-> Microservices Communication: Used in service meshes like Istio to secure inter-service communication.
+-> Zero-Trust Networks: Ensuring every connection is authenticated.
+-> Banking & Finance: Secure transaction verification between systems.
+
+🔹 Step-by-Step mTLS Workflow
+1️⃣ Client Initiates a Secure Connection
+-> The client (browser, API, or microservice) connects to the server over HTTPS or another TLS-secured protocol.
+-> Example: https://secure-api.example.com
+
+2️⃣ Server Sends its TLS Certificate
+-> The server responds with its TLS certificate (X.509 certificate).
+-> The certificate is signed by a trusted Certificate Authority (CA).
+-> The client verifies if this certificate is valid, not expired, and signed by a trusted CA.
+✅ If the server's certificate is valid → move to step 3.
+❌ If invalid → the connection is rejected.
+
+3️⃣ Server Requests Client Authentication
+-> Unlike normal TLS, the server also asks the client for a certificate.
+-> This is done using a Certificate Request message in the TLS handshake.
+
+4️⃣ Client Sends its Certificate
+-> The client presents its own certificate to the server.
+-> This certificate is also issued by a trusted CA and must match the server’s expected CA.
+✅ If valid → proceed to step 5.
+❌ If invalid → the server rejects the connection.
+
+5️⃣ Mutual Certificate Validation
+-> Both the server and the client validate each other’s certificates:
+-> The client verifies the server’s certificate.
+-> The server verifies the client’s certificate.
+-> Certificate verification includes checking:
+-> The signature (issued by a trusted CA).
+-> The expiration date.
+-> The Certificate Revocation List (CRL) / OCSP status.
+-> The Common Name (CN) / Subject Alternative Name (SAN) matches the expected identity.
+
+6️⃣ TLS Handshake Completion
+-> If both certificates are valid, a secure, encrypted connection is established.
+-> Both parties generate session keys to encrypt data transmission.
+
+7️⃣ Secure Data Exchange
+-> The client and server can now securely communicate over an authenticated and encrypted channel.
+-> This ensures end-to-end encryption and mutual trust.
+
+
+** Real-World Example: Setting Up mTLS in Nginx
+------------------------------------------------
+Step 1: Generate Certificates for Client & Server
+# Generate CA key and certificate
+openssl genrsa -out ca.key 2048
+openssl req -x509 -new -nodes -key ca.key -sha256 -days 365 -out ca.crt
+
+# Generate Server Key and Certificate Signing Request (CSR)
+openssl genrsa -out server.key 2048
+openssl req -new -key server.key -out server.csr
+
+# Sign Server Certificate with CA
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 365 -sha256
+
+# Generate Client Key and CSR
+openssl genrsa -out client.key 2048
+openssl req -new -key client.key -out client.csr
+
+# Sign Client Certificate with CA
+openssl x509 -req -in client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out client.crt -days 365 -sha256
+
+
+Step 2: Configure Nginx for mTLS Edit your Nginx configuration file (e.g., /etc/nginx/nginx.conf):
+server {
+    listen 443 ssl;
+    server_name example.com;
+
+    ssl_certificate /etc/nginx/server.crt;
+    ssl_certificate_key /etc/nginx/server.key;
+
+    ssl_client_certificate /etc/nginx/ca.crt;
+    ssl_verify_client on;
+
+    location / {
+        proxy_pass http://backend;
+    }
+}
+
+-- ssl_verify_client on; → Enables mTLS.
+-- ssl_client_certificate → Specifies the CA certificate for verifying clients.
+
+Step 3: Restart Nginx
+sudo systemctl restart nginx
+
+Advantages of mTLS
+✅ Stronger Security: Both parties authenticate each other.
+✅ Prevents Spoofing & MITM Attacks: Ensures only trusted clients communicate.
+✅ Zero-Trust Architecture: Every request is verified.
+✅ Better API Protection: Ideal for API security and sensitive transactions.
+
+
+===========================================================================================================================
+** HTTP, the hypertext transfer protocol, uses port 80 to deliver web pages
+-> HTTP stands for Hyper Text Transfer Protocol. WWW is about communication between web clients and servers. 
+-> Communication between client computers and web servers is done by sending HTTP Requests and receiving HTTP Responses.
+-> An HTTP Proxy serves two intermediary roles as an "HTTP Client" and a "HTTP Server" for security, management, and caching functionality. 
+-> The HTTP Proxy routes HTTP Client requests from a Web browser to the Internet, while supporting the caching of Internet data.
+
+** HTTPS: Port 443 is dedicated to HTTPS, the secure version of HTTP delivered over TLS/SSL
+-> HTTPS uses an encryption protocol to encrypt communications. 
+-> The protocol is called Transport Layer Security (TLS), although formerly it was known as Secure Sockets Layer (SSL). 
+-> This protocol secures communications by using what's known as an asymmetric public key infrastructure.
+
+
+How http and https works?
+-> HTTP (Hypertext Transfer Protocol) and HTTPS (HTTP Secure) are protocols used to transfer data between a client (such as a web browser) and a server (such as a website). 
+-> Both protocols work in a similar manner, but HTTPS is a more secure version of HTTP.
+
+1.  HTTP works by using a request-response model. When a client sends an HTTP request to a server, the server responds with an HTTP response. 
+-> The request and response consist of headers and a message body. The headers contain information about the request or response, such as the content type and the length of the message body, while the message body contains the actual data being transferred.
+
+2. HTTPS, on the other hand, uses a combination of HTTP and SSL/TLS (Secure Sockets Layer/Transport Layer Security) protocols to provide a secure connection between the client and the server. 
+-> The SSL/TLS protocols use a combination of symmetric and asymmetric encryption to encrypt the data being transferred between the client and the server, making it difficult for anyone to intercept or eavesdrop on the data.
+
+-> HTTPS working Mechanism:
+1. The client sends a request to the server using the HTTPS protocol. The request is encrypted using SSL/TLS.
+2. The server receives the request and generates a public key and a private key. The public key is sent back to the client as part of the SSL/TLS handshake.
+3. The client receives the public key and uses it to encrypt a symmetric key. The symmetric key is sent back to the server using SSL/TLS.
+4. The server receives the symmetric key and decrypts it using its private key. The symmetric key is then used to encrypt all subsequent communication between the client and the server.
+5. The server sends an HTTPS response to the client, which is encrypted using the symmetric key.
+6. The client receives the encrypted HTTPS response and decrypts it using the symmetric key.
+
+
+===========================================================================================================================
+** Tcp Ip protocol and working mechanism
+-> TCP/IP (Transmission Control Protocol/Internet Protocol) is a suite of communication protocols used for transmitting data over networks, including the internet. 
+-> It is the foundation of modern networking and is widely used for data transmission between computers and devices. 
+-> TCP/IP is organized into four layers: Application, Transport, Internet, and Link Layer.
+
+1. Application Layer:
+-- The Application Layer is the top layer of the TCP/IP model. 
+-- It provides communication services directly to end-users and applications. 
+-- This layer includes various protocols like HTTP, SMTP, FTP, DNS, and more, which enable specific types of communication between applications.
+
+2. Transport Layer:
+-- The Transport Layer is responsible for the end-to-end communication and reliable data delivery between applications running on different devices. 
+-- It offers two primary protocols: Transmission Control Protocol (TCP) and User Datagram Protocol (UDP).
+-- TCP provides reliable, connection-oriented communication by ensuring that data packets are delivered in order and without loss or duplication. 
+-- It performs flow control and congestion control to optimize data transfer.
+-- UDP is a simpler, connectionless protocol that does not guarantee reliable delivery. 
+-- It is often used for real-time applications like streaming and online gaming, where some data loss is acceptable.
+
+3. Internet Layer:
+-- The Internet Layer is responsible for routing packets across the network. 
+-- It uses IP (Internet Protocol) to handle addressing and packet forwarding. Each device on the network is assigned a unique IP address to identify its location.
+-- When a packet is sent from the source device, the Internet Layer adds the source and destination IP addresses to the packet header. 
+-- Routers use this information to forward the packet towards its destination.
+
+4. Link Layer:
+-- The Link Layer is responsible for data transmission over the physical network medium, such as Ethernet or Wi-Fi. 
+-- It handles data framing, addressing within the local network, and error detection.
+-- The Link Layer encapsulates IP packets into frames appropriate for the specific network medium and forwards them to the next hop.
+
+
+
+======================================================================================================
+Open Systems Interconnection
+----------------------------
+-> The OSI (Open Systems Interconnection) model is a conceptual framework used to understand and describe the functionalities and interactions of networking protocols and systems. 
+-> It consists of seven distinct layers, each responsible for specific tasks and communication functions. 
+-> The model was developed by the International Organization for Standardization (ISO) to facilitate interoperability between different networking technologies and devices.
+
+-> The seven layers of the OSI model, from the bottom (Layer 1) to the top (Layer 7), are as follows:
+1. Layer 1 - Physical Layer: The Physical Layer deals with the physical transmission of data over the network medium. It defines the hardware specifications, such as cables, connectors, switches, and network interface cards. Its primary concern is transmitting raw binary data as electrical or optical signals.
+2. Layer 2 - Data Link Layer: The Data Link Layer provides node-to-node data transfer and error detection and correction within the local network segment. It is responsible for converting raw data from the Physical Layer into frames and addressing them. Switches operate at this layer, and MAC (Media Access Control) addresses are used for device identification.
+3. Layer 3 - Network Layer: The Network Layer is responsible for routing data between different networks or subnets. It determines the optimal path for data packets to reach their destination across the entire network. Routers operate at this layer, and IP (Internet Protocol) addresses are used for logical addressing.
+4. Layer 4 - Transport Layer: The Transport Layer ensures reliable and orderly data delivery between two communicating devices. It manages end-to-end communication, segments data from the application layer into smaller packets, and handles flow control, error detection, and retransmission if necessary. TCP (Transmission Control Protocol) and UDP (User Datagram Protocol) are common protocols at this layer.
+5. Layer 5 - Session Layer: The Session Layer establishes, maintains, and terminates communication sessions between applications. It manages session synchronization and checkpoints, allowing data exchange to resume from the last checkpoint if the connection is lost.
+6. Layer 6 - Presentation Layer: The Presentation Layer handles data representation, encryption, and decryption for the application layer. It ensures that data exchanged between different systems is in a readable and understandable format, regardless of the differences in data formats used by the applications.
+7. Layer 7 - Application Layer: The Application Layer is the topmost layer of the OSI model and is responsible for providing network services directly to end-users or applications. It includes application protocols like HTTP (Hypertext Transfer Protocol), FTP (File Transfer Protocol), SMTP (Simple Mail Transfer Protocol), and more.
+
+-> The OSI model serves as a reference for understanding networking concepts and helps in the development and standardization of networking protocols. It provides a clear separation of concerns between different layers, enabling the development of modular and interoperable network systems. However, in practice, modern networking often follows the TCP/IP model, which is based on a subset of the OSI model and is widely used in the Internet and most networking implementations today.
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+17. RAID: is a technology that is used to increase the performance and/or reliability of data storage. The abbreviation 
+    stands for either Redundant Array of Independent Drives or Redundant Array of Inexpensive Disks, which is older and less used. 
+-> A RAID system consists of two or more drives working in parallel. These can be hard discs, but there is a trend to also use the 
+   technology for SSD (Solid State Drives). There are different RAID levels, each optimized for a specific situation. 
+   These are not standardized by an industry group or standardization committee. This explains why companies sometimes come up with 
+   their own unique numbers and implementations. This article covers the following RAID levels:
+RAID 0 – striping
+RAID 1 – mirroring
+RAID 5 – striping with parity
+RAID 6 – striping with double parity
+RAID 10 – combining mirroring and striping
+
+Q. What is a level 0 backup? What is an incremental backup?
+-> An incremental backup copies only those blocks in a data file that change between backups. A level 0 incremental backup, 
+   which copies all blocks in the data file, is used as a starting point for an incremental backup strategy.
+-> A level 0 incremental backup, which is the base for subsequent incremental backups, copies all blocks containing data, 
+   backing the datafiles up into a backup set just as a full database backup.
+

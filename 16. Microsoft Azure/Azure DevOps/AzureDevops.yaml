@@ -1,0 +1,48 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - src/
+
+jobs:
+- job: Build
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+    - checkout: self
+    - task: UseNode@1
+      inputs:
+        version: '16.x'
+    - script: npm install
+      displayName: 'Install Dependencies'
+    - script: npm test
+      displayName: 'Run Tests'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathToPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: 'drop'
+
+- job: Deploy_Staging
+  dependsOn: Build
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+    - task: AzureWebApp@1
+      inputs:
+        azureSubscription: 'AzureServiceConnection'
+        appName: 'my-web-app'
+        package: '$(Build.ArtifactStagingDirectory)/drop'
+        slotName: 'staging'
+
+- job: Deploy_Production
+  dependsOn: Deploy_Staging
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+    - task: AzureWebApp@1
+      inputs:
+        azureSubscription: 'AzureServiceConnection'
+        appName: 'my-web-app'
+        package: '$(Build.ArtifactStagingDirectory)/drop'

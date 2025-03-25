@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+  labels:
+    app: jenkins
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      containers:
+        - name: jenkins
+          image: jenkins/jenkins:lts
+          ports:
+            - containerPort: 8080
+            - containerPort: 50000
+
+kubectl apply -f jenkins-deployment.yaml
+
+Expose Jenkins using a Service (optional): You can create a Service to expose Jenkins to the outside world, for example:
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins
+spec:
+  selector:
+    app: jenkins
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+
+Access Jenkins UI:
+
+Access Jenkins via the LoadBalancer IP or port forwarded to your local machine.
+
+Unlock Jenkins:
+
+Retrieve the password for unlocking Jenkins from the Kubernetes pod logs:
+kubectl logs <pod_name>

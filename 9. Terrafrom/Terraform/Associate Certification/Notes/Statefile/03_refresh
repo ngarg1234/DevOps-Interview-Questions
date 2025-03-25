@@ -1,0 +1,22 @@
+terraform refresh command will check the latest state of infrastructure and update the statefile  accordingly
+
+suppose, if you delete an instance on aws manually and you need to delete the state of the instance from statefile, 
+you can run terraform refresh command 
+
+
+terraform refresh will not add or remove resources in the state file; it only updates the attributes of the existing 
+resources in the state file to match the real-world state.
+
+you can't use terraform refresh to import a resource to statefile
+
+you can use terraform refresh only to update curerent infra with statefile, ie suppose you delete a resource manaually, you can 
+run terraform refresh to update it in the statefile, however, if you create a resource manually, terraform refresh doesn't 
+help you to update the statefile. in this case you have to run terraform import command 
+
+note: terraform plan and apply by default do terraform refresh
+
+commands:
+
+terraform refresh
+
+terraform apply -refresh-only

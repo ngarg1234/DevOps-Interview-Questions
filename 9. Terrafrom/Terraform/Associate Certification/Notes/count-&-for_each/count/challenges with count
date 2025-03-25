@@ -1,0 +1,39 @@
+
+
+count refer to the index of a list 
+
+example: 
+
+variable instance_type {
+  type        = list
+  default     = ["t2.nano", "t2.micro", "t2.small"]
+  description = "description"
+}
+
+resource "aws_instance" "test_instance"{
+     count = length(var.instance_type)
+     ami = "ami-0261755bbcb8c4a84"
+     instance_type = var.instance_type[count.index]
+ }
+
+ in the above example, if add one more value(t2.large) to the end of the list instance_type, 
+
+        in the next apply, it will create one more instance with the type t2.large 
+
+but, if you add the same value (t2.large) to the beggining of the list, 
+
+        the plan will show 
+                Plan: 1 to add, 3 to change, 0 to destroy.
+        since we were reffering to index, it will cause  changes 
+also one more thing, since we are updating instance_type, it will delete and recreate all resources - this is a drawback of using count 
+
+
+if you check the statfile, you can see each instance will have an index associsated to it and it will have the coresponding attributes
+
+but when you add a new item to the beggining of the list, the index will changes 
+
+
+
+NOTE: use count parameter if all the attributes are same
+
+you should use for_each in the conditions similar to above 

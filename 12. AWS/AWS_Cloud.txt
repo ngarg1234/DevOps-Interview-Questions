@@ -1,0 +1,820 @@
+Module 1: Introduction to Amazon Web Services:
+=============================================
+
+** Client- Server model: 
+-> In computing, a client can be a web browser or desktop application that a person interacts with to make requests to computer servers. A server can be services, such as Amazon Elastic Compute Cloud (Amazon EC2) – a type of virtual server.
+-> For example, suppose that a client makes a request for a news article, the score in an online game, or a funny video. The server evaluates the details of this request and fulfills it by returning the information to the client.
+
+Cloud Computing:
+-> Selecting a cloud strategy: cloud application components, preferred resource management tools, and any legacy IT infrastructure requirements.
+-> The three cloud computing deployment models are cloud-based, on-premises, and hybrid.
+
+1. Cloud-based deployment: 
+-> Run all parts of the application in the cloud.
+-> Migrate existing applications to the cloud.
+-> Design and build new applications in the cloud.
+-> You can build them using higher-level services that reduce the management, architecting, and scaling requirements of the core infrastructure.
+
+2. On-Premises deployments (private cloud deployment): 
+-> Companies and organizations hosted and maintained hardware such as compute, storage, and Networking equipment in their own data centers.
+-> Deploy resources by using virtualization and resource management tools.
+-> Increase resource utilization by using application management and virtualization technologies.
+
+3. Hybrid-Deployment:
+-> Connect cloud-based resources to on-premises infrastructure.
+-> Integrate cloud-based resources with legacy IT applications.
+-> For example, suppose that a company wants to use cloud services that can automate batch data processing and analytics. However, the company has several legacy applications that are more suitable on premises and will not be migrated to the cloud. 
+-> With a hybrid deployment, the company would be able to keep the legacy applications on premises while benefiting from the data and analytics services that run in the cloud.
+
+Six advantages of cloud computing
+1. Pay-as-you-go
+2. Benefit from massive economies of scale
+3. Stop guessing capacity
+4. Increase speed and agility
+5. Realize cost savings
+6. Go global in minutes
+
+
+Amazon Elastic Compute Cloud (Amazon EC2)
+==========================================
+• You can provision and launch an Amazon EC2 instance within minutes.
+• You can stop using it when you have finished running a workload.
+• You pay only for the compute time you use when an instance is running, not when it is stopped or terminated.
+• You can save costs by paying only for server capacity that you need or want.
+
+-> How Amazon EC2 works: Launch – Connect -Use
+
+
+Amazon EC2 Instance Types: 
+--------------------------
+1. General Purpose:
+2. Memory Optimized
+3. Compute Optimized
+4. Accelerated Computing
+5. Storage Optimized
+
+1. General purpose instances (T3): 
+-> Provide a balance of compute, memory, and Networking resources. You can use them for a variety of workloads, such as:
+• application servers
+• gaming servers
+• backend servers for enterprise applications
+• small and medium databases
+
+2. Compute optimized instances (C5): 
+-> You can use compute optimized instances for workloads such as web, application, and gaming servers.
+-> However, the difference is computing optimized applications are ideal for high-performance web servers, compute-intensive applications servers, and dedicated gaming servers. 
+-> You can also use compute optimized instances for batch processing workloads that require processing many transactions in a single group.
+
+3. Memory optimized instances (R5a): 
+-> Are designed to deliver fast performance for workloads that process large datasets in memory. 
+-> In computing, memory is a temporary storage area. It holds all the data and instructions that a central processing unit (CPU) needs to be able to complete actions. 
+-> Before a computer program or application can run, it is loaded from storage into memory. This preloading process gives the CPU direct access to the computer program.
+-> Memory optimized instances enable you to run workloads with high memory needs and receive great performance.
+
+4. Accelerated computing instances (F1): 
+-> Use hardware accelerators, or coprocessors, to perform some functions more efficiently than is possible in software running on CPUs. 
+-> Examples of these functions include floating-point number calculations, graphics processing, and data pattern matching.
+-> In computing, a hardware accelerator is a component that can expedite data processing. 
+-> Accelerated computing instances are ideal for workloads such as graphics applications, game streaming, and application streaming.
+
+5. Storage optimized instances (D2):
+-> Are designed for workloads that require high, sequential read and write access to large datasets on local storage. 
+-> Examples of workloads suitable for storage optimized instances include distributed file systems, data warehousing applications, and high-frequency online transaction processing (OLTP) systems.
+-> In computing, the term "Input/output operations per second (IOPS)" is a metric that measures the performance of a storage device. It indicates how many different input or output operations a device can perform in one second. Storage optimized instances are designed to deliver tens of thousands of low-latency, random IOPS to applications. 
+-> You can think of input operations as data put into a system, such as records entered into a database. An output operation is data generated by a server. 
+-> An example of output might be the analytics performed on the records in a database. If you have an application that has a high IOPS requirement, a storage optimized instance can provide better performance over other instance types not optimized for this kind of use case.
+
+
+Amazon EC2 Pricing:
+------------------
+
+-> You pay only for the compute time that you use.
+
+1. On-Demand: 
+--------------
+-> Are ideal for short-term, irregular workloads that cannot be interrupted. No upfront costs or minimum contracts apply. 
+-> The instances run continuously until you stop them, and you pay for only the compute time you use.
+-> Sample use cases for On-Demand Instances include developing and testing applications and running applications that have unpredictable usage patterns. 
+-> On-Demand Instances are not recommended for workloads that last a year or longer because these workloads can experience greater cost savings using Reserved Instances.
+
+2. Reserved instances: 
+-----------------------
+-> Are a billing discount applied to the use of On-Demand Instances in your account. There are two available types of Reserved Instances:
+
+• Standard Reserved Instances
+• Convertible Reserved Instances
+
+-> You can purchase Standard Reserved and Convertible Reserved Instances for a 1-year or 3-year term. You realize greater cost savings with the 3-year option. 
+
+2.a Standard Reserved Instances: 
+-> This option is a good fit if you know the EC2 instance type and size you need for your steady-state applications and in which AWS Region you plan to run them. 
+-> Reserved Instances require you to state the following qualifications:
+• Instance type and size: For example, m5.xlarge
+• Platform description (operating system): For example, Microsoft Windows Server or Red Hat Enterprise Linux
+• Tenancy: Default tenancy or dedicated tenancy
+-> You have the option to specify an Availability Zone for your EC2 Reserved Instances. If you make this specification, you get EC2 capacity reservation. This ensures that your desired amount of EC2 instances will be available when you need them.
+
+
+Tenancy: 
+-------
+-> Tenancy in AWS refers to how resources are allocated and isolated in the cloud environment. It's essentially about whether your resources (like EC2 instances) run on shared hardware or dedicated hardware.
+
+-> AWS offers two main types of tenancy:
+1. Shared Tenancy (Default)
+-> In shared tenancy, your AWS resources (like EC2 instances) run on shared hardware with resources from other AWS customers.
+-> AWS manages the isolation between these resources, so you don’t have to worry about them interfering with each other. This is the most common and cost-effective option.
+
+2 Dedicated Tenancy
+-> In dedicated tenancy, your AWS resources run on hardware that is dedicated only to you.
+-> This means no other customers' resources will be running on the same physical hardware as yours.
+-> It can be useful for regulatory or compliance reasons, where you need more isolation or want to ensure that you’re the only one using specific hardware.
+
+
+2.b Convertible Reserved Instances: 
+----------------------------------
+-> If you need to run your EC2 instances in different Availability Zones or different instance types, then Convertible Reserved Instances might be right for you. 
+-> Note: You trade in a deeper discount when you require flexibility to run your EC2 instances.
+
+
+-> At the end of a Reserved Instance term, you can continue using the Amazon EC2 instance without interruption. 
+
+-> However, you are charged On-Demand rates until you do one of the following:
+
+• Terminate the instance: 
+-> Purchase a new Reserved Instance that matches the instance attributes (instance family and size, Region, platform, and tenancy).
+
+
+3. EC2 Instance saving plans: 
+-----------------------------
+-> EC2 Instance Savings Plans reduce your EC2 instance costs when you make an hourly spend commitment to an instance family and Region for a 1-year or 3-year term. 
+-> This term commitment results in savings of up to 72% compared to On-Demand rates. 
+-> Any usage up to the commitment is charged at the discounted Savings Plans rate (for example, $10 per hour). Any usage beyond the commitment is charged at regular On-Demand rates.
+-> The EC2 Instance Savings Plans are a good option if you need flexibility in your Amazon EC2 usage over the duration of the commitment term. 
+
+-> "You have the benefit of saving costs on running any EC2 instance within an EC2 instance family in a chosen Region (for example, M5 usage in N. Virginia) regardless of Availability Zone, instance size, OS, or tenancy. The savings with EC2 Instance Savings Plans are like the savings provided by Standard Reserved Instances".
+
+-> Unlike Reserved Instances, however, you don't need to specify up front what EC2 instance type and size (for example, m5. xlarge), OS, and tenancy to get a discount. Further, you don't need to commit to a certain number of EC2 instances over a 1-year or 3-year term. Additionally, the EC2 Instance Savings Plans don't include an EC2 capacity reservation option.
+
+
+4. Spot instances:
+------------------
+-> Are ideal for workloads with flexible start and end times, or that can withstand interruptions. Spot Instances use unused Amazon EC2 computing capacity and offer you cost savings at up to 90% off of On-Demand prices.
+-> After you have launched a Spot Instance, if capacity is no longer available or demand for Spot Instances increases, your instance may be interrupted. This might not pose any issues for your background processing job. However, in the earlier example of developing and testing applications, you would most likely want to avoid unexpected interruptions. Therefore, choose a different EC2 instance type that is ideal for those tasks.
+
+5. Dedicated hosts:
+--------------------
+-> Are physical servers with Amazon EC2 instance capacity that is fully dedicated to your use.
+-> You can use your existing per-socket, per-core, or per-VM software licenses to help maintain license compliance. You can purchase On-Demand Dedicated Hosts and Dedicated Hosts Reservations. 
+-> Of all the Amazon EC2 options that were covered, Dedicated Hosts are the most expensive.
+
+--------------------------------------------------------------------------------------------------
+Scaling Amazon EC2:
+====================
+
+1. "Scalability" involves beginning with only the resources you need and designing your architecture to automatically respond to changing demand by scaling out or in. As a result, you pay for only the resources you use. You don’t have to worry about a lack of computing capacity to meet your customers’ needs.
+2. Amazon EC2 Auto Scaling: Amazon EC2 Auto Scaling enables you to automatically add or remove Amazon EC2 instances in response to changing application demand. By automatically scaling your instances in and out as needed, you can maintain a greater sense of application availability.
+-> If you’ve tried to access a website that wouldn’t load and frequently timed out, the website might have received more requests than it was able to handle. This situation is similar to waiting in a long line at a coffee shop, when there is only one barista present to take orders from customers.
+-> Within Amazon EC2 Auto Scaling, you can use two approaches: "Dynamic scaling and Predictive scaling".
+
+• Dynamic scaling responds to changing demand. 
+• Predictive scaling automatically schedules the right number of Amazon EC2 instances based on predicted demand.
+
+
+Directing Traffic with Elastic Load Balancing:
+----------------------------------------------
+
+1. Elastic Load Balancing: 
+--------------------------
+-> It is the AWS service that automatically distributes incoming application traffic across multiple resources, such as Amazon EC2 instances. 
+-> A load balancer acts as a single point of contact for all incoming web traffic to your Auto Scaling group. This means that as you add or remove Amazon EC2 instances in response to the amount of incoming traffic, these requests route to the load balancer first. 
+-> Then, the requests spread across multiple resources that will handle them. 
+-> For example, if you have multiple Amazon EC2 instances, Elastic Load Balancing distributes the workload across the multiple instances so that no single instance has to carry the bulk of it. 
+
+-> Although "Elastic Load Balancing" and "Amazon EC2 Auto Scaling" are separate services, they work together to help ensure that applications running in Amazon EC2 can provide high performance and availability. 
+
+------------------------------------------------------------------------------------
+Messaging and Queuing:
+----------------------
+
+-> Applications are made of multiple components. The components communicate with each other to transmit data, fulfill requests, and keep the application running.
+-> Suppose that you have an application with tightly coupled components. These components might include "databases, servers, the user interface, business logic", and so on. This type of architecture can be considered a monolithic application.
+-> In this approach to application architecture, if a single component fails, other components fail, and possibly the entire application fails.
+To help maintain application availability when a single component fails, you can design your application through a microservices approach.
+
+-> To help maintain application availability when a single component fails, you can design your application through a microservices approach.
+-> In a microservices approach, application components are loosely coupled. In this case, if a single component fails, the other components continue to work because they are communicating with each other. The loose coupling prevents the entire application from failing.
+-> When designing applications on AWS, you can take a microservices approach with services and components that fulfill different functions. 
+-> Two services facilitate application integration: "Amazon Simple Notification Service (Amazon SNS) and Amazon Simple Queue Service (Amazon SQS)".
+
+1. Amazon Simple Notification Service (Amazon SNS): 
+-> It is a publish/subscribe service. 
+-> Using Amazon SNS topics, a publisher publishes messages to subscribers. 
+-> This is similar to the coffee shop; the cashier provides coffee orders to the barista who makes the drinks.
+-> In Amazon SNS, subscribers can be web servers, email addresses, AWS Lambda functions, or several other options.     
+
+2. Amazon Simple Queue Service (Amazon SQS) 
+-> Itis a message queuing service. 
+-> Using Amazon SQS, you can send, store, and receive messages between software components, without losing messages or requiring other services to be available. 
+-> In Amazon SQS, an application sends messages into a queue. A user or service retrieves a message from the queue, processes it, and then deletes it from the queue.
+
+==========================================================================================
+Serverless computing:
+=====================
+-> Earlier in this module, you learned about Amazon EC2, a service that lets you run virtual servers in the cloud. If you have applications that you want to run in Amazon EC2, you must do the following:
+1. Provision instances (virtual servers).
+2. Upload your code.
+3. Continue to manage the instances while your application is running.
+
+** Comparison between computing with virtual servers (thinking about servers and code) and serverless computing (thinking only about code).
+ The term “serverless” means that your code runs on servers, but you do not need to provision or manage these servers. With serverless computing, you can focus more on innovating new products and features instead of maintaining servers.
+ Another benefit of serverless computing is the "flexibility to scale serverless applications automatically". Serverless computing can adjust the applications' capacity by modifying the units of consumptions, such as throughput and memory. 
+ An AWS service for serverless computing is "AWS Lambda".
+
+
+1. AWS Lambda:
+--------------
+-> It is a service that lets you run code without needing to provision or manage servers.
+-> While using AWS Lambda, you pay only for the compute time that you consume. Charges apply only when your code is running. You can also run code for virtually any type of application or backend service, all with zero administration. 
+-> For example, a simple Lambda function might involve automatically resizing uploaded images to the AWS Cloud. In this case, the function triggers when uploading a new image. 
+
+How AWS Lambda works
+1. You upload your code to Lambda. 
+2. You set your code to trigger from an event source, such as AWS services, mobile applications, or HTTP endpoints.
+3. Lambda runs your code only when triggered.
+4. You pay only for the compute time that you use. In the previous example of resizing images, you would pay only for the compute time that you use when uploading new images. Uploading the images triggers Lambda to run code for the image resizing function.
+
+Specifications of AWS Lambda:
+------------------------------
+1. Languages Supported: Nod.js, Python, Java, Go, Ruby, C# (.NET Core)
+
+2. Event Sources:
+	a. Amazon S3 (e.g., when a file is uploaded to S3) 
+	b. Amazon SNS (e.g., when a message is published)
+	c. Amazon SQS (e.g., when a message is added to a queue)
+	d. API Gateway (e.g., for HTTP-based API requests)
+	e. Amazon DynamoDB (e.g., on item updates)
+	f. CloudWatch Events (e.g., scheduled events or other AWS events)
+	g. AWS IoT (e.g., device data)
+
+3. Execution Environment:
+-- Compute Resources: AWS Lambda functions run in a secure, isolated compute environment (container). 
+-- Timeout: Lambda functions can run for up to 15 minutes per invocation.
+-- Memory: You can allocate memory from 128 MB to 10,240 MB (10 GB), and the CPU power is proportional to the memory you allocate.
+
+4. Automatic Scaling:
+-> Lambda functions scale automatically depending on the number of incoming requests.
+-> Each request is processed in parallel with others, allowing you to handle many requests simultaneously.
+
+5. Pricing:
+-- Request pricing: You are charged for the number of requests (invocations) to your Lambda function. AWS provides 1 million free requests per month.
+-- Duration pricing: You are charged based on the duration (time) your function runs, measured in milliseconds, and the amount of memory you allocate.
+-- Free tier: AWS provides a free tier with 1 million requests and 400,000 GB-seconds of compute time per month.
+
+6. Concurrency:
+-- Lambda allows concurrent executions, and the maximum concurrency depends on the AWS region.
+-- Reserved concurrency: You can set a reserved concurrency limit for a function, ensuring that it has a certain amount of capacity dedicated to it.
+
+
+Limitations of AWS Lambda
+--------------------------
+1. Timeout Limitation: The maximum execution time of a Lambda function is "15 minutes (900 seconds)". After this, the function will be forcibly terminated. If your workload requires longer processing times, Lambda may not be suitable.
+
+2. Package Size: The deployment package (code and dependencies) cannot exceed "50 MB" when uploading directly via the AWS Management Console or "250 MB when using Amazon S3" as the source for the package.
+
+3. Memory Allocation: The maximum memory that you can allocate to a Lambda function is 10 GB (10,240 MB). If your workload needs more memory or CPU, consider alternative solutions.
+
+4. Ephemeral Storage: Lambda functions have access to a temporary file system in /tmp, which can store up to 512 MB of data during execution. This storage is ephemeral, meaning it is cleared when the function execution completes or is terminated.
+
+5. Cold Starts: Lambda functions experience cold starts when they haven't been invoked for some time or when a new instance of the function is initialized to handle more requests. 
+-> Cold starts can introduce latency, particularly in languages like Java and .NET, which have longer startup times compared to others (e.g., Node.js or Python).
+-- Cold Start in VPC: Lambda functions that are configured to run within a VPC might experience longer cold start times due to network initialization. These functions need to establish ENI (Elastic Network Interface) connections to the VPC, which can delay execution.
+
+6. Limited Support for File Systems: Lambda functions don’t have persistent access to a traditional file system. While you can store data temporarily in /tmp, for persistent data, you must rely on services like S3, DynamoDB, or EFS (if mounted to Lambda).
+
+7. Concurrency Limits: AWS imposes default concurrency limits on Lambda functions. If your function receives a high volume of requests simultaneously, it may be throttled. You can request increased concurrency limits through AWS Support.
+
+==============================================================================================
+
+1. Containers: 
+--------------
+-> Provide you with a standard way to package your application's code and dependencies into a single object. You can also use containers for processes and workflows in which there are essential requirements for security, reliability, and scalability.
+-> Container orchestration services help you to deploy, manage, and scale your containerized applications. Next, you will learn about two services that provide container orchestration: "Amazon Elastic Container Service" and "Amazon Elastic Kubernetes Service".
+
+
+a. Amazon Elastic Container Service (Amazon ECS)
+-------------------------------------------------
+-> Amazon Elastic Container Service (Amazon ECS) is a highly scalable, high-performance container management system that enables you to run and scale containerized applications on AWS. 
+-> Amazon ECS supports Docker containers. Docker is a software platform that enables you to build, test, and deploy applications quickly. AWS supports the use of open-source Docker Community Edition and subscription-based Docker Enterprise Edition. With Amazon ECS, you can use API calls to launch and stop Docker-enabled applications.
+
+
+b. Amazon Elastic Kubernetes Service (Amazon EKS)
+--------------------------------------------------
+-> Amazon Elastic Kubernetes Service (Amazon EKS) is a fully managed service that you can use to run Kubernetes on AWS. 
+-> Kubernetes is open-source software that enables you to deploy and manage containerized applications at scale. A large community of volunteers maintains Kubernetes, and AWS actively works together with the Kubernetes community. As new features and functionalities release for Kubernetes applications, you can easily apply these updates to your applications managed by Amazon EKS.
+
+
+2. AWS Fargate:
+---------------
+-> AWS Fargate is a serverless compute engine for containers. It works with both Amazon ECS and Amazon EKS. 
+-> When using AWS Fargate, you do not need to provision or manage servers. 
+-> AWS Fargate manages your server infrastructure for you. You can focus more on innovating and developing your applications, and you pay only for the resources that are required to run your containers.
+
+============================================================================================
+
+Module3: AWS Global Infrastructure:
+===================================
+
+Region: 
+------
+-> When determining the right Region for your services, data, and applications, consider the following four business factors. 
+1. Compliance with data governance and legal requirements (Data Compliance)
+2. Proximity to your customers (Latency: delay between a request for data and the response)
+3. Available services within a Region (Service Availability)
+4. Pricing
+
+Availability Zones:
+-------------------
+-> An Availability Zone is a single data center or a group of data centers within a Region. Availability Zones are located tens of miles apart from each other. This is close enough to have low latency (the time between when content requested and received) between Availability Zones. However, if a disaster occurs in one part of the Region, they are distant enough to reduce the chance that multiple Availability Zones are affected.
+-> Planning for failure and deploying applications across multiple Availability Zones is an important part of building a resilient and highly available architecture.
+
+
+Edge Locations: Amazon CloudFront
+----------------------------------
+-> An edge location is a site that Amazon CloudFront uses to store cached copies of your content closer to your customers for faster delivery.
+
+1. Origin: Suppose that your company’s data is stored in Brazil, and you have customers who live in China. To provide content to these customers, you don’t need to move all the content to one of the Chinese Regions.
+2. Edge location: Instead of requiring your customers to get their data from Brazil, you can "cache a copy locally at an edge location" that is close to your customers in China.
+3. Customer: When a customer in China requests one of your files, "Amazon CloudFront retrieves the file from the cache in the edge location" and delivers the file to the customer. The file is delivered to the customer faster because it came from the edge location near China instead of the original source in Brazil.
+
+----------------------------------------------------------------------------------------------------
+
+-- How to Provision AWS Resources/Ways to interact with AWS services:
+1. AWS Management Console: It is a web-based interface for accessing and managing AWS services. 
+
+2. AWS Command Line Interface (AWS CLI): To save time when making API requests, you can use the AWS Command Line Interface (AWS CLI). AWS CLI enables you to control multiple AWS services directly from the command line within one tool. AWS CLI is available for users on Windows, macOS, and Linux. 
+-> By using AWS CLI, you can automate the actions that your services and applications perform through scripts. For example, you can use commands to launch an Amazon EC2 instance, connect an Amazon EC2 instance to a specific Auto Scaling group, and more.
+
+3. Software development kits (SDKs): SDKs make it easier for you to use AWS services through an API designed for your programming language or platform. SDKs enable you to use AWS services with your existing applications or create entirely new applications that will run on AWS.
+-> To help you get started with using SDKs, AWS provides documentation and sample code for each supported programming language. Supported programming languages include C++, Java, .NET, and more.
+
+======================================================================================
+AWS Elastic Beanstalk:
+-----------------------
+-> With AWS Elastic Beanstalk, you provide code and configuration settings, and Elastic Beanstalk deploys the resources necessary to perform the following tasks:
+• Adjust capacity.
+• Load balancing.
+• Automatic scaling
+• Application health monitoring
+
+
+AWS CloudFormation:
+-------------------
+• With AWS CloudFormation, you can treat your infrastructure as code. This means that you can build an environment by writing lines of code instead of using the AWS Management Console to individually provision resources.
+• AWS CloudFormation provisions your resources in a safe, repeatable manner, enabling you to frequently build your infrastructure and applications without having to perform manual actions. It determines the right operations to perform when managing your stack and rolls back changes automatically if it detects errors.
+
+
+AWS Outposts: 
+-------------
+-> AWS Outposts is a fully managed service that extends AWS infrastructure, services, APIs, and tools to customer premises. 
+-> By providing local access to AWS managed infrastructure, AWS Outposts enables customers to build and run applications on-premises using the same programming interfaces as in AWS Regions, while using local compute and storage resources for lower latency and local data processing needs.
+-> An Outpost is a pool of AWS compute and storage capacity deployed at a customer site. 
+-> AWS operates, monitors, and manages this capacity as part of an AWS Region. You can create subnets on your Outpost and specify them when you create AWS resources such as EC2 instances, EBS volumes, ECS clusters, and RDS instances. Instances in Outpost subnets communicate with other instances in the AWS Region using private IP addresses, all within the same VPC.
+
+=============================================================================================
+
+Module4: NETWORKING: Connectivity to AWS
+=========================================
+
+Amazon Virtual Private Cloud (Amazon VPC):
+------------------------------------------ 
+-> A Networking service that you can use to establish boundaries around your AWS resources.
+-> Amazon VPC enables you to provision an isolated section of the AWS Cloud. In this isolated section, you can launch resources in a virtual Network that you define. 
+-> Within a virtual private cloud (VPC), you can organize your resources into subnets. A subnet is a section of a VPC that can contain resources such as Amazon EC2 instances.
+
+-> VPC and subnets:
+
+      Name	         Default    Adjustable
+VPCs per Region		      5	     	Yes
+Subnets per VPC		     200	Yes
+IPv4 CIDR blocks per VPC      5		Yes (up to 50)
+IPv6 CIDR blocks per VPC      5		Yes (up to 50)
+
+
+Internet gateway: 
+-----------------
+-> To allow public traffic from the internet to access your VPC, you attach an internet gateway to the VPC.
+
+-> What if you have a VPC that includes only private resources?
+
+Virtual private gateway: 
+------------------------
+-> To access private resources in a VPC, you can use a virtual private gateway.
+
+-> The bodyguard is like a "Virtual private Network (VPN)" connection that encrypts (or protects) your internet traffic from all the other requests around it. 
+-> The virtual private gateway is the component that allows protected internet traffic to enter into the VPC. 
+
+-> A "Virtual private gateway" enables you to establish a virtual private Network (VPN) connection between your VPC and a private Network, such as an on-premises data center or internal corporate Network. 
+-> A Virtual private gateway allows traffic into the VPC only if it is coming from an approved Network.
+
+
+AWS Direct Connect:
+-------------------
+-> It is a service that lets you to establish a dedicated private connection between your data center and a VPC. 
+-> The private connection that AWS Direct Connect provides helps you to reduce Network costs and increase the amount of bandwidth that can travel through your Network.
+
+
+Subnets and Network Access Control Lists:
+=========================================
+
+** Subnets: A subnet is a section of a VPC in which you can group resources based on security or operational needs. Subnets can be public or private. 
+
+** Public subnets: contain resources that need to be accessible by the public, such as an online store’s website.
+** Private subnets: contain resources that should be accessible only through your private Network, such as a database that contains customers’ personal information and order histories. 
+-> In a VPC, subnets can communicate with each other. For example, you might have an application that involves Amazon EC2 instances in a public subnet communicating with databases that are in a private subnet.
+
+
+1. VPC Peering:
+---------------
+• VPC Peering is a connection between two VPCs that allows them to route traffic between each other using private IP addresses. Peering works across different regions (inter-region peering) as well as within the same region (intra-region peering).
+
+• Use Case: Suitable for connecting two VPCs in the same or different AWS accounts to share resources, like EC2 instances, databases, etc.
+
+• Key Features:
+o Traffic between the VPCs remains private, and it doesn't traverse the internet.
+o You must update the route tables in each VPC to allow communication.
+o Peering connections are one-to-one (i.e., two VPCs can only peer with each other, but they cannot transitively connect to other VPCs through the peering connection).
+
+•Limitations:
+o Cannot overlap CIDR blocks between VPCs.
+o No transitive peering (one VPC can't route traffic through another VPC).
+
+Example:
+• VPC A and VPC B are connected directly via VPC peering. Each VPC must have a route in its route table to the other VPC’s CIDR block via the peering connection.
+
+-------------------------------------------------------------------------
+2. AWS Transit Gateway:
+------------------------
+• AWS Transit Gateway is a highly scalable service that allows you to interconnect multiple VPCs and on-premises networks through a central hub (the Transit Gateway). It acts as a hub to facilitate communication between all attached VPCs and even your on-premises networks.
+
+• Use Case: Ideal for connecting multiple VPCs in large architectures or multi-account environments where you want simplified and scalable management of inter-VPC traffic.
+
+• Key Features:
+o Allows for transitive routing (one VPC can route traffic to another VPC through the Transit Gateway).
+o Supports inter-region peering, allowing communication between VPCs in different regions.
+o Simplifies network architecture by consolidating VPC connections through a single service.
+o You can also connect on-premises networks via Direct Connect or VPN to the Transit Gateway.
+
+• Limitations:
+o More complex to set up than VPC peering, especially for small-scale architectures.
+o Additional cost compared to VPC peering.
+
+Example:
+• VPC A, VPC B, and VPC C are all attached to a Transit Gateway, and VPC A can communicate with VPC B or VPC C through the central Transit Gateway.
+
+--------------------------------------------------------------------------
+3. VPC Endpoints: 
+-----------------
+-> VPC Endpoints are a crucial AWS networking feature that allows you to connect your VPC to AWS services and other VPCs securely, without traversing the public internet. 
+-> VPC Endpoints provide private, secure access to AWS services from within a VPC, ensuring that traffic between your VPC and the services remains on the AWS internal network.
+
+-> There are two types of VPC endpoints:
+1. Interface Endpoints (AWS PrivateLink)
+2. Gateway Endpoints
+
+1. Interface VPC Endpoints (AWS PrivateLink): [Many AWS services (e.g., S3, DynamoDB, KMS, and others)]
+---------------------------------------------
+-> These are used to connect to a broad range of AWS services or third-party services with private connectivity via ENIs in your VPC. They are more flexible and can be used for various services beyond just S3 and DynamoDB.
+
+-> Service Supported: Many AWS services (e.g., S3, EC2, DynamoDB, KMS, and others)
+-> Traffic Routing: Through ENI (Elastic Network Interface) in your VPC
+-> VPC Connectivity: Provides private IP for services (via ENI)
+-> Private Connectivity: Yes, fully private via AWS PrivateLink
+-> Creation Complexity: More complex, involves ENI setup and integration with PrivateLink.
+-> Use Case: Secure connections to AWS or third-party services
+-> Pricing: Hourly and data processing charges for ENI
+
+Use Case:
+-> You can use Interface Endpoints to connect to services like S3, DynamoDB, or any other AWS service that supports private connectivity (like services inside your VPC or third-party services). This ensures that traffic remains private and does not leave AWS's internal network.
+
+Example:
+• Service: S3
+• Endpoint Type: Interface VPC Endpoint (PrivateLink)
+• How it works: When an EC2 instance in a private subnet accesses an S3 bucket via the Interface Endpoint, the traffic is routed privately using AWS’s internal network without going through the public internet.
+
+Steps to Create Interface Endpoint:
+1. In the AWS Console, go to VPC Dashboard.
+2. Under Endpoints, click Create Endpoint.
+3. Choose Interface as the endpoint type.
+4. Select the AWS service you want to connect to (for example, S3, DynamoDB, etc.).
+5. Choose the VPC and subnet where you want to create the endpoint.
+6. Configure security groups to control access to the endpoint.
+7. Click Create Endpoint.
+
+
+2. Gateway VPC Endpoints: [Only Amazon S3 and DynamoDB]
+-------------------------
+-> Gateway Endpoints are simpler and specifically used for private, high-performance connections to "Amazon S3 and DynamoDB", without requiring ENIs. They are typically easier to set up and have lower operational complexity.
+
+-> Service Supported: Only Amazon S3 and DynamoDB
+-> Traffic Routing: Through route tables and a gateway in your VPC
+-> VPC Connectivity: Uses VPC route tables to direct traffic to S3/DynamoDB
+-> Private Connectivity: Yes, private connection to specific AWS services
+-> Creation Complexity: Simpler, involves adding route table entries
+-> Use Case: Secure access to S3 or DynamoDB in the same region
+-> Pricing: Only data processing charges
+
+• Private Connectivity: The traffic from your VPC to the service is routed over the AWS backbone, without needing a NAT Gateway, VPN, or public IP addresses.
+• Supports: Only for Amazon S3 and DynamoDB.
+• Mechanism: The gateway endpoint allows you to update the route table to send traffic to the AWS service using the endpoint instead of routing it through the internet or NAT.
+
+Use Case:
+• You can use Gateway Endpoints for S3 or DynamoDB to ensure secure and private access to these services without needing to use public IPs.
+Example:
+• Service: Amazon S3
+• Endpoint Type: Gateway VPC Endpoint
+• How it works: When an EC2 instance in your VPC accesses an S3 bucket, the traffic is routed directly to S3 over the AWS internal network without traversing the public internet.
+
+Steps to Create Gateway Endpoint:
+1. Go to the VPC Dashboard in the AWS Console.
+2. Under Endpoints, click Create Endpoint.
+3. Select Gateway as the endpoint type.
+4. Choose the AWS service (S3 or DynamoDB).
+5. Choose the VPC and select the route table(s) to update for the traffic to route through the endpoint.
+6. Click Create Endpoint.
+
+===================================================================================================
+Network traffic in a VPC: 
+-------------------------
+-> When a customer requests data from an application hosted in the AWS Cloud, this request is sent as a packet. A packet is a unit of data sent over the internet or a Network. 
+-> It enters a VPC through an internet gateway. Before a packet can enter a subnet or exit from a subnet, it checks for permissions. These permissions indicate who sent the packet and how the packet is trying to communicate with the resources in a subnet.
+-> The VPC component that checks packet permissions for subnets is a Network access control list (ACL).
+
+-> Network ACLs: A Network ACL is a virtual firewall that controls inbound and outbound traffic at the subnet level.
+
+-> Each AWS account includes a default Network ACL. When configuring your VPC, you can use your account’s default Network ACL or create custom Network ACLs. 
+-> By default, your account’s default Network ACL allows all inbound and outbound traffic, but you can modify it by adding your own rules. 
+-> For custom Network ACLs, all inbound and outbound traffic is denied, until you add rules to specify which traffic to allow. Additionally, all Network ACLs have an explicit deny rule. This rule ensures that if a packet doesn’t match any of the other rules on the list, the packet is denied.
+
+
+NACL Stateless packet filtering:
+---------------------------------
+-> Network ACLs perform "stateless packet filtering". They remember nothing and check packets that cross the subnet border each way: inbound and outbound. 
+-> When a packet response for that request comes back to the subnet, the Network ACL does not remember your previous request. The Network ACL checks the packet response against its list of rules to determine whether to allow or deny.
+-> After a packet has entered a subnet, it must have its permissions evaluated for resources within the subnet, such as Amazon EC2 instances. 
+
+-> The VPC component that checks packet permissions for an Amazon EC2 instance is a security group.
+
+** Security groups:
+-------------------
+-> A security group is a virtual firewall that controls inbound and outbound traffic for an Amazon EC2 instance.
+-> By default, a security group denies all inbound traffic and allows all outbound traffic. You can add custom rules to configure which traffic should be allowed; any other traffic would then be denied.
+-> If you have multiple Amazon EC2 instances within the same VPC, you can associate them with the same security group or use different security groups for each instance. 
+
+
+Stateful packet filtering
+-------------------------
+-> Security groups perform "Stateful packet filtering". They remember previous decisions made for incoming packets.
+-> When a packet response for that request returns to the instance, the security group remembers your previous request. The security group allows the response to proceed, regardless of inbound security group rules.
+
+-> With both Network ACLs and security groups, you can configure custom rules for the traffic in your VPC. 
+
+
+-> Control traffic to subnets using Network ACLs: A Network access control list (NACL) allows or denies specific inbound or outbound traffic at the subnet level. 
+-> You can use the default Network ACL for your VPC, or you can create a custom Network ACL for your VPC with rules that are like the rules for your security groups in order to add an additional layer of security to your VPC.
+-> There is no additional charge for using Network ACLs.
+
+-> The following diagram shows a VPC with two subnets. Each subnet has a Network ACL. When traffic enters the VPC (for example, from a peered VPC, VPN connection, or the internet), the router sends the traffic to its destination. 
+-> Network ACL A determines which traffic destined for subnet 1 is allowed to enter subnet 1, and which traffic destined for a location outside subnet 1 is allowed to leave subnet 1. Similarly, Network ACL B determines which traffic is allowed to enter and leave subnet 2.
+
+
+Network ACL basics:
+--------------------
+
+-- The following are the basic things that you need to know about Network ACLs:
+• Your VPC automatically comes with a modifiable default Network ACL. By default, it allows all inbound and outbound IPv4 traffic and, if applicable, IPv6 traffic.
+• You can create a custom Network ACL and associate it with a subnet to allow or deny specific inbound or outbound traffic at the subnet level.
+• Each subnet in your VPC must be associated with a Network ACL. If you don't explicitly associate a subnet with a Network ACL, the subnet is automatically associated with the default Network ACL.
+• You can associate a Network ACL with multiple subnets. However, a subnet can be associated with only one Network ACL at a time. When you associate a Network ACL with a subnet, the previous association is removed.
+• A Network ACL has inbound rules and outbound rules. Each rule can either allow or deny traffic. Each rule has a number from 1 to 32766. We evaluate the rules in order, starting with the lowest numbered rule, when deciding whether allow or deny traffic. If the traffic matches a rule, the rule is applied, and we do not evaluate any additional rules. We recommend that you start by creating rules in increments (for example, increments of 10 or 100) so that you can insert new rules later on, if needed.
+• We evaluate the Network ACL rules when traffic enters and leaves the subnet, not as it is routed within a subnet.
+• NACLs are stateless, which means that information about previously sent or received traffic is not saved. If, for example, you create a NACL rule to allow specific inbound traffic to a subnet, responses to that traffic are not automatically allowed. This is in contrast to how security groups work. 
+
+-> Security groups are stateful, which means that information about previously sent or received traffic is saved. If, for example, a security group allows inbound traffic to an EC2 instance, responses are automatically allowed regardless of outbound security group rules.
+• Network ACLs can't block DNS requests to or from the Route 53 Resolver (also known as the VPC+2 IP address or AmazonProvidedDNS). To filter DNS requests through the Route 53 Resolver, you can enable Route 53 Resolver DNS Firewall in the Amazon Route 53 Developer Guide.
+• Network ACLs can't block traffic to the Instance Metadata Service (IMDS). 
+
+
+-- To manage access to IMDS, see Configure the instance metadata options in the Amazon EC2 User Guide.
+-> Network ACLs do not filter traffic destined to and from the following:
+o Amazon Domain Name Services (DNS)
+o Amazon Dynamic Host Configuration Protocol (DHCP)
+o Amazon EC2 instance metadata
+o Amazon ECS task metadata endpoints
+o License activation for Windows instances
+o Amazon Time Sync Service
+o Reserved IP addresses used by the default VPC router
+
+• There are quotas (also known as limits) for the number of Network ACLs per VPC and the number of rules per Network ACL. For more information, see Amazon VPC quotas.
+
+
+
+Network ACL rules:
+------------------
+-- You can add or remove rules from the default Network ACL or create additional Network ACLs for your VPC. When you add or remove rules from a Network ACL, the changes are automatically applied to the subnets that it's associated with.
+
+** The following are the parts of a Network ACL rule:
+• Rule number: Rules are evaluated starting with the lowest numbered rule. As soon as a rule matches traffic, it's applied regardless of any higher-numbered rule that might contradict it.
+• Type: The type of traffic; for example, SSH. You can also specify all traffic or a custom range.
+• Protocol: You can specify any protocol that has a standard protocol number. For more information, see Protocol Numbers. If you specify ICMP as the protocol, you can specify any or all of the ICMP types and codes.
+• Port range: The listening port or port range for the traffic. For example, 80 for HTTP traffic.
+• Source: [Inbound rules only] The source of the traffic (CIDR range).
+• Destination: [Outbound rules only] The destination for the traffic (CIDR range).
+• Allow/Deny: Whether to allow or deny the specified traffic.
+
+-> If you add a rule using a command line tool or the Amazon EC2 API, the CIDR range is automatically modified to its canonical form. For example, if you specify 100.68.0.18/18 for the CIDR range, we create a rule with a 100.68.0.0/18 CIDR range.
+
+
+--------------------------------------------------------------------------------------
+Default Network ACL:
+---------------------
+-> The default Network ACL is configured to allow all traffic to flow in and out of the subnets with which it is associated. 
+-> Each Network ACL also includes a rule whose rule number is an asterisk (*). This rule ensures that if a packet doesn't match any of the other numbered rules, it's denied. You can't modify or remove this rule.
+
+Inbound	 	 	 	 	 
+Rule #	Type	Protocol	Port range	Source	Allow/Deny
+100	All IPv4 traffic	All	All	0.0.0.0/0	ALLOW
+*	All IPv4 traffic	All	All	0.0.0.0/0	DENY
+Outbound	 	 	 	 	 
+Rule #	Type	Protocol	Port range	Destination	Allow/Deny
+100	All IPv4 traffic	All	All	0.0.0.0/0	ALLOW
+*	All IPv4 traffic	All	All	0.0.0.0/0	DENY
+
+
+-> If you create a VPC with an IPv6 CIDR block or if you associate an IPv6 CIDR block with your existing VPC, we automatically add rules that allow all IPv6 traffic to flow in and out of your subnet. We also add rules whose rule numbers are an asterisk that ensures that a packet is denied if it doesn't match any of the other numbered rules. You can't modify or remove these rules. The following is an example default Network ACL for a VPC that supports IPv4 and IPv6.
+Inbound	 	 	 	 	 
+Rule #	Type	Protocol	Port range	Source	Allow/Deny
+100	All IPv4 traffic	All	All	0.0.0.0/0	ALLOW
+101	All IPv6 traffic	All	All	::/0		ALLOW
+*	All traffic		All	All	0.0.0.0/0	DENY
+*	All IPv6 traffic	All	All	::/0		DENY
+Outbound	 	 	 	 	 
+Rule #	Type	Protocol	Port range	Destination	Allow/Deny
+100	All traffic		All	All	0.0.0.0/0	ALLOW
+101	All IPv6 traffic	All	All	::/0		ALLOW
+*	All traffic		All	All	0.0.0.0/0	DENY
+*	All IPv6 traffic	All	All	::/0		DENY
+
+
+=======================================================================================
+
+Global Networking:
+-------------------
+
+1. Domain Name System (DNS)
+----------------------------
+-> Suppose that AnyCompany has a website hosted in the AWS Cloud. Customers enter the web address into their browser, and they are able to access the website. This happens because of Domain Name System (DNS) resolution. 
+-> DNS resolution involves a customer DNS resolver communicating with a company DNS server.
+-> You can think of DNS as being the phone book of the internet. DNS resolution is the process of translating a domain name to an IP address. 
+
+-> For example, suppose that you want to visit AnyCompany’s website. 
+• When you enter the domain name into your browser, this request is sent to a customer DNS resolver. 
+• The customer DNS resolver asks the company DNS server for the IP address that corresponds to AnyCompany’s website.
+• The company DNS server responds by providing the IP address for AnyCompany’s website, 192.0.2.0.
+
+ 
+2. Amazon Route 53 (DNS, Register domains and host zones, Routing policies)
+---------------------------------------------------------------------------
+• Amazon Route 53 is a DNS web service. It gives developers and businesses a reliable way to route end users to internet applications hosted in AWS. 
+• Amazon Route 53 "connects user requests to infrastructure running in AWS" (such as Amazon EC2 instances and load balancers). It can route users to infrastructure outside of AWS.
+• Another feature of Route 53 is the "ability to manage the DNS records for domain names". You can register new domain names directly in Route 53. You can also transfer DNS records for existing domain names managed by other domain registrars. This enables you to manage all of your domain names within a single location.
+
+Example: How Amazon Route 53 and Amazon CloudFront deliver content:
+-------------------------------------------------------------------
+-> Suppose that AnyCompany’s application is running on several Amazon EC2 instances. These instances are in an Auto Scaling group that attaches to an Application Load Balancer. 
+• A customer requests data from the application by going to AnyCompany’s website. 
+• Amazon Route 53 uses DNS resolution to identify AnyCompany.com’s corresponding IP address, 192.0.2.0. This information is sent back to the customer.
+• The customer’s request is sent to the nearest edge location through Amazon CloudFront. 
+• Amazon CloudFront connects to the Application Load Balancer, which sends the incoming packet to an Amazon EC2 instance.
+
+===============================================================================================
+Module 5 Introduction: Storage and Databases
+--------------------------------------------
+
+1. Instance stores:
+--------------------
+-> Block-level storage volumes behave like physical hard drives.
+-> An instance store provides temporary block-level storage for an Amazon EC2 instance. An instance store is disk storage that is physically attached to the host computer for an EC2 instance, and therefore has the same lifespan as the instance. When the instance is terminated, you lose any data in the instance store.
+-> Amazon EC2 instances are virtual servers. If you start an instance from a stopped state, the instance might start on another host, where the previously used instance store volume does not exist. Therefore, AWS recommends instance stores for use cases that involve temporary data that you do not need in the long term.
+
+
+2. Amazon Elastic Block Store (Amazon EBS):
+-------------------------------------------
+-> Amazon EBS is a service that provides block-level storage volumes that you can use with Amazon EC2 instances. If you stop or terminate an Amazon EC2 instance, all the data on the attached EBS volume remains available.
+-> To create an EBS volume, you define the configuration (such as volume size and type) and provision it. After you create an EBS volume, it can attach to an Amazon EC2 instance.
+-> Because EBS volumes are for data that needs to persist, it’s important to back up the data. You can take "incremental backups of EBS volumes by creating Amazon EBS snapshots".
+
+2.1 Amazon EBS snapshots:
+---------------------
+-> An EBS snapshot is an "Incremental backup". This means that the first backup taken of a volume copies all the data. For subsequent backups, only the blocks of data that have changed since the most recent snapshot are saved. 
+-> Incremental backups are different from full backups, in which all the data in a storage volume copies each time a backup occurs. The full backup includes data that has not changed since the most recent backup.
+
+
+3. Amazon Simple Storage Service (Amazon S3):
+---------------------------------------------
+Object storage: 
+---------------
+-> In object storage, each object consists of "data, metadata, and a key".
+-> The data might be an image, video, text document, or any other type of file. 
+-> Metadata contains information about what the data is, how it is used, the object size, and so on. 
+-> An object’s key is its unique identifier.
+
+Amazon Simple Storage Service (Amazon S3):
+------------------------------------------
+-> It is a service that provides object-level storage. Amazon S3 stores data as objects in buckets.
+-> You can upload any type of file to Amazon S3, such as images, videos, text files, and so on. For example, you might use Amazon S3 to store backup files, media files for a website, or archived documents. Amazon S3 offers unlimited storage space. The maximum file size for an object in Amazon S3 is 5 TB.
+-> When you upload a file to Amazon S3, you can set permissions to control visibility and access to it. You can also use the Amazon S3 versioning feature to track changes to your objects over time.
+
+
+Amazon S3 storage classes:
+--------------------------
+-> With Amazon S3, you pay only for what you use. You can choose from a range of storage classes to select a fit for your business and cost needs. When selecting an Amazon S3 storage class, consider these two factors:
+• How often you plan to retrieve your data!
+• How available you need your data to be!
+
+a. S3 Standard: 
+---------------
+-> Designed for frequently accessed data.
+-> Stores data in a minimum of three Availability Zones
+-> Amazon S3 Standard provides high availability for objects. This makes it a good choice for a wide range of use cases, such as websites, content distribution, and data analytics. Amazon S3 Standard has a higher cost than other storage classes intended for infrequently accessed data and archival storage.
+
+b. S3 Standard-IA (S3 Standard-Infrequent Access)
+-------------------------------------------------
+-> Ideal for infrequently accessed data
+-> Similar to Amazon S3 Standard but has a lower storage price and higher retrieval price
+-> Amazon S3 Standard-IA is ideal for data infrequently accessed but requires high availability when needed. Both Amazon S3 Standard and Amazon S3 Standard-IA store data in a minimum of three Availability Zones.
+
+c. S3 One Zone-IA (S3 One Zone-Infrequent Access):
+--------------------------------------------------
+-> Stores data in a "Single Availability Zone"
+-> Has a lower storage price than Amazon S3 Standard-IA
+-> Compared to S3 Standard and S3 Standard-IA, which store data in a minimum of three Availability Zones, S3 One Zone-IA stores data in a single Availability Zone. This makes it a good storage class to consider if the following conditions apply:
+• You want to save costs on storage.
+• You can easily reproduce your data in the event of an Availability Zone failure.
+
+d. S3 Intelligent-Tiering:
+---------------------------
+• Ideal for data with unknown or changing access patterns.
+• Requires a small monthly monitoring and automation fee per object.
+-> In the S3 Intelligent-Tiering storage class, Amazon S3 monitors objects’ access patterns. If you haven’t accessed an object for 30 consecutive days, Amazon S3 automatically moves it to the infrequent access tier, S3 Standard-IA. If you access an object in the infrequent access tier, Amazon S3 automatically moves it to the frequent access tier, S3 Standard.
+
+e. S3 Glacier Instant Retrieval:
+--------------------------------
+• Works well for archived data that requires immediate access.
+• Can retrieve objects within a few milliseconds.
+
+e. S3 Glacier Flexible Retrieval:
+---------------------------------
+• Low-cost storage designed for data archiving.
+• Able to retrieve objects within a few minutes to hours. (1-12hrs)
+-> For example, you might use this storage class to store archived customer records or older photos and video files. You can retrieve your data from S3 Glacier Flexible Retrieval from 1 minute to 12 hours.
+
+g. S3 Glacier Deep Archive:
+---------------------------
+• Lowest-cost object storage class ideal for archiving
+• Able to retrieve objects within 12 hours
+-> S3 Deep Archive supports long-term retention and digital preservation for data that might be accessed once or twice in a year. This storage class is the lowest-cost storage in the AWS Cloud, with data retrieval from 12 to 48 hours. All objects from this storage class are replicated and stored across at least three geographically dispersed Availability Zones.
+
+h. S3 Outposts:
+--------------
+• Creates S3 buckets on Amazon S3 Outposts
+• Makes it easier to retrieve, store, and access data on AWS Outposts
+-> Amazon S3 Outposts delivers object storage to your on-premises AWS Outposts environment. Amazon S3 Outposts is designed to store data durably and redundantly across multiple devices and servers on your Outposts. It works well for workloads with local data residency requirements that must satisfy demanding performance needs by keeping data close to on-premises applications.
+
+=====================================================================================
+Amazon Elastic File System (Amazon EFS)
+---------------------------------------
+File storage:
+-------------
+• In file storage, multiple clients (such as users, applications, servers, and so on) can access data that is stored in shared file folders. In this approach, a storage server uses block storage with a local file system to organize files. Clients access data through file paths.
+• Compared to block storage and object storage, file storage is ideal for use cases in which a large number of services and resources need to access the same data at the same time.
+
+	Amazon Elastic File System (Amazon EFS) is a scalable file system used with AWS Cloud services and on-premises resources. As you add and remove files, Amazon EFS grows and shrinks automatically. It can scale on demand to petabytes without disrupting applications. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

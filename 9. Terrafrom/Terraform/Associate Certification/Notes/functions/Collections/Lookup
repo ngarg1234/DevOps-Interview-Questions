@@ -1,0 +1,17 @@
+lookup function return the value of a map element based on the key provided
+
+    lookup(map_name, key_name)
+
+
+        
+example:
+
+variable my_map {
+    default = {
+        item1 = "one"
+        item2 = "two"
+    }
+}
+
+
+lookup(var.my_map, item1) => o/p = one

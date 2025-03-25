@@ -1,0 +1,22 @@
+we will create an eip in networking_project and output it's public ip
+
+in the security project, we will create a security_group and whitlist the above eip
+
+VERY IMP NOTE:
+
+    FOR SHARING STATEFILE WITH ANOTHER WORKSPACE, YOU HAVE TO ENABLE Remote state sharing IN YOUR WORKSPACE SETTING
+
+    go to workspace setting -> Remote state sharing -> enable either of these "share with all workspace or share with specific workspace"
+
+
+main section to note is below,
+
+data "terraform_remote_state" "eip"{
+    backend = "remote"
+    config = {
+        organization = "Terraform_shyam"
+        workspaces = {
+            name = "networking_project"
+        }
+    }
+}

@@ -1,0 +1,12 @@
+
+you have to refer to the module as below,
+
+source  = "app.terraform.io/Terraform_shyam/vpc/aws"
+
+repo name is -> terraform-aws-vpc
+
+module "vpc" {
+  source  = "app.terraform.io/Terraform_shyam/vpc/aws"
+  version = "1.0.0"
+  tag = "terraform|_module"
+}

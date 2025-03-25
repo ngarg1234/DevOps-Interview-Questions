@@ -1,0 +1,341 @@
+AWS Load Balancer and Auto Scaling
+==================================
+
+Load Balancer:
+--------------
+• AWS offers a service called Elastic Load Balancer (ELB), which is used to distribute
+incoming traffic across multiple servers or machines.
+• For instance, if one server is busy, the load balancer can redirect traffic to another
+available server. This helps avoid overloading any single server and ensures a smooth
+experience for users.
+
+1. Application Load Balancer (ALB)
+------------------------------------
+-> Goal: Handles HTTP and HTTPS traffic.
+
+** Attribute:
+-> Supports URL path-based routing (e.g., requests with /images can be routed to
+a specific backend).
+-> Supports host-based routing (e.g., requests to api.example.com can be routed
+to one service, while www.example.com can be routed to another).
+-> Designed for microservices and container-based architectures
+Example:
+-> Requests to /login are routed to one backend service, while requests to /profile
+are routed to another backend service.
+
+
+2. Network Load Balancer (NLB)
+------------------------------
+-> Goal: Handles TCP and UDP traffic for applications requiring high performance and low
+latency.
+** Attribute:
+-> Operates at the Transport Layer (Layer 4) of the OSI model.
+-> Capable of handling millions of requests per second with ultra-low latency
+** Scenario:
+-> Real-time gaming, financial applications, or other use cases requiring fast and
+reliable communication
+** Example:
+-> Distributes TCP traffic for a secure connection between clients and backend
+servers.
+
+3. Classic Load Balancer (CLB):
+-------------------------------
+-> Goal: Handles basic HTTP, HTTPS, and TCP traffic.
+** Attribute:
+-> Operates at both the Application layer (Layer 7) and Transport layer (Layer 4).
+-> Simpler to set up but lacks the advanced features of ALB and NLB.
+** Scenario: Legacy applications or simple architectures where advanced routing isn’t
+required.
+** Example:
+-> Balances HTTP traffic across a few servers for a simple web application.
+
+==================================================================================================
+
+Ramesh:
+
+Details:
+
+Load balancer type: Application
+Scheme: Internet-facing
+Status: Active
+Hosted zone: Z3AADJGX6KTTL2
+VPC: vpc-0c8009988dd9825ea 
+Availability Zones: 
+subnet-049d5d53dc41c6242 us-east-2a (use2-az1)
+subnet-007acf283d583efe4 us-east-2b (use2-az2)
+subnet-0b5c082cd31639c14 us-east-2c (use2-az3)
+
+Load balancer IP address type: IPv4
+Date created: February 12, 2025, 22:43 (UTC+05:30)
+Load balancer ARN: arn:aws:elasticloadbalancing:us-east-2:565393024864:loadbalancer/app/ramesh/1b1cc7dc4433cec9
+DNS name Info: ramesh-1087146965.us-east-2.elb.amazonaws.com (A Record)
+
+Listeners and rules:
+-> A listener checks for connection requests on its configured protocol and port. Traffic received by the listener is routed according to the default action and any additional rules.
+
+Network mapping Info:
+-> Targets in the listed zones and subnets are available for traffic from the load balancer using the IP addresses shown.
+
+VPC: vpc-0c8009988dd9825ea 
+IPv4 VPC CIDR: 172.31.0.0/16
+IPv6 : -
+
+Load balancer IP address type: IPv4
+
+Mappings
+Including two or more Availability Zones, and corresponding subnets, increases the fault tolerance of your applications.
+
+Zone                        Subnet                     IPv4 address        Private IPv4 address                IPv6 address
+us-east-2a (use2-az1)    subnet-049d5d53dc41c6242     Assigned by AWS     Assigned from CIDR 172.31.0.0/20    Not applicable
+us-east-2b (use2-az2)    subnet-007acf283d583efe4     Assigned by AWS     Assigned from CIDR 172.31.16.0/20   Not applicable
+us-east-2c (use2-az3)    subnet-0b5c082cd31639c14     Assigned by AWS     Assigned from CIDR 172.31.32.0/20   Not applicable
+
+Resource map: View, explore, and troubleshoot your load balancer's architecture.
+
+Securiy:
+Security groups (1): A security group is a set of firewall rules that control the traffic to your load balancer.
+
+Security Group ID             Name            Description
+sg-0c96338aa21fff230           default      default VPC security group
+
+Monitoring:
+
+Integrations: You can integrate the following AWS services with your load balancer. Integration status and details are displayed below. You set up and configure integration through these services.
+
+1. Amazon Application Recovery Controller (ARC) Info
+Optimizes: Availability
+
+2. Amazon CloudFront + AWS Web Application Firewall (WAF) Info
+Optimizes: Performance, Security, Availability
+
+3. AWS Global Accelerator Info
+Optimizes: Performance, Availability
+
+4. AWS Config Info
+Optimizes: Monitoring, Compliance
+
+5. AWS Web Application Firewall (WAF) Info
+Optimizes: Security
+
+
+Attributes:
+==========
+
+Traffic configuration:
+----------------------
+
+1. TLS Version and Cipher Headers: 
+-> Off: This typically refers to not explicitly enforcing a specific TLS version or cipher suite on the load balancer. When this is off, ALB will negotiate the best available TLS version and cipher suite with the client based on the default settings.
+-> Impact: It's generally recommended to specify supported TLS versions (e.g., TLS 1.2, TLS 1.3) to ensure secure communication. You might consider enabling it and explicitly defining strong ciphers for better security.
+
+2. WAF Fail Open
+-> Off: This means that if there’s an issue with the AWS Web Application Firewall (WAF), the load balancer will not fail open (i.e., traffic won’t be forwarded if WAF fails).
+-> Impact: Leaving it off ensures that the load balancer does not pass traffic when there is a failure in the WAF rules, thus protecting your application. Turning it on might allow traffic to pass through if the WAF encounters errors, but this could expose you to malicious traffic.
+
+3. HTTP/2
+-> On: HTTP/2 is a newer version of the HTTP protocol that offers performance improvements over HTTP/1.1, such as multiplexing multiple requests over a single connection and header compression.
+-> Impact: With HTTP/2 enabled, you get better performance, especially for websites with lots of resources (images, scripts, etc.). This is generally beneficial for modern web applications.
+
+4. Connection Idle Timeout
+-> 60 seconds: This is the amount of time a connection can be idle before it is closed. After 60 seconds of no activity, the ALB will terminate the connection.
+-> Impact: This is typically used to clean up stale connections. If your application has long-running connections, you may need to increase this value. For most web applications, 60 seconds should be sufficient.
+
+5. HTTP Client Keepalive Duration
+-> 3600 seconds (1 hour): This defines the duration that a connection is kept open between the client and the ALB to reuse for multiple requests. The default of 3600 seconds means that the connection is kept alive for one hour before being closed.
+-> Impact: This improves performance for clients making multiple requests within a short time frame, as it avoids the overhead of establishing new connections. This is beneficial for applications with many requests from the same client.
+
+6. Packet Handling: Desync Mitigation Mode
+-> Defensive: Desynchronization (desync) occurs when packets are misinterpreted due to protocol mismatches or issues. In Defensive mode, ALB tries to prevent desynchronization from causing problems by performing defensive checks and dropping potentially problematic packets.
+-> Impact: This setting helps protect your load balancer from certain types of attack or misbehaving clients. It ensures that the traffic being processed doesn’t cause issues due to unexpected or malformed packets.
+
+7. Drop Invalid Header Fields
+-> Off: This means that invalid or malformed headers will not be dropped by ALB. Instead, the request will be forwarded to the target, even if there are problems with the headers.
+-> Impact: This could be risky if you are concerned about malformed or malicious headers. Enabling this would add an extra layer of protection by dropping requests with invalid headers.
+
+8. X-Forwarded-For Header
+-> Append: The X-Forwarded-For header contains the original client’s IP address when it’s passed through a proxy or load balancer. The Append setting means ALB will add the client IP to the existing X-Forwarded-For header, rather than replacing it.
+-> Impact: This allows you to keep the full history of client IP addresses as the request passes through proxies or load balancers, which can be useful for logging, auditing, and security purposes.
+
+9. Client Port Preservation
+-> Off: This setting determines whether the load balancer should preserve the client’s source port in the forwarded traffic to the backend. When turned off, the ALB does not preserve the client’s source port.
+-> Impact: In most cases, you do not need to preserve the client’s source port, as it does not typically impact web traffic. However, for certain use cases, such as when backend services need to track the source port, you may want to enable this.
+
+10. Preserve Host Header
+-> Off: The Host header contains the domain or subdomain that the client requested. Setting this to Off means the ALB will not preserve the Host header from the incoming request and may modify it or replace it with the hostname of the target group.
+-> Impact: In many cases, you want to preserve the Host header for proper routing or for applications that require it (e.g., multi-tenant applications). It’s advisable to set this to On if your application depends on this header for correct routing or logic.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Real-World Scenarios:
+---------------------
+1. Web Applications: Use ALB to route user traffic based on URL paths or hostnames to
+microservices.
+2. Gaming and Financial Applications: Use NLB for ultra-fast response times and to
+handle large volumes of traffic.
+3. Legacy Systems: Use CLB for older applications that don’t require modern features.
+
+Step to Create a Load Balancer in AWS
+--------------------------------------
+• Before Creating Load balancer, you have to create EC2 instance.
+• As usual you can create Ec2 instance, But this time you have to give user data
+which is present in Advanced details.
+
+Step 1: Open the Load Balancer Console:
+1. Navigate to EC2 -> Load Balancers under the Load Balancing section.
+2. Click on the Create Load Balancer button.
+
+Step 2: Select the Load Balancer Type:
+1. You will be presented with three options:
+• Application Load Balancer
+• Network Load Balancer
+• Classic Load Balancer
+2. Choose the type based on your requirements:
+• Select ALB for HTTP/HTTPS traffic with advanced routing.
+• Select NLB for TCP/UDP traffic with low latency.
+• Select CLB for basic HTTP/HTTPS traffic.
+
+Step 3: Configure Load Balancer Settings
+1. Enter a Name for the load balancer. For example: my-load-balancer.
+2. For Scheme:
+• Choose Internet-facing for public applications accessible over the internet.
+• Choose Internal for private applications within your VPC.
+3. Select the IP Address Type:
+• Choose IPv4 or Dual stack (for IPv4 and IPv6 support).
+
+Step 4: Configure the Availability Zones
+• Choose the VPC where the load balancer will reside.
+• Select the Availability Zones to ensure high availability.
+• For each selected zone, specify one or more subnets.
+
+Step 5: Configure the Listeners
+1. Add one or more Listeners. A listener checks for connection requests from clients using
+the specified protocol and port.
+• Example: HTTP protocol on port 80.
+2. For HTTPS, you need to attach an SSL certificate. Choose a certificate from AWS
+Certificate Manager (ACM) or upload a custom one.
+
+Step 6: Configure the Target Group
+1. Create a new Target Group or select an existing one:
+• Target type: Instances, IP addresses, or Lambda function.
+• Protocol and port: Specify the protocol (e.g., HTTP) and port (e.g., 80) for routing
+traffic to the targets.
+2. Configure Health Checks:
+• Choose a protocol and path for health checks (e.g., HTTP and /index.html).
+• Set thresholds for healthy and unhealthy status.
+
+Step 7: Register Targets
+1. Select the EC2 instances or IP addresses that you want to route traffic to.
+2. Add the selected targets to the target group.
+
+Step 8: Review and Create
+1. Review all the configurations in the summary page.
+2. If everything looks correct, click Create.
+
+Step 9: Configure Path-Based Routing (for ALB)
+1. Once it is create, After that you can see Listeners and Rules section In the this section
+of your ALB configuration:
+• Add a new Rule.
+• Specify a Path condition (e.g., /images/* or /api/*).
+• Associate the path with a specific target group.
+2. Example:
+Requests with /images/* can route to a target group containing image services.
+Requests with /api/* can route to a target group containing backend APIs.
+3. Configure priorities for the rules to avoid conflicts (lower numbers have higher priority).
+4. Add actions such as redirecting traffic, returning fixed responses, or forwarding
+requests to target groups.
+• Once you created rule name, After that you have to set condition for path like this 
+• Attach the Target-Group.
+• You can set the priority for the rule.
+• Now you can Review and create the Rule.
+Step 10: Testing the Load Balancer
+1. After the load balancer is created, note down its DNS Name (available in the Load
+Balancer details).
+2. Use the DNS Name to test the load balancer in your browser or via tools like curl.
+
+===============================================================================================
+1. What is a Load Balancer?
+A Load Balancer is a service that distributes incoming traffic across multiple servers to ensure high availability and reliability. It prevents any single server from becoming overwhelmed and ensures better performance and fault tolerance.
+2. What are the different types of Load Balancers in AWS?
+Application Load Balancer (ALB): Best suited for HTTP/HTTPS traffic. It operates at Layer 7 (Application Layer) and supports features like path-based routing, host-based routing, WebSocket support, etc.
+Network Load Balancer (NLB): Best suited for TCP/UDP traffic. It operates at Layer 4 (Transport Layer) and can handle high throughput, low-latency traffic.
+Classic Load Balancer (CLB): Legacy ELB that supports both HTTP/HTTPS and TCP traffic. It operates at Layers 4 and 7 but lacks advanced features found in ALB and NLB.
+3. What is the difference between ALB, NLB, and CLB?
+ALB operates at Layer 7 (HTTP/HTTPS), supports advanced routing features like host and path-based routing, SSL offloading, WebSockets, etc.
+NLB operates at Layer 4 (TCP/UDP), designed for ultra-low latency, handles millions of requests per second, and supports static IPs.
+CLB is the oldest ELB offering and supports basic Layer 4 and Layer 7 features but lacks advanced features and scalability.
+4. What is SSL Termination in a Load Balancer?
+SSL Termination refers to the process where the load balancer decrypts incoming SSL/TLS traffic and forwards the unencrypted traffic to the backend servers. This offloads the decryption process from the application servers.
+5. What is Sticky Session (Session Affinity)?
+Sticky Sessions, also known as Session Affinity, ensure that a client’s requests are always routed to the same backend server. This is useful when the application maintains session data that must persist across requests.
+6. What is the difference between TCP and HTTP Load Balancing?
+TCP Load Balancing: Operates at Layer 4 (Transport Layer). It forwards traffic based on IP address and port without looking at the content of the traffic.
+HTTP Load Balancing: Operates at Layer 7 (Application Layer). It can inspect the content of HTTP requests and route traffic based on HTTP headers, path, query parameters, etc.
+7. How do you set up an Auto Scaling group with a Load Balancer?
+An Auto Scaling group automatically adjusts the number of EC2 instances in response to traffic. When an Auto Scaling group is configured, you associate it with a load balancer so that incoming traffic is distributed across the instances in the group.
+8. What is a Health Check in Load Balancers?
+Health checks are used by load balancers to determine the health of the registered instances. If an instance fails the health check, it is removed from the pool of targets and traffic is rerouted to healthy instances.
+9. What is a Target Group?
+A Target Group is a group of backend servers (such as EC2 instances, Lambda functions, or IP addresses) that the Load Balancer routes traffic to. It is associated with a Load Balancer listener and ensures that traffic is directed to the right destination.
+10. How does a Load Balancer determine if a target is healthy?
+A Load Balancer uses health checks to determine if a target is healthy. If the target responds with a successful HTTP status code (e.g., 200), it is considered healthy. If the health check fails, the target is marked as unhealthy and will not receive traffic.
+Target Groups Interview Questions:
+1. What is a Target Group in AWS?
+A Target Group is a logical grouping of targets (like EC2 instances, Lambda functions, or IP addresses) that a Load Balancer can route traffic to. Targets in the group can be registered with the Load Balancer, and the Load Balancer directs traffic to these targets based on rules and health checks.
+2. How do you register EC2 instances in a Target Group?
+EC2 instances are automatically registered when they are launched using an Auto Scaling Group or manually added to a target group via the AWS Management Console, CLI, or API.
+3. What are the different types of targets you can have in a Target Group?
+EC2 Instances: Directly registered instances that are part of the target group.
+IP Addresses: Instances or services not registered in the AWS network (e.g., on-premises servers or other cloud services).
+Lambda Functions: Functions that can handle requests sent by the Load Balancer.
+4. What happens if a Target in a Target Group becomes unhealthy?
+If a target in the target group fails the health checks, the Load Balancer will stop routing traffic to that target until it becomes healthy again.
+5. Can Target Groups be used with multiple Load Balancers?
+Yes, you can associate a Target Group with multiple Load Balancers (for example, one Target Group for both an Application Load Balancer and a Network Load Balancer).
+6. How does the Load Balancer determine which target to send traffic to?
+The Load Balancer uses a routing algorithm like round-robin or least connections (depending on the type of Load Balancer). It first checks the health of the target and then forwards the traffic accordingly.
+
+Route 53 Interview Questions:
+1. What is Amazon Route 53?
+Amazon Route 53 is a scalable and highly available Domain Name System (DNS) web service. It routes end-user requests to endpoints such as websites, EC2 instances, and Load Balancers. Route 53 also provides domain registration, DNS health checks, and routing policy features.
+2. What are the different routing policies in Route 53?
+Simple Routing: Routes traffic to a single resource.
+Weighted Routing: Distributes traffic across multiple resources with specific weights.
+Latency-Based Routing: Routes traffic to the region with the lowest latency for the user.
+Failover Routing: Routes traffic to a backup resource if the primary resource fails.
+Geolocation Routing: Routes traffic based on the geographic location of the requester.
+Geoproximity Routing: Routes traffic based on the geographic location of resources and users with the ability to shift traffic by a specified bias.
+3. What is a Hosted Zone in Route 53?
+A Hosted Zone is a container for records that are associated with a specific domain. A public hosted zone allows you to manage domain records (like A, CNAME, MX, etc.) for a domain. A private hosted zone is used within a VPC for internal DNS resolution.
+4. What is a Record Set in Route 53?
+A Record Set is a set of DNS records for a domain or subdomain in a hosted zone. It defines the domain's response for a specific query. Common record types include A (IPv4 address), AAAA (IPv6 address), CNAME (alias), MX (mail exchange), and more.
+5. What is the purpose of DNS Failover in Route 53?
+DNS Failover is used to route traffic to a backup resource if the primary resource is unhealthy. This is useful for high availability and disaster recovery.
+6. How does Route 53 handle DNS queries?
+When a user queries for a domain, Route 53 checks the DNS records in the associated hosted zone and returns the appropriate IP address or other record information (depending on the type of DNS record). It routes the request based on the routing policy configured for the domain.
+7. What is the TTL (Time to Live) in DNS?
+TTL is the duration (in seconds) that a DNS record is cached by resolvers. Lower TTL values allow for more frequent updates to the DNS record, while higher TTL values reduce DNS lookup frequency.
+8. What is the difference between an Alias record and a CNAME record in Route 53?
+Alias Record: A special Route 53 record that allows you to point a domain to AWS resources (like S3, CloudFront, or ELB). Unlike CNAME records, Alias records can be used at the root domain level (e.g., example.com).
+CNAME Record: A standard DNS record that maps one domain to another (e.g., www.example.com to example.com), but it cannot be used at the root domain level.
+9. How does Latency-Based Routing work in Route 53?
+Latency-Based Routing sends traffic to the AWS region that has the lowest network latency for the requester. It improves performance by routing the user to the closest available resource.
+10. What is a Health Check in Route 53?
+A Health Check in Route 53 monitors the health of a resource (e.g., EC2, Load Balancer) by making regular HTTP/HTTPS requests. If the resource is unhealthy, Route 53 can reroute traffic to a healthy resource.

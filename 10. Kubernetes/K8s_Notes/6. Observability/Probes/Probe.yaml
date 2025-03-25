@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example-pod
+spec:
+  containers:
+    - name: example-container
+      image: my-image:latest
+      # Liveness Probe
+      livenessProbe:
+        httpGet:
+          path: /healthz
+          port: 8080
+
+        tcpSocket:   #Alternative endpoint
+          port: 8080
+
+        exec:
+          command:
+            - cat
+            - /tmp/healthy
+        initialDelaySeconds: 10  # Delay before the probe starts after container starts
+        periodSeconds: 5         # How often to run the probe
+        timeoutSeconds: 2        # Timeout for the probe
+        successThreshold: 1      # How many successes are needed to consider the probe successful
+        failureThreshold: 3      # How many failures are needed to consider the probe failed
+
+      # Readiness Probe
+      readinessProbe:
+        httpGet:
+          path: /readiness
+          port: 8080
+        initialDelaySeconds: 5   # Delay before the probe starts after container starts
+        periodSeconds: 5         # How often to run the probe
+        timeoutSeconds: 2        # Timeout for the probe
+        successThreshold: 1      # How many successes are needed to consider the probe successful
+        failureThreshold: 3      # How many failures are needed to consider the probe failed
+
+      # Startup Probe
+      startupProbe:
+        httpGet:
+          path: /startup
+          port: 8080
+        initialDelaySeconds: 30  # Delay before the probe starts after container starts
+        periodSeconds: 10        # How often to run the probe
+        timeoutSeconds: 5        # Timeout for the probe
+        failureThreshold: 30     # How many failures are needed to consider the probe failed
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: probe-demo
+spec:
+  containers:
+    - name: my-app
+      image: my-app:latest
+
+      # Liveness Probe (Checks if the container is still alive)
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: 8080
+        initialDelaySeconds: 3
+        periodSeconds: 5
+        failureThreshold: 3
+
+      # Readiness Probe (Checks if the app is ready to accept traffic)
+      readinessProbe:
+        httpGet:
+          path: /ready
+          port: 8080
+        initialDelaySeconds: 5
+        periodSeconds: 10
+
+      # Startup Probe (Ensures app has started correctly before checking readiness/liveness)
+      startupProbe:
+        httpGet:
+          path: /startup
+          port: 8080
+        initialDelaySeconds: 10
+        periodSeconds: 5
+        failureThreshold: 6

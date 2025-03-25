@@ -1,0 +1,18 @@
+when a terraform apply is perfomed, terraform automatically lock the statefile.(otherwise, if 2 people perform a terraform apply at 
+the same time(for a same resource) statefile will be corrupted)
+
+The statefile locking happens automatically on all operation that could write a state. you won't see any message that it is
+ happening
+
+
+if state lock fails, terraform will not continue 
+
+Not all the backend support state locking 
+
+NOTE: Local backend support state locking 
+
+==>     force unlocking the state locking 
+
+            force-unlock command is used for unlocking 
+
+but if you unlock the state while someone else is performing a write, it could cause multiple writes 

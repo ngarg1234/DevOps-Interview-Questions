@@ -1,0 +1,193 @@
+✅ Azure DevOps is a comprehensive suite of tools for managing software development, CI/CD pipelines, version control, and project management. Here’s a structured breakdown of what you need to know:
+
+🔹 Azure DevOps Overview
+-> Azure DevOps provides a cloud-hosted solution for DevOps practices, covering:
+1. Azure Repos – Git-based version control.
+2. Azure Pipelines – CI/CD automation.
+3. Azure Boards – Agile project management.
+4. Azure Test Plans – Automated and manual testing.
+5. Azure Artifacts – Package management.
+
+🔹 Core Components & Their Usage
+1️⃣ Azure Repos (Git & TFVC)
+-- Supports Git & Team Foundation Version Control (TFVC).
+-- Branching strategies: Feature branching, GitFlow, Trunk-based development.
+-- Pull requests, code reviews, policies for branch protection.
+
+2️⃣ Azure Pipelines (CI/CD)
+-- Automates build, test, and deployment.
+-- Supports YAML-based pipelines and Classic (GUI-based) pipelines.
+-- Integration with GitHub, Docker, Kubernetes, Terraform, etc.
+
+3️⃣ Azure Boards
+-- Work tracking with Kanban, Scrum, and Agile methodologies.
+-- Backlogs, Work Items, User Stories, Sprints, Epics.
+-- Custom dashboards for visibility.
+
+4️⃣ Azure Artifacts
+-- Hosts and shares NuGet, npm, Maven, Python, and Universal packages.
+-- Secure dependency management.
+
+5️⃣ Azure Test Plans
+-- Manual, exploratory, and automated testing.
+-- Test case tracking, reporting, and execution.
+
+🔹 Production-Grade CI/CD Pipeline Example
+Steps:
+1. Trigger Pipeline on Code Push
+2. Lint & Format Code (Pre-checks)
+3. Build the Application
+4. Run Unit & Integration Tests
+5. Security Scan using CodeQL/SonarQube
+6. Create & Publish Artifacts
+7. Deploy to Staging
+8. Run Post-Deployment Tests
+9. Deploy to Production (Manual/Auto Approval)
+10. Monitor & Rollback (if needed)
+
+----------------------------------------------------------------------------------
+1️⃣ What are the benefits of Azure DevOps over Jenkins/GitHub Actions?
+Azure DevOps vs Jenkins
+✅ Integrated Suite – Azure DevOps provides an all-in-one solution (CI/CD, Repo, Artifacts, Boards, Test Plans), whereas Jenkins is only for CI/CD.
+✅ Managed Service – Azure Pipelines is cloud-hosted, eliminating the need for infrastructure management. Jenkins requires self-hosted maintenance.
+✅ Built-in Security & Compliance – Azure DevOps has RBAC, service connections, secrets management. Jenkins relies on third-party plugins.
+✅ Scalability & Reliability – Azure Pipelines auto-scales across multiple agents; Jenkins requires manual node management.
+✅ Native Azure Integration – Seamless with AKS, ACR, ARM templates, Azure Functions, whereas Jenkins requires additional configuration.
+
+Azure DevOps vs GitHub Actions
+✅ Enterprise-Grade CI/CD – Azure Pipelines is better suited for large teams with compliance requirements. GitHub Actions is developer-focused.
+✅ Better Agent Pools – Azure Pipelines offers Microsoft-hosted agents with more flexibility. GitHub Actions only supports ephemeral runners.
+✅ More Deployment Strategies – Multi-stage pipelines, approvals, gates, rollback mechanisms are more advanced in Azure DevOps.
+✅ Advanced Access Control – RBAC, service connections, and integration with Active Directory (AAD) give Azure DevOps an edge over GitHub Actions.
+
+-------------------------------------------------------------------------------------
+2️⃣ Difference between Classic and YAML Pipelines?
+Feature		Classic Pipelines (GUI-based)	YAML Pipelines (Code-based)
+Definition	Configured via UI				Defined in .yaml file
+Version Control	Not stored in repo			Stored in repo (Git)
+Reusability		Limited					Highly reusable (templates, libraries)
+Flexibility			UI-based, easy for beginners	Code-driven, best for GitOps
+Approval Gates	Built-in UI				Configured via checks
+Best for			Teams new to CI/CD		Experienced DevOps engineers
+💡 YAML pipelines are preferred for production due to version control, reusability, and automation.
+
+--------------------------------------------------------------------------------------
+3️⃣ How do you secure Azure Pipelines?
+✅ RBAC (Role-Based Access Control) – Assign roles via Azure AD to restrict who can modify pipelines.
+✅ Secure Secrets Management – Use Azure Key Vault, secrets variables, or environment variables instead of hardcoding credentials.
+✅ Least Privilege Access – Use Service Connections to grant minimum permissions for deployments.
+✅ Pipeline Approvals & Gates – Require manual approvals, work item validation, or deployment checks before production deployments.
+✅ Artifact Signing & Integrity – Use Azure Artifacts and signed container images to avoid tampering.
+✅ Audit Logging & Monitoring – Enable Azure Monitor and Log Analytics to track pipeline activity.
+
+--------------------------------------------------------------------------------------
+4️⃣ How do you handle secrets in Azure Pipelines?
+Methods to store secrets securely: ✔️ Azure Key Vault – Secure storage for secrets, keys, and certificates.
+✔️ Pipeline Secrets Variables – Defined in Azure DevOps UI (Library → Variable Groups).
+✔️ Environment Variables – Store secrets at runtime via $(SECRET_NAME).
+✔️ Service Connections – Secure authentication without exposing credentials.
+✔️ Vault Injection via Terraform – Store secrets in Terraform state securely.
+
+Example: Using Azure Key Vault in YAML
+variables:
+  - group: my-secret-group
+  - name: DB_PASSWORD
+    value: $(MY_DB_PASSWORD)
+  - name: keyVault
+    value: my-keyvault-name
+
+steps:
+  - task: AzureKeyVault@1
+    inputs:
+      azureSubscription: 'MyServiceConnection'
+      KeyVaultName: $(keyVault)
+      SecretsFilter: '*'
+      RunAsPreJob: true
+
+
+-----------------------------------------------------------------------------------------
+5️⃣ What is a Service Connection in Azure DevOps?
+-> A secure way to connect Azure DevOps with external services.
+🔹 Used for Azure, AWS, Kubernetes, GitHub, DockerHub, Terraform, etc.
+🔹 Stores authentication details securely (without exposing credentials).
+
+🔹 Types:
+-- Azure Resource Manager (ARM) → Used to deploy resources to Azure.
+-- Docker Registry → Used to push/pull images from ACR/DockerHub.
+-- Kubernetes Service Connection → Deploy apps to AKS/EKS.
+
+
+----------------------------------------------------------------------------------------
+6️⃣ How do you integrate Kubernetes with Azure DevOps?
+✅ Step 1: Create a Kubernetes Service Connection in Azure DevOps.
+✅ Step 2: Add Kubernetes manifest files in the repo (deployment.yaml, service.yaml).
+✅ Step 3: Define a CI/CD pipeline using YAML to deploy to Azure Kubernetes Service (AKS).
+
+Example: Azure DevOps Pipeline Deploying to AKS
+trigger:
+  branches:
+    include:
+      - main
+
+stages:
+- stage: Build
+  jobs:
+    - job: Build
+      steps:
+        - script: |
+            docker build -t myregistry.azurecr.io/myapp:$(Build.BuildId) .
+            docker push myregistry.azurecr.io/myapp:$(Build.BuildId)
+        - task: PublishBuildArtifacts@1
+          inputs:
+            pathToPublish: '$(Build.ArtifactStagingDirectory)'
+            artifactName: 'drop'
+
+- stage: Deploy
+  jobs:
+    - job: Deploy
+      steps:
+        - script: |
+            kubectl apply -f k8s/deployment.yaml
+            kubectl apply -f k8s/service.yaml
+
+
+------------------------------------------------------------------------------
+7️⃣ How do you perform Blue-Green or Canary deployments using Azure Pipelines?
+✅ Blue-Green Deployment → Deploy to a new environment, switch traffic when stable.
+✅ Canary Deployment → Gradually route traffic to the new version while monitoring.
+
+Example: Canary Deployment in Kubernetes
+steps:
+  - script: |
+      kubectl set image deployment/my-app my-app=myregistry.azurecr.io/myapp:latest --record
+      kubectl rollout status deployment/my-app
+      kubectl rollout undo deployment/my-app --to-revision=1
+
+------------------------------------------------------------------------------
+8️⃣ What is an Agent Pool in Azure Pipelines?
+-> An Agent Pool is a collection of virtual machines that execute pipeline jobs.
+-- Types of Agents:
+1. Microsoft-hosted agents → Managed by Azure (e.g., Ubuntu, Windows).
+2. Self-hosted agents → You control the agent (better for security & cost control).
+3. Scale Set Agents → Automatically scale based on demand.
+Example: Using Self-Hosted Agent in YAML
+pool:
+  name: 'MySelfHostedPool'
+
+---------------------------------------------------------------------------------------
+9️⃣ How do you implement rollback strategies in Azure DevOps?
+✅ 1. Deployment Rollback – Use kubectl rollout undo for Kubernetes.
+✅ 2. Versioned Artifacts – Store old versions in Azure Artifacts for rollback.
+✅ 3. Feature Flags – Enable/disable features dynamically using LaunchDarkly.
+✅ 4. Manual Approval Gates – Require approval before rolling back.
+✅ 5. Automatic Rollback – If deployment fails, revert to the last successful state.
+
+-------------------------------------------------------------------------------------
+🔟 How do you monitor and log deployments?
+✅ Azure Monitor & Application Insights – Track application performance.
+✅ Azure Log Analytics – Centralized logging from Azure services.
+✅ Container Logs – Monitor AKS/EKS logs via kubectl logs.
+✅ Azure DevOps Pipeline Logs – View detailed execution logs for debugging.
+✅ Alerting & Notifications – Configure alerts in Azure Monitor for failures.
+
+

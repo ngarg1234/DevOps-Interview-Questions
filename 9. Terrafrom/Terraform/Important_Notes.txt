@@ -1,0 +1,6 @@
+
+
+Regarding state file --- https://github.com/hashicorp/terraform/issues/8099
+
+
+https://www.terraform.io/docs/cli/commands/state/mv.html

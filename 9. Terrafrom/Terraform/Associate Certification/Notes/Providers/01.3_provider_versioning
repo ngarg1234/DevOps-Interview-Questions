@@ -1,0 +1,38 @@
+If you don't specify a provider version, the most recent(latest) provider plugin will be downloaded 
+
+what is the use of ~> symbol 
+
+Version Number arguments
+
+                >=1.0 -> greater than or equal to
+                <=1.0 -> less than or equal to
+                ~> 2.0  -> any version in the 2.X range 
+                >=2.10,<=2.30 ge than equal to 2.10, less that or equal to 2.30
+
+Dependency Lock file: Dependency lock file allows us to lock a specific version of provider 
+
+if a particular version has been recorded in the lock file, terraform will always use the same version even if a new version is available
+
+The output of a normal terraform init
+
+        Initializing provider plugins...
+        - Reusing previous version of integrations/github from the dependency lock file
+        - Installing integrations/github v5.32.0...
+        - Installed integrations/github v5.32.0 (signed by a HashiCorp partner, key ID 38027F80D7FD5FB2)
+the above output clearly mention that the version is locked inside the dependency lock file (ie .terraform.lock.hcl)
+
+How to upgrade the plugin then,
+
+        you have to change the provider version in the code and then run the following command,
+
+                    terraform init -upgrade 
+
+NOTE:   if you simply change the provider version inside the code and try to run a terraform init command, you wil get the following error
+
+
+            Error: Failed to query available provider packages
+
+            Could not retrieve the list of available versions for provider
+            integrations/github: locked provider registry.terraform.io/integrations/github
+            5.32.0 does not match configured version constraint ~> 4.0; must use terraform
+            init -upgrade to allow selection of new versions

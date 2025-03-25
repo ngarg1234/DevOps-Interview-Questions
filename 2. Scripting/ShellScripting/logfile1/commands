@@ -1,0 +1,50 @@
+command for ip:
+awk 'BEGIN{RS="[ \n]"} /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/' logfile
+
+Step 1: BEGIN{RS="[ \n]"}
+-> The BEGIN block is executed before processing any lines of the file.
+** RS="[ \n]" (Record Separator) changes how awk reads records:
+    -- By default, RS (Record Separator) is set to \n (newline), meaning awk reads the file line by line.
+    -- Here, we set RS to whitespace or a newline, which means:
+        -- Each "word" (separated by a space or newline) is treated as a record instead of a full line.
+
+Step 2: /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/
+-> This is a regular expression that matches an IPv4 address:
+^[0-9]+ → Start of the record, followed by one or more digits (0-9).
+\. → A literal dot (.).
+[0-9]+ → Another number.
+\. → Another dot.
+[0-9]+ → Another number.
+\. → Another dot.
+[0-9]+ → Last number (0-255 range).
+-- The ^ ensures that the pattern starts at the beginning of the record.
+
+Step 3: Processing the Log File
+-> Since RS="[ \n]", awk treats each word (or IP address) as a separate record.
+-- Then, it prints only the records that match the IPv4 pattern.
+
+
+===========================================================
+command for http links
+awk 'BEGIN{RS="[ \n]"} /http[s]?:\/\//' logfile | tr -d ';")(+'
+
+Step 1: awk 'BEGIN{RS="[ \n]"} /http[s]?:\/\//' logfile
+BEGIN{RS="[ \n]"}
+
+Changes the Record Separator (RS) to space or newline.
+This makes awk treat each word separately rather than reading full lines.
+/http[s]?:\/\//
+
+This filters records that contain http:// or https://.
+Regex Breakdown:
+http[s]? → Matches http OR https.
+:\/\/ → Matches :// (escaped because / is special in regex).
+This ensures only URLs are printed.
+Effect:
+
+It extracts only URLs from the logfile.
+Step 2: | tr -d ';")(+'
+tr -d '...characters...'
+Removes the specified characters from the extracted URLs.
+;")(+ → These characters are removed from the output.
+This cleans up unwanted punctuation marks.

@@ -1,0 +1,26 @@
+{
+    "builders": [
+        {
+            "type": "amazon-ebs",
+            "access_key": "",
+            "secret_key": "",
+            "region": "eu-west-1",
+            "ami_name": "debitcard-ami-{{timestamp}}",
+            "source_ami": "ami-0943382e114f188e8",
+            "instance_type": "t2.micro",
+            "ssh_username": "ubuntu"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "inline": [
+                "sleep 30",
+                "sudo apt update",
+                "sudo apt install nginx -y"
+            ]
+
+        }
+    ]
+}
+

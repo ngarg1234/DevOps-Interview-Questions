@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: host-based-routing
+  namespace: default
+spec:
+  rules:
+  - host: app1.example.com      # Hostname for app1
+    http:
+      paths:
+      - path: /                   # Path for app1
+        pathType: Prefix
+        backend:
+          service:
+            name: app1-service   # Service for app1
+            port:
+              number: 80
+  - host: app2.example.com      # Hostname for app2
+    http:
+      paths:
+      - path: /                   # Path for app2
+        pathType: Prefix
+        backend:
+          service:
+            name: app2-service   # Service for app2
+            port:
+              number: 80
+
+# URL-based routing (host-based routing) is typically used when traffic needs to be routed to different services based on the hostname (domain name). For example, app1.example.com routes traffic to the app1-service, and app2.example.com routes traffic to the app2-service.

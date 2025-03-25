@@ -1,0 +1,152 @@
+Enforcing a Security Profile on a Namespace: "POD SECURITY" : "PodSecurity Admission Controller"
+====================================================================================
+
+✅ PodSecurity mechanism is designed to make enforcing "security policies" at the Pod level easier and more streamlined, replacing the deprecated PodSecurityPolicy (PSP) feature at the namespace level. 
+
+-> These controls help ensure that Pods adhere to certain security standards, minimizing the risk of security vulnerabilities, misconfigurations, or malicious activity.
+-> To enable Pod Security Admission you will need a v1.22 Kubernetes cluster with the following feature flag enabled --feature-gates="...,PodSecurity=true".
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+featureGates:
+ PodSecurity: true
+nodes:
+- role: control-plane
+- role: worker
+
+https://kubernetes.io/docs/concepts/security/pod-security-standards/
+
+-> Security Profiles: PodSecurity defines three pre-configured security profiles that you can use to enforce policies for your Pods:
+
+Pod Security Standards (PSS) / PodSecurity Profiles:
+=================================================
+-> Each profile defines the security requirements for Pods in a Kubernetes cluster and specifies what actions or configurations are allowed or disallowed.
+
+-> Each of these policies define which fields are restricted within a Pod specification and the allowed values. Some of the fields restricted by these policies include:
+spec.containers[*].ports
+spec.volumes[*].hostPath
+spec.securityContext
+spec.containers[*].securityContext
+
+-> Using namespace labels allows for granulator per namespace policy selection whereas using AdmissionConfiguration allows cluster-level defaulting along with exemptions.
+
+1. restricted profile: [Highly restricted, covering best practices. May cause compatibility issues]
+-> The most stringent security profile. It enforces strict settings that disallow any privileged operations or use of host resources. 
+-> This is designed to provide a high level of security for your workloads.
+-- Disallows running privileged containers.
+-- Disallows the use of host network, host PID, and host IPC.
+-- Disallows the use of certain unsafe capabilities.
+-- Requires running containers with a non-root user.
+-- Disallows mounting sensitive files like /etc/passwd or /etc/shadow.
+
+2. baseline profile: [Covers most common known privilege escalations and provides an easier onboarding]
+-> A more relaxed profile that allows some flexibility in the security configurations while still enforcing the basics of Pod security.
+-- Allows some flexibility, but still limits potentially dangerous operations.
+-- Allows non-privileged containers with some limited access to host resources.
+-- Allows the use of a host network and other settings for certain workloads if needed.
+
+3. privileged profile: [open and unrestricted]
+-> This profile allows Pods to run with fewer restrictions and more flexibility. 
+-> It is mostly used for workloads that need to run with elevated privileges or access to host resources (e.g., privileged containers).
+-- Contains no restrictions. This is the most permissive profile.
+-- Allows running containers with any privileges, including privileged containers, host networking, host PID, and access to all host resources.
+
+
+Policy Modes/ Enforcement Modes:
+--------------------------------
+1. Enforce: Any Pods that violate the policy will be rejected
+2. Warn: Issuing a warning for Pods that do not meet security policies, but not blocking them.
+3. Audit: Records violations of the policy but does not block or warn users.
+-- Pods with violations will be allowed and an audit annotation will be added
+
+
+** How to Enforce Pod Security Policies Using PodSecurity Admission:
+--------------------------------------------------------------------
+
+Applying Policy to a namespace
+-> Policies are applied to a namespace via labels. These labels are as follows:
+-- REQUIRED: pod-security.kubernetes.io/<MODE>: <LEVEL>
+-- OPTIONAL: pod-security.kubernetes.io/<MODE>-version: <VERSION> (defaults to latest)
+
+-> The following command warns the baseline Pod Security Standard pinned to v1.22 of the policy on the test-ns namespace. Be
+kubectl label --overwrite ns test-ns \
+  pod-security.kubernetes.io/warn=baseline \
+  pod-security.kubernetes.io/warn-version=v1.22
+
+1. Namespace Configuration with Pod Security Labels
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: my-namespace
+  labels:
+    pod-security.kubernetes.io/enforce: "restricted"         # Enforces restricted policy
+    pod-security.kubernetes.io/enforce-version: "v1.27"     # API version for the policy
+    pod-security.kubernetes.io/audit: "baseline"            # Audit policy violations to baseline
+    pod-security.kubernetes.io/audit-version: "v1.27"
+    pod-security.kubernetes.io/warn: "baseline"             # Warn on policy violations to baseline
+    pod-security.kubernetes.io/warn-version: "v1.27"
+
+-> pod-security.kubernetes.io/enforce: Specifies the level of enforcement (e.g., restricted, baseline, or privileged).
+-> pod-security.kubernetes.io/warn: If set, Kubernetes will issue warnings if Pods in this namespace do not meet the security standards.
+-> pod-security.kubernetes.io/audit: Specifies that Pods will be audited but not necessarily blocked or warned.
+
+
+
+How to Enable PodSecurity Admission:
+---------------------------------
+
+-> To enable PodSecurity admission, ensure that the feature is enabled on your Kubernetes cluster and configure it according to your needs.
+-> You can enable the PodSecurity Admission controller in your Kubernetes cluster by configuring it in the apiServer settings (typically done in the kube-apiserver configuration).
+
+/etc/kubernetes/manifests/kube-apiserver.yaml
+-> Here’s an example for enabling PodSecurity Admission:
+$$ --enable-admission-plugins=PodSecurity
+
+
+2. Pod Security Admission Controller in kube-apiserver (Cluster-wide setup)
+
+-> Example snippet of kube-apiserver manifest (/etc/kubernetes/manifests/kube-apiserver.yaml):
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kube-apiserver
+  namespace: kube-system
+spec:
+  containers:
+  - name: kube-apiserver
+    image: k8s.gcr.io/kube-apiserver:v1.27.0
+    command:
+    - kube-apiserver
+    - --feature-gates=PodSecurity=true
+    - --enable-admission-plugins=PodSecurity
+    - --disable-admission-plugins=PodSecurityPolicy  # If PodSecurityPolicy is being deprecated
+    - --pod-security-admission-config-file=/etc/kubernetes/psa-config.yaml  # Optional for detailed config
+    volumeMounts:
+    - mountPath: /etc/kubernetes
+      name: etc-kubernetes
+  volumes:
+  - name: etc-kubernetes
+    hostPath:
+      path: /etc/kubernetes
+
+
+3. Pod Security Admission Config File (Optional for advanced config)
+Example psa-config.yaml for cluster-wide profile:
+apiVersion: apiserver.config.k8s.io/v1
+kind: AdmissionConfiguration
+plugins:
+- name: PodSecurity
+  configuration:
+    apiVersion: podsecurity.admission.config.k8s.io/v1beta1
+    kind: PodSecurityConfiguration
+    defaults:
+      enforce: "baseline"
+      enforce-version: "v1.27"
+      audit: "restricted"
+      audit-version: "v1.27"
+      warn: "restricted"
+      warn-version: "v1.27"
+    exemptions:
+      usernames: []
+      runtimeClasses: []
+      namespaces: ["kube-system", "kube-public"]
