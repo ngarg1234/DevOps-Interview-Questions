@@ -1,3 +1,5 @@
+COICPS
+
 1. CrashLoopBackOff
 ✅ Cause:
 -> App inside the pod is crashing repeatedly.
@@ -240,7 +242,6 @@ Control Plane / API Server Issues
 Troubleshooting:
 -> Check ClusterRoleBinding or RoleBinding.
 $$ kubectl auth can-i list pods --as=system:serviceaccount:<namespace>:<serviceaccount-name>
-
 
 
 18. ResourceQuota Denied

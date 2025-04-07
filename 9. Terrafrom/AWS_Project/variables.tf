@@ -1,7 +1,7 @@
 # variables.tf
 variable "aws_region" {
   description = "AWS region"
-  default     = "us-west-2"
+  default     = "ap-south-01"
 }
 
 variable "vpc_cidr" {
@@ -22,4 +22,9 @@ variable "db_instance_class" {
 variable "s3_bucket_name" {
   description = "S3 Bucket name"
   default     = "my-prod-s3-bucket"
+}
+
+variable "profile" {
+  description = "MyAWSProfile"
+  default = "naman"
 }

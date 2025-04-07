@@ -6,6 +6,7 @@ Idempotency: It refers to the property of an operation where performing the oper
 
 Q. The errors or bugs in jenkins and how to troubleshoot it?
 -> There are many potential errors or bugs that can occur in Jenkins. Here are a few common issues that you might encounter:
+
 1. Build failures: One of the most common issues in Jenkins is build failures. 
 -> This can occur for a variety of reasons, such as code issues, configuration errors, or problems with dependencies. 
 2. Plugin conflicts: Jenkins relies heavily on plugins to extend its functionality. However, sometimes plugin conflicts can occur, which can cause issues such as broken builds or problems with job execution.
@@ -155,7 +156,6 @@ Setting Up EC2 instance  as worker node:
 
 1. Install Amazon EC2 plugin (Manage Jenkins-plugin-Amazon EC2)
 2. Setting up worker node: (Manage Jenkins-Cloud-New cloud-Cloud NAme{Demo}-Type{EC2})
-
 
 ** What are the ways to configure Jenkins node agent to communicate with Jenkins master?
    There are 2 ways to start the node agent –
@@ -447,7 +447,10 @@ post {
                 emailext body: 'Deployment has failed',
                 subject: 'Deployment Notification',
                 to: 'user@example.com
-
+            }
+        }
+}
+}
 ** Upstream and downstream job:
 -> An upstream job is a configured project that triggers a project as part of its execution. 
 -> A downstream job is a configured project that is triggered as part of a execution of pipeline. 
@@ -881,7 +884,7 @@ Ans: 3 reasons
 2) One more reason in case of plugins. Plugins should be installed correctly.
 3) We can get build failure if the pom file not found.
 
------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------IMP---------------------------------------------------------------------------------------
 Methods of jenkins backup?
 There are multiple methods to back up the Jenkins configurations such as:
 1. using thin backup
@@ -1028,7 +1031,7 @@ Q. What is the Jenkins User Content service?
 $$ http://<jenkins-server>/userContent/<file-path>
 -> Use cases: Artifact Storage, Static File Serving, Shared Resources
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------IMP------------------------------------------------------------------------------------------
 Q. How can we share information between different build steps or stages in a Jenkins Job?
 -> Every build step or stage will be running in its process and hence sharing information between two different build steps is not so direct. 
 -> We can use either use a File, a Database Entry, an Environment Variable, etc. to share info from one build step to another or a post-build action.

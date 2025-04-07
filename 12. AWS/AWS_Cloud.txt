@@ -92,7 +92,7 @@ Amazon EC2 Pricing:
 
 1. On-Demand: 
 --------------
--> Are ideal for short-term, irregular workloads that cannot be interrupted. No upfront costs or minimum contracts apply. 
+-> Are ideal for short-term, irregular workloads that cannot be interrupted. No upfront costs or minimum contracts apply.
 -> The instances run continuously until you stop them, and you pay for only the compute time you use.
 -> Sample use cases for On-Demand Instances include developing and testing applications and running applications that have unpredictable usage patterns. 
 -> On-Demand Instances are not recommended for workloads that last a year or longer because these workloads can experience greater cost savings using Reserved Instances.
@@ -391,7 +391,7 @@ Amazon Virtual Private Cloud (Amazon VPC):
 -> Amazon VPC enables you to provision an isolated section of the AWS Cloud. In this isolated section, you can launch resources in a virtual Network that you define. 
 -> Within a virtual private cloud (VPC), you can organize your resources into subnets. A subnet is a section of a VPC that can contain resources such as Amazon EC2 instances.
 
--> VPC and subnets:
+-> VPC and subnets: 
 
       Name	         Default    Adjustable
 VPCs per Region		      5	     	Yes

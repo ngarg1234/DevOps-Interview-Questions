@@ -1,0 +1,89 @@
+Great question! 🌱 Let's dive into **Terraform drift**, why it matters, and how to handle it effectively in production and interviews.
+
+---
+
+## 🎯 What is **Drift** in Terraform?
+
+**Drift** occurs when the actual state of your infrastructure changes **outside of Terraform**—meaning something in the real world doesn't match what's in your `.tf` files or state file.
+
+### 🔥 Example:
+- You created an EC2 instance with Terraform.
+- A teammate **manually changed the instance type** in the AWS Console.
+- Now your `.tf` says `t2.micro`, but AWS is running `t3.medium` = **drift**.
+
+---
+
+## 🔍 How to Detect Drift
+
+### ✅ Use `terraform plan`
+```bash
+terraform plan
+```
+
+Terraform compares your current `.tf` configuration with the actual infrastructure and shows you what has drifted.
+
+You’ll see an **"Update in-place"** or **"Change"** proposed if drift is detected.
+
+---
+
+## 🛠️ How to Fix or Manage Drift
+
+### 1. **Revert Manual Changes (Restore Original State)**
+
+If manual changes were made accidentally, you can fix them by:
+```bash
+terraform apply
+```
+Terraform will **override** the manual changes to match your `.tf` configuration.
+
+---
+
+### 2. **Update Terraform Code (Accept the Drift)**
+
+If the manual change is **intentional**, reflect it in code:
+```hcl
+# Update .tf to match new instance type
+instance_type = "t3.medium"
+```
+Then run:
+```bash
+terraform plan
+terraform apply
+```
+
+---
+
+## 🧠 Best Practices to Avoid Drift
+
+| Practice                          | Description |
+|----------------------------------|-------------|
+| **Infrastructure as Code (IaC)** | Avoid making manual changes outside Terraform. |
+| **Policy Enforcement**           | Use tools like AWS Service Control Policies or Sentinel. |
+| **Automation Pipelines**         | Apply Terraform only through CI/CD (e.g., GitHub Actions, Jenkins). |
+| **Drift Detection Tools**        | Tools like `Terraform Cloud`, `Atlantis`, or `Driftctl` to monitor drift automatically. |
+| **Lock down IAM permissions**    | Restrict manual access to avoid config changes. |
+
+---
+
+## 🧪 Bonus Tip: Automate Drift Detection (Optional for Interview)
+
+You can schedule a **daily plan check** using a script:
+```bash
+terraform plan -detailed-exitcode
+```
+
+- Exit code `0`: No changes
+- Exit code `2`: Drift detected
+- Exit code `1`: Error
+
+This can be used in **Lambda, GitHub Actions, or Jenkins** to detect drift automatically.
+
+---
+
+## 💬 In Interviews, Say:
+
+> "Drift happens when infrastructure changes outside Terraform’s control. We detect it using `terraform plan` and handle it either by reverting the drift or updating the `.tf` files. We also use CI pipelines to automate deployments and restrict manual access to prevent it in the first place."
+
+---
+
+Let me know if you want a **Jenkins or GitHub Actions script to detect drift**, or a **diagram to explain** it visually!

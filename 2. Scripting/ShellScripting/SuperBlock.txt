@@ -1,5 +1,6 @@
 Superblock:
--> In Shell (sh, bash, etc.), the term superblock usually refers to the filesystem metadata structure used in Linux and UNIX-based systems. The superblock contains essential information about the filesystem, such as its size, block size, free blocks, and inode information.
+-> In Shell (sh, bash, etc.), the term superblock usually refers to the filesystem metadata structure used in Linux and UNIX-based systems. 
+The superblock contains essential information about the filesystem, such as its size, block size, free blocks, and inode information.
 
 Viewing the Superblock in Shell:
 -------------------------------

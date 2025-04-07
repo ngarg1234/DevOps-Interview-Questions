@@ -71,10 +71,10 @@ Docker Commands:
    $$ docker rm $(docker stop <contaner id>)
 
 10.docker login: login to the docker hub repository
-   $$ docker tag <local-image>:<tag> <hub_username>/<reponame>:<tag>   --->before pushing the image we need to tag the image properly
-   
-   $$ docker build -t <imagename>:<tag> <path of the Dockerfile>
-   $$ docker push <hub_username>/<repo_name>:<tag>		(login required)
+Docker Login: docker login
+Build Image: docker build -t myapp:v1.0 /path/to/myapp/
+Tag Image: docker tag myapp:v1.0 mydockerusername/myrepo:v1.0
+Push Image: docker push mydockerusername/myrepo:v1.0
 
  $$ docker push $DOCKER_REGISTRY_USERNAME/simple-python-flask-app:latest		(login required)
 
@@ -242,6 +242,10 @@ Note: Changes to Dockerfile application code etc. invalidate the cache. All subs
 -----------------------------------------------------------------------------------------
 ** Dangling images and how to delete them.
 -> Simply an unused image that’s got no name and tag. You can easily spot dangling images when you run the $$ docker images command because they show up as <none>:<none>.
+Dangling images in Docker are images that are not tagged and are not associated with any repository.
+They typically occur when an image is built or re-tagged, but there is no longer a need for it.
+These images are usually created as a result of the docker build process,,
+especially if you’ve built images but never assigned a tag or repository to them.
 
 $$ docker image prune :Remove all dangling images. If -a is specified, will also remove all images not referenced by any container.
 --all , -a		Remove all unused images, not just dangling ones
@@ -564,8 +568,8 @@ syntax: $$ docker tag <local-image>:<tag> <hub_username>/<reponame>:<tag>   --->
 ----------------------------------------------------------------------------------------
 Dockerfile instructions
 ------------------------
-## FROM <image_name>:<tag>   ----->it used to specify the base image we want to start.
--> if we dont specify the tag then automatically latest will be pulled
+## FROM <image_name>:<tag>   -----> it is used to specify the base image we want to start.
+-> if we dont specify the tag then automatically latest will be pulled,,
 -> Ex: centos:7, python:2.7, Ubuntu:latest
 
 ## RUN <command>   ----->to run the commands on top of base image
@@ -761,6 +765,10 @@ Disadvantages of Alpine Images:
 -> Distroless is a minimal base image for containers that does NOT include an operating system package manager, shell, or standard utilities.
 -> Unlike traditional base images (like ubuntu, alpine), Distroless only contains your application and its runtime dependencies.
 
+FROM gcr.io/distroless/python3:latest: This specifies the base image as the official Python distroless image. 
+It contains Python 3 runtime and the necessary dependencies, 
+but no shell, no package manager, and no other unnecessary tools.
+
 ⚙️ Created and maintained by Google to improve container security, reduce image size, and minimize attack surface.
 
 ✅ Key Characteristics of Distroless:
@@ -779,25 +787,36 @@ Disadvantages of Alpine Images:
 5. Performance: Faster container startup, fewer runtime dependencies.
 
 =====================================================================================
-There are three types of volumes to consider:
-1. Named volumes: 
--> Named volumes are managed by Docker, and they are stored in a specific directory on the host system (usually /var/lib/docker/volumes/). 
--> Docker abstracts the location of these volumes, which makes them easier to use for data persistence and portability.
--> They have a specific source from outside the container, for example, awesome:/bar .
-$$ docker run -d -v my_named_volume:/data --name my_container my_image
+There are three types of volumes in Docker:
 
-2. Anonymous volumes: 
--> Anonymous volumes are similar to named volumes, but they are created without specifying a name. Docker generates a unique name for them, which makes them useful for temporary data storage.
--> They have no specific source, therefore, when the container is deleted, you can instruct the Docker Engine daemon to remove them.
-$$ docker run -d -v /data --name my_container my_image
+Named volumes: Managed by Docker, stored in /var/lib/docker/volumes/,
+and abstracted for data persistence and portability,
+ e.g., docker run -d -v my_named_volume:/data --name my_container my_image.
 
-3. Host volumes (Bind Mounts): 
--> A host volume can be accessed from within a Docker container and is stored on the host, as per the name. 
--> Host volumes, also known as bind mounts, are a way to mount a directory or file from the host system into the container. 
--> Unlike named or anonymous volumes, bind mounts map a specific location on the host filesystem to a location inside the container.
-$$ docker run -d -v /host/path:/container/path --name my_container my_image
-** Docker has two options for containers to store files on the host machine, so that the files are persisted even after the container stops: Volumes, and Bind mounts.
+Anonymous volumes: Created without a specified name, Docker generates a unique name,
+ useful for temporary data storage, and are removed when the container is deleted, e.g.,
+  docker run -d -v /data --name my_container my_image.
 
+Host volumes (Bind mounts): Mounts a specific host directory/file to a container path, 
+allowing direct access to the host's filesystem, e.g.,
+ docker run -d -v /host/path:/container/path --name my_container my_image.
+
+Key Differences:
+
+            Named Volumes            	                         |  Anonymous Volumes
+                                                                |
+Naming::	   Explicitly named by the user.	                      | Automatically generated by Docker.
+Persistence::Persistent data across container restarts/removals.|	Temporary storage, usually deleted when the container is removed.
+Management::Can be easily backed up, shared, and managed.	    |  No easy way to manage since they are anonymous.
+Use Case::	Persistent data storage (e.g., databases).	       |  Temporary or ephemeral data storage.
+
+Summary:
+Use named volumes when you need data to persist across container lifecycles or require easy management (e.g., for databases or shared data).
+
+Use anonymous volumes for temporary or one-time data storage where you don’t need to manage or reuse the volume after the container is stopped.
+
+Note: Docker provides two options for persisting files on the host machine after the container stop
+s: Volumes and Bind mounts.
 -----------------------------------------------------------------------------------------------------------
 Volumes:
 --------
@@ -915,136 +934,105 @@ Subnet mask defines network and host portions of IP.
 
 
 --------------------------------------------------------------------------
-Docker networking: 
------------------
--> Docker networking is primarily used to establish communication between Docker containers and the outside world via the host machine where the Docker daemon is running.
+Docker Networking Overview:
+Docker networking is essential for establishing communication between Docker containers and with the outside world via the host machine. Here's a consolidated explanation of the main Docker network types:
 
-1. Bridge Network:-This is a private network created by docker on the host when we install docker.
--> All the containers connected to the same bridge can communicate each other by default.
--> All containers get an internal private Ip and these containers by default under the bridge network.
--> Whenever we create a container by default without configuring any network it will be created under bridge by name docker0
--> Remove all unused network Use the "$$ docker network prune" command to remove all unused networks. 
--> User-defined bridge networks are best when you need multiple containers to communicate on the same Docker host.
+1. Bridge Network:
+Default network for containers unless specified otherwise. All containers on the same bridge network can communicate.
 
--> Default Docker CIDR Range: Bridge network: 172.17.0.0/16
--> This means Docker containers on the default bridge network will be assigned IP addresses in the range 172.17.0.1 to 172.17.255.255
--> you have a total of 65,536 possible IP addresses (2^16 = 65536) within this network.
--> In the case of 172.17.0.0/16, the first 16 bits are allocated to the network part of the address, and the remaining 16 bits can be used for host addresses within that network.
+Private IPs are assigned to containers, and communication happens within this private network.
 
-Change Default Docker Bridge CIDR (Optional):
--> If you want to avoid conflicts:
--> Edit /etc/docker/daemon.json:
-{
-  "bip": "192.168.100.1/24"
-}
-Restart Docker:  sudo systemctl restart docker
-     
-## create a custom bridge network
-$$ docker network create --driver bridge <network_name>
-## To create a container in the custom bridge
-$$ docker run -dti --network <network_name><imagename:tag>
+By default, containers use the docker0 bridge network (CIDR range: 172.17.0.0/16).
 
-## custom bridge allows us to ping/they can communicate with container name and Ip
+Command to remove unused networks:
 
-## To connect containers present in different bridge
-$$ docker network connect <network_name> <container id>
-$$ docker network disconnect <network_name> <container id> 
+bash
+Copy
+docker network prune
+Custom Bridge Network:
 
-*****************************************************************************************
-2. HOST NETWORK: 
-$$ docker run --network host <image_name>
-$$ docker run -d -it --network host <imagename:tag>
--> This driver removes the network isolation between the host machine and the docker. The containers are directly connected to host network.
--> It depends upon us when to use this network as per requirement. 
--> Shares the same network interfaces as the host, Does not get its own private IP address. Instead, it uses the IP address of the host machine, Can bind to ports on the host machine directly, rather than having to map ports between the host and the container.
--> Host networks are best when the network stack should not be isolated from the Docker host, but you want other aspects of the container to be isolated.
+Create: docker network create --driver bridge <network_name>
 
-*****************************************************************************************
-3. NONE NETWORK:
--> Containers are not attached to any network on the host machine
--> This containers will not have any IP allocated
--> The services on this containers cannot be accessed by the outside world.
--> This option is used when a user wants to disable the networking access to a container.
--> In simple terms, None is called a loopback interface, which means it has no external network interfaces. 
--> Only loopback interface (127.0.0.1) is available inside the container.
-Ex: perform operation (ansible vault) then we can assign none network
-$$ docker run --network none nginx
+Run container on custom bridge: docker run -dti --network <network_name> <image_name>
 
-✅ When to Use none Network?
-1. Full Isolation (Security/Testing):
--- When you want to fully isolate a container.
--- No inbound/outbound network traffic.
--- Good for security-sensitive operations where network access is not needed.
-Example:
--> Running containers that only do internal computation without needing to talk to anything outside.
-Example: A container doing CPU-bound processing without needing network
+To connect containers on different networks:
 
-2. Container with Only Volume Access (Data Processing):
-3. Debugging and Analysis (Networking Tests):
-4. Custom Network Stacks (Manual Network Configuration):
+bash
+Copy
+docker network connect <network_name> <container_id>
+docker network disconnect <network_name> <container_id>
+2. Host Network:
+Removes network isolation between the container and the host machine. Containers use the host's IP address and network interface.
 
-🧠 Summary for Notes:
-Docker 'none' network:
-- No network access; only loopback (127.0.0.1).
-- Used for security, isolation, data processing without networking.
-- Useful in debugging, manual networking setups.
-- Run with: docker run --network none <image>
+No private IP; containers share the host's network interface.
 
+Command:
 
-*****************************************************************************************
-4. Macvlan NETWORK:
--> Macvlan is a Docker network driver that assigns a unique MAC address and IP to a container, making it appear like a physical device on the LAN.
--> Containers behave like independent machines on the same physical network as the host.
--> Bypasses the NAT (Network Address Translation) used in bridge networks — containers are directly accessible from the LAN.
--> Useful for network isolation, IP assignment, and low-level network access.
+bash
+Copy
+docker run --network host <image_name>
+Use Case: Best when containers need direct access to the host network, without isolation.
 
-🔑 Key Characteristics of Macvlan Network:
--- Containers get direct IP from your network (LAN) — not shared with Docker host.
--- Supports multiple MAC addresses per physical network interface.
--- Useful when containerized apps need to be directly accessible on the network.
--- Allows legacy apps that require direct Layer 2 (Ethernet) network access.
--- Useful when working with special protocols that don't work well with NAT.
+3. None Network:
+No network connectivity. Containers only have access to the loopback interface (127.0.0.1).
 
+Use Case: Used for containers that require full isolation (e.g., security-sensitive tasks or data processing that doesn’t require network access).
 
+Command:
+
+bash
+Copy
+docker run --network none <image_name>
+4. Macvlan Network:
+Assigns a unique MAC address and IP address to each container, making it appear as a physical device on the network (LAN).
+
+No NAT; containers are directly accessible from the LAN.
+
+Key Features:
+
+Allows containers to be directly accessible on the network.
+
+Suitable for legacy apps requiring Layer 2 (Ethernet) access.
+
+Command to create:
+
+bash
+Copy
 docker network create -d macvlan \
   --subnet=192.168.1.0/24 \
   --gateway=192.168.1.1 \
   -o parent=eth0 my_macvlan_network
+Important Note: To allow communication between the host and containers on macvlan, create a dummy interface:
 
--d macvlan: Specifies that you are using the macvlan driver.
---subnet: The subnet for the Macvlan network. In this case, we are using the 192.168.1.0/24 network.
---gateway: The gateway for the Macvlan network, which is usually the host's IP address on the network.
--o parent=eth0: Specifies the network interface on the host to use for the Macvlan network. Here eth0 is the host's network interface. You can replace this with the correct interface on your machine.
-my_macvlan_network: The name of the network.
-
-⚠️ Important Notes:
-1. Host can't directly talk to containers on Macvlan unless you create a macvlan in bridge mode.
-2. You may need to create a dummy interface to allow host-container communication:
+bash
+Copy
 ip link add macvlan-shim link eth0 type macvlan mode bridge
 ip addr add 192.168.1.200/24 dev macvlan-shim
 ip link set macvlan-shim up
+5. Overlay Network:
+Cross-host communication: Allows containers on different Docker hosts to communicate as though they are on the same network.
 
+Commonly used in Docker Swarm or Kubernetes for multi-host setups.
 
-*****************************************************************************************
-5. Overlay Network: Create Internal Private Network
--> An Overlay network in Docker is a type of network that allows containers on different Docker hosts to communicate with each other. 
--> This is particularly useful in Docker Swarm or Kubernetes setups, where containers may run on different physical or virtual machines but still need to interact as though they are on the same network. 
--> This is typically achieved by encapsulating the original network packets in a new packet format and then transmitting them over the underlying network. 
--> Overlay networks connect multiple Docker daemons together and enable swarm services to communicate with each other. 
--> You can also use overlay networks to facilitate communication between a swarm service and a standalone container, or between two standalone containers on different Docker daemons. 
--> This strategy removes the need to do OS-level routing between these containers.
+Uses VXLAN to encapsulate traffic and ensure secure communication between Docker hosts.
 
---> Key Features of Overlay Networks:
-1. Cross-Host Communication: Overlay networks enable containers on different Docker hosts (servers) to communicate with each other over a secure network. 
--> This is a fundamental feature for multi-host networking, such as in a Docker Swarm or Kubernetes cluster.
-2. Encapsulation and Encryption: Overlay networks encapsulate traffic between containers. 
--> This means that network traffic is encrypted and tunneled between Docker hosts using VXLAN (Virtual Extensible LAN) technology. This makes it secure and isolated.
-3. Used with Docker Swarm: Overlay networks are commonly used in Docker Swarm to enable communication between services on different nodes in a Swarm cluster.
-4. Works with Docker Compose: Overlay networks can also be used with Docker Compose in a multi-host configuration.
+Key Features:
 
-** How Overlay Networks Work in Docker:
--> When using an overlay network, Docker creates a virtual network that spans multiple hosts. 
--> The containers on each host are connected to this virtual network, and Docker uses an underlying mechanism (such as VXLAN) to route traffic between them.
+Enables communication between services across nodes in a Docker Swarm.
+
+Supports encryption and encapsulation for secure data transfer.
+
+Can be used with Docker Compose in multi-host configurations.
+
+Summary of Network Types:
+Network Type |	 Description	                                |  Use Case
+Bridge	    |  Default, private network for containers.	  |  When containers need to communicate on the same Docker host.
+Host	       |  Containers use the host’s network.	        |  When containers need direct access to the host network.
+None	       |  No network access, only loopback.	        |  For full isolation or tasks requiring no network access.
+Macvlan	    |  Containers get a unique IP on the LAN.	  |  For containers that need direct network access or legacy apps.
+Overlay	    |  Enables communication across Docker hosts. |  Multi-host setups, such as Docker Swarm or Kubernetes.
+
+This simplifies the explanation of Docker networking, allowing you to easily compare and choose the right network type based on your container needs.
 
 ** Key Components:
 1. Docker Swarm: When running in swarm mode, Docker automatically manages the creation and distribution of overlay networks.
@@ -1187,11 +1175,17 @@ Q. What is a .dockerignore file?
 
 ======================================================================================
 Q. what is out of memory error in docker?
--> An "Out of Memory" (OOM) error in Docker typically occurs when a container exceeds the amount of memory allocated to it, causing the Docker daemon to kill the container due to resource exhaustion. This can happen if the container consumes more memory than what was assigned or what is available on the host system.
--> Within this setting, if the kernel memory limit is lower than the user memory limit, running out of kernel memory causes the container to experience an OOM error.
+-> An "Out of Memory" (OOM) error in Docker typically occurs when a container
+ exceeds the amount of memory allocated to it,
+ causing the Docker daemon to kill the container due to resource exhaustion. 
+This can happen if the container consumes more memory than what was assigned or what is available on the host system.
+-> Within this setting, if the kernel memory limit is lower than the user memory limit, 
+running out of kernel memory causes the container to experience an OOM error.
 -> However, it would be fine if the root user is used rather than the created user.
--> On Linux systems, if the kernel detects that there is not enough memory to perform some system task then it throws OOM or out of memory error and starts killing the processes to free up some memory. 
--> Any process can be killed by kernel. That means it can kill Docker and Docker containers as well. Which can be a high risk if your application is running on  production and suddenly due to out of memory error occurred , your container was killed and your production application faces some down time. So it is very important to understand and control this memory issue by docker.
+-> On Linux systems, if the kernel detects that there is not enough memory to perform some s
+ystem task then it throws OOM or out of memory error and starts killing the processes to free up some memory. 
+-> Any process can be killed by kernel. That means it can kill Docker and Docker
+ containers as well. Which can be a high risk if your application is running on  production and suddenly due to out of memory error occurred , your container was killed and your production application faces some down time. So it is very important to understand and control this memory issue by docker.
 
 Q. How to Identify and Fix an OOM Error in Docker:
 1. Check the Logs:
@@ -1199,7 +1193,8 @@ $$ docker logs <container_id>
 $$ journalctl -u docker.service: For Docker Daemon logs (which might also indicate memory issues), you can check the system logs:
 
 2. Check Docker’s OOM Killer Logs:
--> Docker uses the kernel's OOM Killer to terminate containers that use too much memory. You can check if the kernel has killed any containers by inspecting the host's dmesg logs:
+-> Docker uses the kernel's OOM Killer to terminate containers that use too much memory.
+ You can check if the kernel has killed any containers by inspecting the host's dmesg logs:
 $$ dmesg | grep -i "killed process"
 RESULT: Out of memory: Kill process 12345 (docker-container) score 123 or sacrifice child
 
@@ -1234,14 +1229,20 @@ $$ Docker events: Docker events are a command to see the stream of activities th
 Q. How Multi-stage Build Works
 -> With multi-stage builds, you use multiple FROM statements in your Dockerfile.
 -> Each FROM instruction can use a different base, and each of them begins a new stage of the build.
--> We can selectively copy artifacts from one stage to another, leaving behind everything we don’t want in the final image.
--> In multi-stage build, we pick the tasks of building and running our applications into different stages. Here, we start with a large image that includes all of the necessary dependencies needed to compile the binary executable of our application. 
+-> We can selectively copy artifacts from one stage to another,
+ leaving behind everything we don’t want in the final image.
+-> In multi-stage build, we pick the tasks of building and running our applications into different stages.
+ Here, we start with a large image that includes all of the necessary dependencies needed to compile the binary executable of our application. 
 -> This can be termed as the builder stage.
--> We then took a lightweight image for our run stage which includes only what is needed to run a binary executable. i.e just having jre in our final stage is sufficient to run our application. This can be termed as the production stage.
+-> We then took a lightweight image for our run stage which includes only what is
+ needed to run a binary executable. i.e just having jre in our final stage is sufficient to run our application. This can be termed as the production stage.
 
--> We can use multiple FROM commands combined with AS commands in our Dockerfile where the last FROM command will actually build the image. 
--> All the FROM commands before that, will lead to the creation of intermediate images which are cached regularly.
--> The AS command when used with the FROM command allows us to provide a virtual name for our intermediate images.
+-> We can use multiple FROM commands combined with AS commands in our Dockerfile where
+ the last FROM command will actually build the image. 
+-> All the FROM commands before that, will lead to the creation of intermediate 
+images which are cached regularly.
+-> The AS command when used with the FROM command allows us to provide a virtual
+ name for our intermediate images.
 
 -----------------------------------------------------------------------------------------
 Q. How container achieve isolation

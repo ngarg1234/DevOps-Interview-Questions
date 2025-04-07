@@ -10,13 +10,10 @@ you can also store the logs to a file by setting the path to the file
 
 export TF_LOG_PATH = /home/terraform.log
 
-
-
 Terraform 0.15 allows you to generate logs from the Terraform provider and the core application separately. The Terraform development team needs the core logs for your attempted operation to troubleshoot core-related errors. 
 To enable core logging, set the TF_LOG_CORE environment variable to the appropriate log level. For bug reports, you should use the TRACE level.
 
 export TF_LOG_CORE=TRACE
-
 
 You can also generate provider logs by setting the TF_LOG_PROVIDER environment variable.
 

@@ -287,15 +287,35 @@ chgrp - used to change groupname for files and directories
 for eg : chgrp newgroupname filename
 for eg : chgrp -R newgroupname directoryname
 
-umask : It is used to set default permission.
-Note : It is reverse of chmod
-syn : umask 000 filename
-For eg : chmod 777 filename
-               777 
-              ------
-        umask  000 filename 	
+umask : 
 
-777 - 654 = 123 
+Without umask, every new file would have 666 (rw-rw-rw-), and every directory would have 777 (rwxrwxrwx).
+
+umask removes unwanted permissions automatically, so you don't need to manually use chmod every time.
+
+777 - 654 = 123 xxxCommon umask Values
+umask Value	File Permission	Directory Permission	Explanation
+000	666 → 666	777 → 777	No restrictions (not secure)
+022	666 → 644	777 → 755	Default on most systems (read-only for others)
+027	666 → 640	777 → 750	Private files, group can read
+077	666 → 600	777 → 700	Private files and directories
+
+🔹 Checking & Changing umask
+Check current umask:
+umask
+
+Change umask temporarily:
+
+umask 027  # Removes write for group & all permissions for others
+
+Set it permanently:
+Add to ~/.bashrc or ~/.profile:
+
+umask 027
+
+Then apply:
+
+source ~/.bashrc
 
 rm command - used to delete files and directories
 For files - rm filename 
@@ -326,7 +346,7 @@ syn : ping <ipaddress>
 -> Below image depicts how traceroute command is used to reach the Google(172.217.26.206) host from the local machine and it also prints detail about all the hops that it visits in between.
 
 ** Traceroute: Prints the route that a packet takes to reach the host. 
--> It is useful when you want to know about the route & about all the hops that a packet takes.
+-> It is useful when you want to know about the route & about all the hops that a packet takes. 
 
 Finger: Finger command is a user information lookup command which gives details of all the users logged in. This tool is generally used by system administrators. It provides details like login name, user name, idle time, login time, and in some cases their email address even.
 

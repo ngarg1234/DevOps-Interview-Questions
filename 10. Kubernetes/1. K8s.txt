@@ -1,6 +1,7 @@
 Considerations for large clusters:
 ==================================
--> A cluster is a set of nodes (physical or virtual machines) running Kubernetes agents, managed by the control plane. Kubernetes v1.32 supports clusters with up to 5,000 nodes. 
+-> A cluster is a set of nodes (physical or virtual machines) running Kubernetes agents, managed by the control plane. 
+Kubernetes v1.32 supports clusters with up to 5,000 nodes. 
 1. No more than 110 pods per node
 2. No more than 5,000 nodes
 3. No more than 150,000 total pods
@@ -19,21 +20,23 @@ Cloud provider resource quotas
 6. Number of load balancers
 7. Network subnets
 8. Log streams
--> Gating the cluster scaling actions to bring up new nodes in batches, with a pause between batches, because some cloud providers rate limit the creation of new instances.
+-> Gating the cluster scaling actions to bring up new nodes in batches, with a pause between batches,
+ because some cloud providers rate limit the creation of new instances.
 
 ========================================================================================
 Q. What is monolithic appn and microservices and why are we moving from monolithic to microservices?
 -> Monolithic application: Single, unified unit while a microservices architecture is a collection of smaller, independently deployable services.
 -> Because you can detect bugs or performance issues in a gradual fashion.
--> In microservices small services can be written in different languages(Python, Node.js, Java) but where as in monolithic its more of a single language.
+-> In microservices small services can be written in different languages(Python, Node.js, Java)
+but where as in monolithic its more of a single language.
 -> Microservice would be cost effective as it can manipulate servers depending on the traffic, but in monolithic it has to create a lot number 
    of services as per traffic.
 -> Ex for microservice: Kubernetes.
 
-		Monolithic					Microservices
+		Monolithic				                            	Microservices
 modules, together deployed with tight coupling		deploy k8s, modules will be individually 
-through ansible, automation Jenkins			 
-downtime high						no downtime, i.e, downtime other application is not possible
+through ansible,                                  automation Jenkins			 
+downtime high						                          no downtime, i.e, downtime other application is not possible
 
 -> Container orchestration is the automation of much of the operational effort required to run containerized workloads and services.
    This includes a wide range of things software teams need to manage a container's lifecycle, including provisioning, deployment, scaling (up and down),
@@ -84,7 +87,8 @@ Definition of Docker Swarm:
 Kubernetes Overview: {K8S-Container orchestration tool}
 -------------------------------------------------------
 -> Kubernetes, is an open-source system for automating deployment, scaling, and management of containerized applications. 
--> K8s, is written primarily in the "Go" open source programming language or "Golang". It is known for its simplicity, speed, and efficient memory management. 
+-> K8s, is written primarily in the "Go" open source programming language or "Golang". It is known for its simplicity, speed,
+ and efficient memory management. 
 -> It groups containers that make up an application into logical units for easy management and discovery.
 -> Daemon service: 100% of service is available.
 -> Monitor K8S: -> Prometheus, Grafana, Fludentd, Elasticsearch, Kiabana, Stackdriver, New Relic, Datadog.
@@ -93,14 +97,16 @@ Kubernetes Features:
 --------------------
 1. Self-healing: Restarts containers that fail, replaces and reschedules containers when nodes die, kills containers that don't respond to your user-     defined health check, and doesn't advertise them to clients until they are ready to serve. (Probe)
 
-2. Automated rollouts and rollbacks: Kubernetes progressively rolls out changes to your application or its configuration, while monitoring application health to ensure it doesn't kill all your instances at the same time. 
+2. Automated rollouts and rollbacks: Kubernetes progressively rolls out changes to your application or its configuration,
+ while monitoring application health to ensure it doesn't kill all your instances at the same time. 
 -> If something goes wrong, Kubernetes will rollback the change for you. Take advantage of a growing ecosystem of deployment solutions.
 
 3. Horizontal scaling: Scale your application up and down with a simple command, with a UI, or automatically based on CPU usage.
--> Horizontal scaling means that the response to increased load, is to deploy more Pods.  
--> Vertical scaling : Increasing CPU usage/Hardware capacities.
+-> Horizontal scaling means that the response to increased load, is to deploy more Pods.
+-> Vertical scaling : Increasing CPU usage/Hardware capacities..
 
-4. Service discovery and load balancing: No need to modify your application to use an unfamiliar service discovery mechanism. Kubernetes gives Pods their own IP addresses and a single DNS name for a set of Pods, and can load-balance across them.
+4. Service discovery and load balancing: No need to modify your application to use an unfamiliar service discovery mechanism. 
+Kubernetes gives Pods their own IP addresses and a single DNS name for a set of Pods, and can load-balance across them.
 
 ----------------------------------------------------------------------------------------
 ** kubectl: Command line interface, it is tool to connect between api server and user. (kubectl run, cluster-info, get nodes)
@@ -108,13 +114,15 @@ Kubernetes Features:
 	$$ kubectl cluster-info
 	$$ kubectl get nodes
 
-** Kubeadm is a tool used to build Kubernetes (K8s) clusters. Kubeadm performs the actions necessary to get a minimum viable cluster up and running quickly.
+** Kubeadm is a tool used to build Kubernetes (K8s) clusters. 
+Kubeadm performs the actions necessary to get a minimum viable cluster up and running quickly.
 	$$ kubeadm validate cluster 
 
 ** kubeconfig: It is a configuration file used by kubectl, to connect to a Kubernetes cluster. (Easily switch between different clusters and users in the same configuration file)
 -> The kubeconfig file contains information such as the location of the API server, the credentials used  to authenticate with the API server,
  and the current context (the cluster, user, and namespace that kubectl is currently interacting with).
 -> Usually located in the user's home directory under ~/.kube/config but specified with "KUBECONFIG" environment variable or the --kubeconfig flag.
+
 
 =========================================================================================
 Kubernetes Architecture and Components:
@@ -130,7 +138,10 @@ CLI/UI-->API-->(API server::SCHEDULER::CONTROLLERS::KEY VALUE STORE-etcd)
 
 -> Nodes(Minions): A node is a machine – physical or virtual – on which Kubernetes is installed. 
 -> A node is a worker machine and this is were containers will be launched by Kubernetes
--> A cluster is a set of nodes grouped together. This way even if one node fails you have your application still accessible from the other nodes. Moreover having multiple nodes helps in sharing load as well.
+-> A cluster is a set of nodes grouped together.
+ This way even if one node fails you have your application still accessible from the 
+ other nodes. 
+ Moreover having multiple nodes helps in sharing load as well.
 
 1. Master Node:
 ===============
@@ -152,7 +163,7 @@ CLI/UI-->API-->(API server::SCHEDULER::CONTROLLERS::KEY VALUE STORE-etcd)
 	
 	   	
 2. Key-Value Store (etcd):  (It stores the current information)
--> By default, etcd data is stored in folder /var/lib/etcd , which is most likely stored on the root file system.
+-> By default,  etcd data is stored in folder /var/lib/etcd , which is most likely stored on the root file system.
 -> etcd is a distributed, highly-available, consistent key-value store which stores the configuration data of the complete Kubernetes cluster.
 -> Configuration data represent the desired state of the cluster Ex:-
 	- which nodes exist in the cluster
@@ -270,10 +281,13 @@ Modes of Operation: kube-proxy supports different modes to manage traffic routin
 -- Uses iptables rules to forward traffic to the correct pod 
 -- Scales well because packets are handled at the kernel level
 -- Load balances traffic across pods.
+
+
 2. IPVS Mode (Recommended for Large Clusters)
 -- Uses IP Virtual Server (IPVS) for more efficient load balancing.
 -- Supports advanced scheduling algorithms (e.g., round-robin, least connections).
 -- Better performance than iptables for high-traffic workloads.
+
 3. Userspace Mode (Legacy, Not Recommended)
 -- Uses a user-space proxy to forward traffic.
 -- Slower than iptables and IPVS because traffic goes through an additional hop.
@@ -312,7 +326,7 @@ Container Runtimes:
 
 ** Methods of Setting up/installing Kubernetes, Types of cluster available in market, Types of k8s cluster
 1. MiniKube: Easy to run a single-node Kubernetes cluster locally on your machine.
--> Minikube provides an executable command line utility that will AUTOMATICALLY download the ISO and deploy it in a virtualization platform such as Oracle Virtualbox or Vmware fusion. So you must have a Hypervisor installed on your system. For windows you could use Virtualbox or Hyper-V and for Linux use Virtualbox or KVM. So you must have a hypervisor installed, kubectl installed and minikube executable installed on your system
+-> Minikube provides an executable command line utility that will AUTOMATICALLY download the ISO and deploy it in a virtualization platform such as Oracle Virtualbox or Vmware fusion. So you must have a Hypervisor installed on your system. For windows you could use Virtualbox or Hyper-V and for Linux use Virtualbox or KVM. So you must have a hypervisor installed, kubectl installed and minikube executable installed on your system..
 
 2. kubeadmin: It is a tool used to configure kubernetes in a multi-node setup. (both for experimental production grade cluster)can also be used for production)
 
@@ -375,7 +389,7 @@ Commands:
 
 -> "--image" mentioned is downloaded from docker hub repository.
 
-pod-definition.yaml
+pod-definition.yaml  ak mnlat scni
 apiVersion:v1
 kind: Pod
 metadata:
@@ -471,29 +485,34 @@ spec:
 $$ kubectl get pod orange -o yaml > /root/orange.yaml
 
 *****************************************************************************
-2. Sidecar containers/Multi-Container Pod: 
+2. Sidecar containers/Multi-Container Pod:
 -> These are the containers that will run along with the main container.
 -> We have a pod with a main container which is working very well but If we want to extend the functionality without changing the existing main container then better option is to use sidecar container.
 -> To take the copy of file or data from main container we can use sidecar container.
 
 ## Sidecar container/Multi container: This pattern is useful for scenarios where you need to add features such as monitoring, logging, proxying, or managing secrets without modifying the main application code.
 1. Logging and Monitoring with a Sidecar
--> we will use the Fluentd sidecar container to collect logs from the primary application container and send them to an external logging system (like Elasticsearch or Splunk). This approach ensures that logs are collected without modifying the primary application.
+-> we will use the Fluentd sidecar container to collect logs from the primary application container and send them to an external logging system (like Elasticsearch or Splunk).
+This approach ensures that logs are collected without modifying the primary application.
 
 2. Multi-Container Pod with Sidecar for Proxying (e.g., with Envoy)
--> A sidecar container is used to act as a proxy or API gateway for the primary application. Envoy, a popular proxy, can be used as a sidecar to manage network traffic, handle retries, timeouts, circuit breaking, and more.
+-> A sidecar container is used to act as a proxy or API gateway for the primary application.
+Envoy, a popular proxy, can be used as a sidecar to manage network traffic, handle retries, timeouts, circuit breaking, and more.
 
 3. Multi-Container Pod for Application with Caching Sidecar (e.g., Redis)
--> Use a sidecar to deploy a Redis container within the same pod. This sidecar could provide caching services to the application without needing to manage Redis as a separate service.
+-> Use a sidecar to deploy a Redis container within the same pod. 
+This sidecar could provide caching services to the application without needing to manage Redis as a separate service.
 
 *****************************************************************************
 3. Single Container per Pod:
--> Description: A Pod with only one container is the simplest and most common pattern in Kubernetes. It represents a single containerized application that runs by itself.
+-> Description: A Pod with only one container is the simplest and most common pattern in Kubernetes. 
+It represents a single containerized application that runs by itself.
 -> Use Case: Ideal for stateless applications, microservices, and when you need the full resources of the Pod allocated to a single container.
 -> Example: A web server, like an Nginx or Apache container, running in a Pod.
 
 4. Ambassador pattern:
--> Description: The Ambassador pattern uses a sidecar container to proxy traffic between external clients and the main application container. This pattern is often used for cases like service discovery, routing, and API gateway functionality.
+-> Description: The Ambassador pattern uses a sidecar container to proxy traffic between external clients and the main application container.
+ This pattern is often used for cases like service discovery, routing, and API gateway functionality.
 -> Use Case: Ideal when you need to intercept or manipulate traffic before it reaches the application (e.g., security, traffic routing, or load balancing).
 -> Example: A main application container that handles user requests and a proxy container that handles inbound traffic, API routing, or SSL termination.
 
@@ -503,6 +522,16 @@ $$ kubectl get pod orange -o yaml > /root/orange.yaml
 5. Adapter pattern
 6. Batch Job pattern
 7. DaemonSet pattern
+
+
+Pattern	Importance
+✅ Single Container Pod  	Most common, every app uses it.
+✅ Init Container	        Ensures dependencies are ready before starting the app.
+✅ Sidecar	                Adds extra functionality (logging, security, monitoring). Limited to a single Pod’s resources.
+✅ Multi-Container Pod	    Allows tightly coupled processes in the same Pod.
+✅ Job & CronJob       	  For scheduled & one-time background tasks.
+✅ DaemonSet	              Runs system-wide services like logging & monitoring. Runs on all nodes, so it impacts the entire cluster.
+
 
 ========================================================================================
 STATIC POD:
@@ -600,10 +629,10 @@ Lifecycle of pod phases / status:
 -> All of the containers have been created.
 -> At least one container is running or it may be in starting or restarting.
 	
-3. Succeeded
--> All the containers in the pod have been terminated successfully.
--> No container will be restarted.
-	
+ 3. Succeeded
+-> All containers in the Pod have exited successfully.
+-> No containers will be restarted.
+
 4. Failed 
 -> All the containers in the pod are not be running and any one container have been terminated in failure.
 		
@@ -616,11 +645,13 @@ Lifecycle of pod phases / status:
 -> This status is not one of the pod phases.
 
 =========================================================================================
-YAML:
+YAML: ak mnlat scni (Aaj Kal... Main Nashta Leke Aata... School College Nahi Jaata!")
+
+ak mnlta scni 
 -----
 -> Kubernetes uses YAML files as input for the creation of objects such as PODs, Replicas, Deployments, Services etc. 
 
--> Contains 4 top level fields:
+-> Contains 4 top level fields: 
 
 1. apiVersion: 
 -> (String) v1 / apps/v1 / apps/v1beta1 / extensions/v1beta1
@@ -700,7 +731,8 @@ PodDisruptionBudget		policy/v1
 =========================================================================================
 Port forwarding in Kubernetes
 ------------------------------
--> Port forwarding in Kubernetes allows you to access a specific port of a Pod or Service on your local machine. This is useful for debugging, accessing applications, or exposing internal services temporarily without setting up an external LoadBalancer or Ingress.
+-> Port forwarding in Kubernetes allows you to access a specific port of a Pod or Service on your local machine. 
+This is useful for debugging, accessing applications, or exposing internal services temporarily without setting up an external LoadBalancer or Ingress.
 
 $$ kubectl port-forward <resource-type>/<resource-name> <local-port>:<target-port>
 
@@ -729,15 +761,25 @@ $$ nohup kubectl port-forward pod/<pod-name> 8080:80 &
 LABELS & SELECTORS:
 -------------------
 
--> Labels and Selectors in Kubernetes (K8s) — core concepts used for organizing, identifying, and selecting Kubernetes objects (like Pods, Services, ReplicaSets, Deployments).
+-> Labels and Selectors in Kubernetes (K8s) — core concepts used for organizing, identifying, and selecting Kubernetes objects
+(like Pods, Services, ReplicaSets, Deployments).
 
 Q. Why do we label our PODs and objects in Kubernetes?
--> Say we deployed 3 instances of our frontend web application as 3 PODs. We would like to create a replication controller or replica set to ensure that we have 3 active PODs at anytime. And YES that is one of the use cases of replica sets. You CAN use it to monitor existing pods, if you have them already created, as it IS in this example. In case they were not created, the replica set will create them for you. The role of the replicaset is to monitor the pods and if any of them were to fail, deploy new ones. The replica set is in fact a process that monitors the pods. Now, how does the replicaset know what pods to monitor. There could be 100s of other PODs in the cluster running different application. This is where labelling our PODs during creation comes in handy. We could now provide these labels as a filter for replicaset. Under the selector section we use the match Labels filter and provide the same label that we used while creating the pods. 
+-> Say we deployed 3 instances of our frontend web application as 3 PODs.
+We would like to create a replication controller or replica set to ensure that we have 3 active PODs at anytime.
+The role of the replicaset is to monitor the pods and if any of them were to fail, deploy new ones.
+The replica set is in fact a process that monitors the pods.
+Now, how does the replicaset know what pods to monitor. 
+There could be 100s of other PODs in the cluster running different application.
+This is where labelling our PODs during creation comes in handy. We could now provide these labels as a filter for replicaset.
+Under the selector section we use the match Labels filter and provide the same label that we used while creating the pods. 
 This way the replicaset knows which pods to monitor.
 
 Q. We started with 3 replicas and in the future we decide to scale to 6. How do we update our replicaset to scale to 6 replicas?
-->  The first, is to update the number of replicas in the definition file to 6. Then run the $$ kubectl replace command specifying the same file using the –f parameter and that will update the replicaset to have 6 replicas.
--> The second way to do it is to run the kubectl scale command. Use the replicas parameter to provide the new number of replicas and specify the same file as input.
+->  The first, is to update the number of replicas in the definition file to 6. 
+Then run the $$ kubectl replace command specifying the same file using the –f parameter and that will update the replicaset to have 6 replicas.
+-> The second way to do it is to run the kubectl scale command.
+ Use the replicas parameter to provide the new number of replicas and specify the same file as input.
 
 ** Labels of pod and Replica set labels should match.
 ** ReplicaSet won't allow to create more replica of pods using command with same label and different name.
@@ -945,7 +987,8 @@ Replica Set vs Replication Controller:
 but won't work with a Replica Set.  This is because Replica Sets are meant to be used as the backend for Deployments.
 
 Q. So what is a replica and why do we need a replication controller? What if for some reason, our application crashes and the POD fails?
--> High availability: Users will no longer be able to access our application. To prevent users from losing access to our application, we would like to have more than one instance or POD running at the same time.
+-> High availability: Users will no longer be able to access our application. 
+To prevent users from losing access to our application, we would like to have more than one instance or POD running at the same time.
 -> Another reason we need replication controller is to create multiple PODs to share the load across them.
 
 -------------------------------------------
@@ -1043,7 +1086,7 @@ $$ kubectl scale --replicas=6 replicaset myapp-replicaset
 1. Scaling: 
 -> we can change the value for number of replicas in spec file.
 -> we can also use the below command 
-$$ sudo kubectl scale deployment.v1.apps/nginx-deployment --replicas=3
+$$ sudo kubectl scale --replicas=3 deployment.v1.apps/nginx-deployment
 	
 2. Autoscalling (deployment internal autoscaller)
 -> kubernetes can scale deployment automatically based on resource usage.
@@ -1162,7 +1205,10 @@ c. One time initialization of resources.
 6. StatefulSet:
 ----------------
 -> A StatefulSet in Kubernetes is a specialized type of Deployment designed for managing stateful applications. 
--> While Deployments are great for stateless applications, StatefulSets are tailored for applications that need to maintain persistent state across Pods, like databases, message queues, or any application where the identity and storage must be preserved even if the Pod is restarted, rescheduled, or moved to another node.
+-> While Deployments are great for stateless applications,
+StatefulSets are tailored for applications that need to maintain persistent state across Pods,
+ like databases, message queues, or any application where the identity and storage must be preserved even if the Pod is restarted,
+  rescheduled, or moved to another node.
 	  
 ✅ It creates the Stateful application:
 ✅ For the StatefulSets to work, a headless service should be created. 
@@ -1173,15 +1219,23 @@ c. One time initialization of resources.
 Key Characteristics of StatefulSets:
 -------------------------------------
 1. Stable Network Identity: Each Pod in a StatefulSet gets a unique, stable network identity that persists across rescheduling or restarts.
--- Pods in a StatefulSet are named in a predictable pattern, typically using the name of the StatefulSet followed by an index number, like my-app-0, my-app-1, my-app-2, etc.
+-- Pods in a StatefulSet are named in a predictable pattern,
+ typically using the name of the StatefulSet followed by an index number,
+ like my-app-0, my-app-1, my-app-2, etc.
 
-2. StatefulSets are usually paired with Persistent Volumes (PVs) to provide persistent storage for each Pod. Each Pod in a StatefulSet gets its own PersistentVolumeClaim (PVC), which ensures that data is not lost when a Pod is deleted or recreated.
+2. StatefulSets are usually paired with Persistent Volumes (PVs) to provide persistent storage for each Pod.
 
-3. Ordered Pod Deployment and Scaling: StatefulSets ensure that Pods are created, updated, or deleted in a specific order. For example, Pods are deployed in ascending order (Pod-0, Pod-1, etc.), and the scaling operations (scaling up or down) also happen in an ordered manner.
+ Each Pod in a StatefulSet gets its own PersistentVolumeClaim (PVC), which ensures that data is not lost when a Pod is deleted or recreated.
 
-4. Graceful Termination: Pods in a StatefulSet are terminated in reverse order (from the highest index down to 0), allowing for a more graceful shutdown and recovery. This ensures that Pods are cleaned up systematically and in the correct order.
+3. Ordered Pod Deployment and Scaling: StatefulSets ensure that Pods are created, updated, or deleted in a specific order. 
+For example, Pods are deployed in ascending order (Pod-0, Pod-1, etc.), and the scaling operations (scaling up or down) also happen in an ordered manner.
 
-5. Pod Management: In contrast to a Deployment, which can replace Pods at random, a StatefulSet ensures that Pods are replaced in a controlled manner, preserving the stateful application behavior.
+4. Graceful Termination: Pods in a StatefulSet are terminated in reverse order (from the highest index down to 0), allowing for a more graceful shutdow
+n and recovery. This ensures that Pods are cleaned up systematically and in the correct order.
+
+5. Pod Management: In contrast to a Deployment, which can replace Pods at random, a StatefulSet ensures that Pods are replaced i
+
+n a controlled manner, preserving the stateful application behavior.
 
 6. Stable Storage: StatefulSets create and manage PersistentVolumeClaims for each Pod, which provides storage that survives Pod restarts and reschedules.	   
 	
@@ -1198,9 +1252,12 @@ Stateful Applications:
 When to Use StatefulSets?
 --------------------------
 -> Let’s consider a simple example of running three replicas of a MySQL database server in Kubernetes. 
--> The deployment should be configured with one Pod in the primary role, handling read-write operations, and the remaining three Pods as MySQL read-only replicas.
+-> The deployment should be configured with one Pod in the primary role, handling read-write operations,
+ and the remaining three Pods as MySQL read-only replicas.
 
--> Applications connecting to the database will always need to connect to the Pod that’s in the primary role in order to receive read-write access. This wouldn’t be possible if a Deployment or ReplicaSet was used, as scheduling or replication changes would generate new Pod identities. The application would have no way of knowing which Pod is the primary MySQL instance.
+-> Applications connecting to the database will always need to connect to the Pod that’s in the primary role in order to receive read-write access. 
+This wouldn’t be possible if a Deployment or ReplicaSet was used, as scheduling or replication changes would generate new Pod identities.
+ The application would have no way of knowing which Pod is the primary MySQL instance.
 
 -> StatefulSets eliminate this problem. Each Pod in the StatefulSet is assigned a predictable and consistent network identity in the form <statefulset-name>-<pod-ordinal-index>. The four Pods in the MySQL deployment would be named as follows:
 
@@ -1273,7 +1330,8 @@ Cache (Redis, Memcached)	✅ (for stateless) / 	✅ StatefulSet (if persistence 
 
 ==================================================================================	  
 ✅ Service Discovery:
--> Service Discovery is the process by which microservices automatically find and communicate with each other without hardcoding IP addresses or endpoints. 
+-> Service Discovery is the process by which microservices automatically find and
+communicate with each other without hardcoding IP addresses or endpoints. 
 
 -> In Kubernetes:
 -- Services (Pods, Deployments) scale dynamically, so IP addresses of Pods change.
@@ -1311,7 +1369,8 @@ POD SCHEDULING TO WORKER NODE:
 
 MULTIPLE SCHEDULERS:
 --------------------
--> Default scheduler has an algorithm that distributes pods across node evenly, as well as takes into consideration we specify through taints and tolerations and node affinity etc.
+-> Default scheduler has an algorithm that distributes pods across node evenly, 
+as well as takes into consideration we specify through taints and tolerations and node affinity etc.
 
 Q. What if none of these satisfy your condition?
 -> K8s highly extensible, We can write our own scheduler program package it and deploy it as default scheduler or custom scheduler.
@@ -1401,7 +1460,8 @@ SCHEDULING PODS TO WORKER NODES:
 
 1. Manual scheduling:
 Q. How it works?
--> Every time you create a pod, k8s will add a section called "nodeName" and scheduler will search for it in all pods, the pod which does not have this properties in it, and identifies right node for the pod, once identifies scheduler will schedule that pod to node by providing 'nodeName' by creating binding object.
+-> Every time you create a pod, k8s will add a section called "nodeName" and scheduler will search for it in all pods, the pod which does not have this properties in it, and identifies right node for the pod, once identifies scheduler will schedule that pod to node (by providing 'nodeName')
+ by creating binding object.
 
 Q. What if 'No scheduler'?
 -> Pod continues to be in pending state and you can schedule it by manually.
@@ -1431,7 +1491,7 @@ spec:
 How to create/schedule pods in a particular worker node?
 	1. Taint and tolerations. 
 	2. Affinity and Anti-Affinity. 
-        3. Node selector.
+  3. Node selector.
 
 1. Taint and Tolerations:
 --------------------------
@@ -1441,7 +1501,7 @@ How to create/schedule pods in a particular worker node?
 -> Only pods consisting of "toleration" for that taint will be created in 
 -> "Taint effect" defines how nodes with taint react to pods.
 -> Lets say we have dedicated resource in Node-1 and we cant schedule all pods to it. so we need taint and toleration here to assign pods to node.
--> Tolerated pod can be scheduled any other node which does not have taint. So overcome this we will learn "NODE SELECTOR" or "NODE-AFFINITY".
+-> Tolerated pod can be scheduled on any other node which does not have taint. So overcome this we will learn "NODE SELECTOR" or "NODE-AFFINITY".
 
 -> The master node is already tainted by:
 		taints:
@@ -1569,10 +1629,49 @@ metadata:
 
 2. Node Affinity and Anti-Affinity:
 ----------------------------------
-
--> Lets say we have 3 nodes with labels Large, Small and Medium. By providing "NodeSelector" we can assign node to pod but what happens when we want pod to be scheduled on node with large and medium labels. Like place pod on any node but not small. We can achieve this using  concept called "Node Affinity".  
+V.imp..
+-> Lets say we have 3 nodes with labels Large, Small and Medium. By providing "NodeSelector" we can assign node to pod but 
+what happens when we want pod to be scheduled on node with large and medium labels.
+Like place pod on any node but not small. 
+We can achieve this using  concept called "Node Affinity".  
 
 -> Using affinity we can completely dedicate pod to particular nodes.
+
+🧠 Think of it like this:
+Feature	Analogy
+nodeSelector	Like giving someone a simple address: “Go only to this street.” 🏠
+affinity	Like giving Google Maps directions with preferences: “Go to this area, but if it's busy, try nearby.” 🗺️
+
+ You can influence scheduling using:
+Feature          	          Description
+nodeSelector	              Assign Pod to specific node by label
+affinity / antiAffinity	    Assign Pods to (or away from) specific nodes or other Pods
+taints & tolerations	      Prevent Pods from being scheduled unless they tolerate taints
+resource limits/requests   	Ensure the node has enough capacity
+priorityClassName          	Decide which Pods are more important during scheduling
+
+
+selector:
+spec:
+  nodeSelector:
+    disktype: ssd
+✅ Pod will only run on nodes with disktype=ssd.
+
+affinity:
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: disktype
+          operator: In
+          values:
+          - ssd
+          - nvme
+
+
+------------------------------------------Till here naman..---------------------------------------
 
 a. NODE AFFINITY: 
 -----------------
@@ -1979,7 +2078,8 @@ kubectl describe svc <servicename>
 Headless services:
 ------------------
 -> A Kubernetes headless service is a form of service that doesn't allocate a cluster IP to represent a set of pods. 
--> Instead of load-balancing traffic across a group of pods, a headless service allows DNS queries for the service to go back to the individual IP addresses of all the pods associated with it.
+-> Instead of load-balancing traffic across a group of pods,
+ a headless service allows DNS queries for the service to go back to the individual IP addresses of all the pods associated with it.
 -> Headless service lists all the ip's of the pods it is pointing, when a DNS query for headless service is run.	   
 -> We can create a headless service by specifying none for the clusterIP.
 -> Headless service is used with StatefulSets where name of the pods are fixed.
@@ -2532,7 +2632,8 @@ Resource quotas and limitaions:
 -> Resource-Quotas are used to limit the total amount of resources that can be consumed by all the objects (like Pods, Services, etc.) within a particular namespace. 
 -> This helps administrators ensure that no single namespace consumes more resources than the cluster can handle and helps manage resource usage within the cluster.
 
--> A Resource-Quota defines constraints on the amount of CPU, memory, number of Pods, and other resources that a namespace can use. It can be applied to various resource types, such as:
+-> A Resource-Quota defines constraints on the amount of CPU, memory, number of Pods, and other resources that a namespace can use. 
+It can be applied to various resource types, such as:
 1. CPU and memory requests and limits
 2. Number of Pods, Services, and Persistent Volume Claims (PVCs)
 3. Number of ConfigMaps, Secrets, etc.
@@ -2558,7 +2659,8 @@ spec:
 
 ** Enforcing Resource Quotas:
 -> Once a Resource-Quota is created, Kubernetes will enforce these limits in the specified namespace. 
--> If any object (such as a Pod, Deployment, or Service) in that namespace exceeds the defined limits, the Kubernetes API server will reject the creation or modification of those objects.
+-> If any object (such as a Pod, Deployment, or Service) in that namespace exceeds the defined limits,
+ the Kubernetes API server will reject the creation or modification of those objects.
 
 ** Viewing ResourceQuota Usage:
 $$ kubectl get resourcequota -n my-namespace
@@ -2604,7 +2706,8 @@ Resource Limits:
 3. Node03
 
 -> Scheduler check for sufficient resources and assign pods.
--> If their is no sufficient resources available on any of nodes, scheduler will not assign pods to any nodes and would get an error saying; "pod is pending", under event we can see "Insufficient CPU"
+-> If their is no sufficient resources available on any of nodes,
+ scheduler will not assign pods to any nodes and would get an error saying; "pod is pending", under event we can see "Insufficient CPU"
 
 -> We can specify required amount of CPU and Memory like 1CPU and !Gi Memory.
 -> 1CPU: 0.1=100m
@@ -3498,6 +3601,11 @@ Assignment:
 		Create Role and ClusterRole with binding to a service account.
 		Resource quotas CPU Memory and count.
 -----------------------------------------------------------------------------------------------------------------------------------------
+Component	What it does
+Role	Defines a set of permissions (within a namespace)
+ClusterRole	Like a Role, but applies cluster-wide or across namespaces
+RoleBinding	Binds a Role to a user/group/service account (in a namespace)
+ClusterRoleBinding	Binds a ClusterRole to a user/group/service account (cluster-wide)
 
 =======================================================================================================================================
 
@@ -5429,3 +5537,50 @@ Q. how u manage kubernetes using jenkins pipeline?
    applications in Kubernetes, ensuring that your applications are always up-to-date and running as expected. 
    This approach also allows you to easily manage multiple Kubernetes clusters and deploy applications to different 
    environments, such as development, testing, and production.
+
+e Network Policies in Kubernetes?
+Answer: A NetworkPolicy is a Kubernetes resource used to control the flow of 
+network traffic to and from pods. It helps secure the cluster by defining rules 
+for pod communication.
+Key Features:
+1. Ingress Rules: Control incoming traffic to pods.
+27
+2. Egress Rules: Control outgoing traffic from pods.
+3. Selectors: Use pod labels to define which pods the policy applies to.
+Example Configuration:
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+ name: allow-app-traffic
+ namespace: default
+spec:
+ podSelector:
+ matchLabels:
+ app: my-app
+ policyTypes:
+ - Ingress
+ - Egress
+ ingress:
+ - from:
+ - podSelector:
+ matchLabels:
+ app: frontend
+ egress:
+ - to:
+ - ipBlock:
+ cidr: 192.168.1.0/24
+Use Cases:
+ Restrict access to sensitive pods.
+28
+ Allow specific pods to communicate within a namespace.....
+
+Explanation:
+podSelector: This policy applies to all Pods in the default namespace with label app: my-app.
+
+policyTypes: Defines that this policy controls both Ingress (incoming) and Egress (outgoing) traffic.
+
+ingress.from: Only allows incoming traffic from Pods labeled app: frontend.
+
+egress.to: Only allows outgoing traffic to the IP block 192.168.1.0/24.
+
+

@@ -1,6 +1,6 @@
 1. What is terrafrom Workspace:
 -> A Terraform workspace is an isolated environment for managing infrastructure within a single Terraform configuration. 
--> Workspaces allow you to have multiple, independent states for the same set of configurations. 
+-> Workspaces allow you to have multiple, independent states for the same set of configurations.
 -> This is useful when you want to create and manage different environments (like dev, staging, and production) using the same Terraform code.
 -> By default, Terraform uses the default workspace, but you can create and manage additional workspaces.
 
@@ -13,8 +13,19 @@ Answer: Terraform loses track of all managed infrastructure. On next apply, it w
 2) What happens if multiple team members run terraform apply simultaneously?
 Answer: State file locking fails, risking corrupted state and inconsistent infrastructure. One process succeeds while others error out, potentially leading to drift if not managed properly.
 
- 3) What happens if a resource fails halfway through a terraform apply?
+3) What happens if a resource fails halfway through a terraform apply?
 Answer: Terraform leaves successfully created resources running but marks the state as tainted. Subsequent apply operations will attempt to recreate failed resources, but you're left in partial state.
+        partially created" state, and it will attempt to handle the failure as part of the next terraform apply.
+ 
+        Example of Partial Failure:
+        Imagine you are provisioning an EC2 instance and an S3 bucket. If the EC2 instance creation fails for some reason, the S3 bucket will still be created if the apply was successful until that point. The EC2 resource will need to be retried on the next apply since it will be marked as failed in the state file.
+
+        Conclusion:
+        Terraform doesn’t automatically rollback successfully applied resources when one resource fails midway.
+
+        Failed resources will be retried in the next terraform apply.
+
+        Error handling in Terraform will stop further operations, but previously successful resources will remain intact.
 
 4) What happens when AWS API rate limits are hit during a large terraform apply?
 Answer: Operations fail with throttling errors. Terraform retries a few times then fails the apply. Resources created before the limit was hit remain, creating partial deployments.

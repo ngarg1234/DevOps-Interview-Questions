@@ -117,6 +117,7 @@ $*--> All arguments passed to the script.
 $@--> All arguments passed to the script stored in script in array format.
 $$--> Process id of current running process
 $!--> It gives process id of the last command went into background.
+---------------------  v.V. iMP.-----------------------------------------------------------
 $?--> Status of last executed command. Zero(0)means success and non-zero means failure.
 
 Nohup: No hang up : Keep processes running even after exiting the shell/terminal.
@@ -365,6 +366,7 @@ __________________________________________________
 2.Write script to print employee names if their age is more than 50 from below data.
 
 name  employee_id  age
+do
 vijay  100         35
 Vinay  101         40
 Raj    102         55
@@ -380,7 +382,6 @@ file=$1
 sed '1 d' $file > temp
 
 while read line
-do
         
 age=`echo $line | awk -F " " '{print $3}'`
 
@@ -665,7 +666,8 @@ if [ $size -ge 10 ]; then
 fi
 
 =======================================================================================================
-5. Software installation: A shell script can be created to automate the process of installing software on multiple systems. This script can download the necessary files, install dependencies, and configure settings as needed. 
+5. Software installation: A shell script can be created to automate the process of installing software on multiple systems.
+This script can download the necessary files, install dependencies, and configure settings as needed. 
 
 #!/bin/bash
 apt-get update

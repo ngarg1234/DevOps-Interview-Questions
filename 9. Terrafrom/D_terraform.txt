@@ -91,6 +91,7 @@ Deprecated:
 🔹 Applies Changes? terraform refresh modified the state instantly, whereas terraform plan -refresh-only requires manual apply (terraform apply -refresh-only).
 🔹 Safer? terraform refresh was risky (modified state without confirmation), but terraform plan -refresh-only is safer (previews changes first).
 🔹 Availability: terraform refresh was deprecated in v0.15, while terraform plan -refresh-only is available in all recent versions. 🚀
+State Drift Detection: It can be helpful for detecting "drift"—when the actual infrastructure has diverged from the state file due to changes made outside of Terraform.
 
 2. terraform taint  ->  terraform apply -replace="aws_instance.web"
 2.1 terraform taint (Deprecated)
@@ -920,6 +921,21 @@ Q. Data types in terraform?
   —> it will use the argument's default value if it has one, or raise an error if the argument is mandatory. 
   -> null is most useful in conditional expressions, so you can dynamically omit an argument if a condition isn't met.
 8. tupple: specifying some value 
+
+Shri chatgpt .. Example of null in Terraform:
+Example 1: null as a Default Value for Optional Variables
+hcl
+Copy
+variable "instance_type" {
+  type    = string
+  default = null
+}
+
+resource "aws_instance" "example" {
+  ami           = "ami-12345678"
+  instance_type = var.instance_type != null ? var.instance_type : "t2.micro"
+}
+In this example, the instance_type variable is optional. If no value is provided, it defaults to null, and then the instance_type is conditionally assigned based on whether the variable is null.
 
 --------------------------------------------------------------------------------------
 Q. How do I run Terraform locally?

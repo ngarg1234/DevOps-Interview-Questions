@@ -107,8 +107,8 @@ EKS Cluster 1 (VPC-A)                EKS Cluster 2 (VPC-B)
 +---------------------+             +---------------------+
 
 >> Connected via VPC Lattice
->> No VPC peering, no TGW needed
->> Managed routing, TLS, IAM control
+>> No VPC peering, no TGW needed..
+>> Managed routing, TLS, IAM control..
 
 ========================================================================================
 ⚙️ Amazon EKS Managed Node Groups vs Self-Managed Nodes

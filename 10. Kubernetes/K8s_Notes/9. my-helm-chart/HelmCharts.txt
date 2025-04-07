@@ -1,7 +1,7 @@
 HELM CHARTS:
 ------------
 
--> helm: package manager, charts: bundle of yaml playbooks
+-> helm: package manager, charts: collections of Kubernetes yaml manifests
 -> Helm helps you manage Kubernetes applications — Helm Charts help you define, install, manage the lifecycle and upgrade even the most complex Kubernetes application. 
 -> Charts are easy to create, version, share, and publish — so start using Helm and stop the copy-and-paste.
 -> Helm uses a packaging format called charts, which are collections of Kubernetes manifests that describe the resources needed to run an application.
@@ -97,7 +97,7 @@ helm plugin list
 HELM REPO:
 ----------
 1. AWS CLI installed: 
-$$ aw configure
+$$ aws configure
 
 2. Create S3 bucket:
 $$ aws s3 mb s3://your-helm-repo-bucket --region <your-region>
