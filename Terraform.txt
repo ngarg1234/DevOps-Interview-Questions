@@ -6,6 +6,26 @@ Terraform configurations must declare which providers they require so that Terra
 
 Terraform Init will download plugins associated with Provider.,
 
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.0"
+    }
+  }
+}
+
+or another way
+
+provider "aws" {
+  alias = dev
+  region = "us-east-1" or profile = dev
+}
+
 Terraform Target flag allows us to destroy specific resources..
 
 > terraform destroy -target aws_instance.myec2
@@ -35,9 +55,9 @@ to ensure that new versions with breaking chnages will not be automatically inst
 When you create contsraints, it creates terraform lock file..then tf looks at this lock file for constraints..
 
 you need to delte this file, if contstarinst you wnat to chnage, otherise it will keep looking at this lock file....
-
+------------------------------------------------------------------------------------------------------------------------------
 One way you can avoid this by adding .. > terraform init --upgrade 
-
+--------------------------------------------------------------------------------------------------------------------------
 it will rechevk tj constraints and update the lock file..
 
 Outputs: Output the resource attributes,,  output ( which we used to see in Console) in Command Prompt..
@@ -78,7 +98,8 @@ lookup()
 
 Data Source : https://www.bitslovers.com/terraform-data/
 
-terraform manages data sources to retrieve information from cloud provider APIs, such as availability zone IDs or data about the peace of your infrastructure through the outputs(mind it) of different Terraform states..
+terraform manages data sources to retrieve information from cloud provider APIs, such as availability zone IDs or data about the peace of your infrastructure 
+through the outputs(mind it) of different Terraform states..
 
 Terraform When to use Data
 The best use case for Data Source is when we are hardcoded information that could change and decrease the maintainability of our code.
@@ -297,6 +318,65 @@ Team Collaboration - use ths keyword.. importance of centaral backend/s3..
 State Locking
 
 https://medium.com/clarusway/how-to-use-s3-backend-with-a-locking-feature-in-terraform-to-collaborate-more-efficiently-fa0ea70cf359
+
+Go to the backend.tf file and add the following.
+
+$ vim backend.tf
+
+
+#backend.tf
+provider "aws" {
+  region = "us-east-1"
+}
+resource "aws_s3_bucket" "tf_remote_state" {
+  bucket = "terraform-s3-backend-with-locking"
+  lifecycle {
+    prevent_destroy = true
+  }
+  versioning {
+    enabled = true
+  }
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}
+#locking part
+
+resource "aws_dynamodb_table" "tf_remote_state_locking" {
+  hash_key = "LockID"
+  name = "terraform-s3-backend-locking"
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+  billing_mode = "PAY_PER_REQUEST"
+}
+
+Then.. main.tf
+
+#main.tf
+provider "aws" {
+   region = "us-east-1"
+ }
+ 
+ terraform {
+   backend "s3" {
+     bucket = "terraform-s3-backend-with-locking"
+     key = "terraform/backend/terraform_aws.tfstate"
+     region = "us-east-1"
+     dynamodb_table = "terraform-s3-backend-locking"
+     encrypt = true
+   }
+ }
+ 
+ resource "aws_instance" "terraform_aws_ec2" {
+   ami = "ami-0be2609ba883822ec"
+   instance_type = "t2.micro"
+ }
 
 When you do write operation, terraform would lock the state file..
 

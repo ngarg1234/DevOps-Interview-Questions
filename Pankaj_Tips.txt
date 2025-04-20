@@ -1,6 +1,14 @@
 aws -- iam, ec2, s3, orgnaisation to organisation managment, control policies, boundaries, security, how to improve, well architect - PROCESS
 
 https://aws.amazon.com/architecture/well-architected/?wa-lens-whitepapers.sort-by=item.additionalFields.sortDate&wa-lens-whitepapers.sort-order=desc&wa-guidance-whitepapers.sort-by=item.additionalFields.sortDate&wa-guidance-whitepapers.sort-order=desc
+Remember CROPS for well architecture
+
+Cost Optimisation
+reliable
+Operational Excellence
+Performance Efficient
+Secure
+Sustainable..
 
 Client Dealing
 
@@ -23,6 +31,10 @@ terarform, python, aws expert,
 -- waht is devops/cicd, 
 
 -- 
+
+V.V.Imp Interview questions aws
+
+https://www.youtube.com/watch?v=7Te4kCoq4-o ... follow his playlist.....
 
 
 Today and Tomorrow topics

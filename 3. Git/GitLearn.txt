@@ -210,7 +210,7 @@ c. Unintended changes: Fewer people with write or admin access means fewer chanc
 -> Highlight settings that users should consider to impact the security posture when deploying the project. 
 -> The SECURITY.md file plays a pivotal role in establishing a secure and open environment for your project. It not only sets the groundwork for responsible security practices but also serves as a valuable resource for contributors and users, ultimately contributing to a more resilient and secure project ecosystem.
 
-10. Use branch protection rules
+10. Use branch protection rules - ----------------------------------------- V.Imp.-------------------------------------------------------------------------------------------------
 -> Branch protection rules provide an essential layer of security in a DevSecOps workflow, preventing unauthorized or accidental changes to sensitive parts of your codebase.
 -> Some of the controls that you can enforce with branch protection rules include:
 1. Require pull request reviews before merging: This ensures that at least one other person reviews and approves the changes before they can be merged into a protected branch.
@@ -230,7 +230,8 @@ c. Unintended changes: Fewer people with write or admin access means fewer chanc
 
 11. Rotate SSH tokens and personal keys
 -> Regularly rotating SSH tokens and personal keys is an essential practice to boost code security in your GitHub repositories. 
--> Rotating SSH tokens and personal keys is a proactive security measure that helps prevent unauthorized access to your GitHub repositories. If a malicious actor somehow gets hold of your SSH token or personal keys, they can wreak havoc in your codebase. 
+-> Rotating SSH tokens and personal keys is a proactive security measure that helps prevent unauthorized access to your GitHub repositories.
+If a malicious actor somehow gets hold of your SSH token or personal keys, they can wreak havoc in your codebase. 
 
 Q. How to rotate SSH tokens and personal keys
 GitHub facilitates the rotation of SSH tokens and personal keys with a straightforward process. Here are the steps:

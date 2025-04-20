@@ -87,3 +87,10 @@ This can be used in **Lambda, GitHub Actions, or Jenkins** to detect drift autom
 ---
 
 Let me know if you want a **Jenkins or GitHub Actions script to detect drift**, or a **diagram to explain** it visually!
+```bash
+terraform plan -detailed-exitcode
+```
+
+- Exit code `0`: No changes
+- Exit code `2`: Drift detected
+- Exit code `1`: Error

@@ -151,7 +151,9 @@ Merge conflicts:
 -- Merge conflict occurs if the same line of code is modified on the same file on two different branches and when we try to merge those 2 branches, we will get merge conflicts.
 
 -> Resolution:
-If i don't know whose changes should i take in the merge, I contact developers who modified file on branch1 and branch2 then they will decide and give new change. After that I will commit that to a file and continue with merge.
+
+If i don't know whose changes should i take in the merge, 
+I contact developers who modified file on branch1 and branch2 then they will decide and give new change. After that I will commit that to a file and continue with merge.
 
 Rebase :
 -> Rebase is also nothing but merge here one branch will get added to the tip of another branch
@@ -248,6 +250,130 @@ There are three types of repositories:
 -> Central repository refers to the Maven community that comes into action when there is a need for dependencies, and those dependencies cannot be found in the local repository. Maven downloads the dependencies from here whenever needed.
 
 ------------------------------------------------------------------------------------------
+
+No worries at all — let’s slow it down and go step-by-step with a real-world story that makes the danger of rebasing shared branches crystal clear. 🔍
+
+🧑‍💻 Imagine this team:
+You and Alex are both working on a branch called feature.
+
+You both clone the repo and start working.
+
+Initial state (shared on GitHub):
+
+css
+Copy
+Edit
+A — B (feature on GitHub)
+🔁 You make a commit and push:
+You:
+
+bash
+Copy
+Edit
+git checkout feature
+echo "Your change" >> file.txt
+git commit -am "You: Added your change"
+git push origin feature
+GitHub now looks like:
+
+css
+Copy
+Edit
+A — B — C (your commit)
+Alex pulls and gets that commit too.
+
+🧨 You decide to rebase feature onto main
+Let’s say main has one extra commit:
+
+css
+Copy
+Edit
+A — B (feature)
+ \
+  D (main)
+You run:
+
+bash
+Copy
+Edit
+git checkout feature
+git rebase main
+This changes history — your commit C is reapplied on top of D, creating a new commit E (with a new hash):
+
+css
+Copy
+Edit
+A — B — D (main) — E (your rebased commit)
+Now, to update GitHub, you need to force push:
+
+bash
+Copy
+Edit
+git push --force
+Now GitHub looks like this:
+
+css
+Copy
+Edit
+A — B — D — E (feature)
+Old commit C is gone from GitHub.
+
+😵 What happens to Alex now?
+Alex's local branch still looks like:
+
+css
+Copy
+Edit
+A — B — C
+But GitHub now looks like:
+
+css
+Copy
+Edit
+A — B — D — E
+So if Alex tries to pull:
+
+bash
+Copy
+Edit
+git pull origin feature
+Git says:
+
+❌ "Your branch and 'origin/feature' have diverged."
+
+Now Alex has to:
+
+Do a rebase or reset manually
+
+Might lose their own local changes
+
+Might get really confused 😩
+
+✅ Safer Alternative
+If you want to update main with your changes:
+
+bash
+Copy
+Edit
+git checkout main
+git merge feature
+git push origin main
+No rewrite. Everyone’s history still works.
+
+🔒 Golden Rule
+Never use git rebase on branches that are already pushed to shared repos unless you absolutely know what you’re doing.
+
+Want me to give you a tiny Git repo simulation you can try on your machine to see this in action?
+
+| You want to...                  | Use     | Why                                 |
+|---------------------------------|----------|--------------------------------------|
+| Keep complete history           | `merge`  | Shows exactly how things happened    |
+| Make history clean and simple   | `rebase` | Like rewriting the story after editing |
+
+---
+
+Let me know if you want a live example using real Git commands!
+
 Git revert and reset
 1. Git revert :
 -> It is used to undo the committed changes, here history will not be removed. we can track that reverted changes in the 

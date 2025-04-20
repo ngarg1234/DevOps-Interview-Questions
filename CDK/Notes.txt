@@ -1,0 +1,305 @@
+
+Awesome — here are **CDK interview questions with detailed answers**, broken into sections so you can prep efficiently:
+
+---
+
+## 🧠 **Basic CDK Concepts**
+
+### 1. **What is AWS CDK?**
+**Answer:**  
+AWS CDK (Cloud Development Kit) is an open-source software development framework that allows you to define cloud infrastructure
+ using familiar programming languages like TypeScript, Python, Java, and C#. Instead of writing raw JSON/YAML CloudFormation templates,
+  CDK lets you write code to define infrastructure, which is then synthesized into CloudFormation under the hood.
+
+
+CDK Provides contructs (pre-built components) that simplify resource creation.
+
+---
+
+### 2. **Which languages are supported by CDK?**
+**Answer:**  
+AWS CDK supports:
+- TypeScript (primary language)
+- Python
+- Java
+- C#
+- Go (experimental)
+
+---
+
+### 3. **What are Constructs, Stacks, and Apps in CDK?**
+**Answer:**
+- **Construct**: The basic building block (e.g., `Bucket`, `Function`, `Vpc`) — reusable pieces of infrastructure logic.
+- **Stack**: A collection of constructs representing a single CloudFormation stack.
+- **App**: The root of the CDK application; it can contain multiple stacks.
+
+---
+
+### 4. **How does CDK differ from CloudFormation?**
+**Answer:**
+CDK is an abstraction layer over CloudFormation:
+- CDK lets you use loops, conditions, and functions in code.
+- CDK apps are synthesized into CloudFormation templates.
+- CDK allows better reuse and modularity through constructs.
+
+---
+
+### 5. **What is `cdk init` used for?**
+**Answer:**  
+`cdk init` is used to bootstrap a new CDK project with the appropriate language template (e.g., `cdk init app --language=typescript`).
+
+---
+
+### 6. **What is the difference between `cdk synth` and `cdk deploy`?**
+**Answer:**
+- `cdk synth`: Converts your code into a CloudFormation template.
+- `cdk deploy`: Synthesizes and deploys the CloudFormation template to AWS.
+
+---
+
+### 7. **What is the `cdk.context.json` file?**
+**Answer:**  
+This file stores cached context values like availability zones or VPC lookups so that the CDK app doesn't make repeated API calls. It improves performance and consistency.
+
+---
+
+## 📦 **Constructs & Stacks**
+
+### 8. **What are the three levels of CDK Constructs?**
+**Answer:**
+- **L1 (CFN Resources)**: Direct CloudFormation resources (`CfnBucket`, etc.).
+- **L2 (AWS Constructs)**: Higher-level, opinionated constructs (`Bucket`, `Function`).
+- **L3 (Patterns)**: Combine multiple L2 constructs into reusable patterns.
+
+---
+
+### 9. **Can you use constructs from one stack in another?**
+**Answer:**  
+Yes, you can pass references between stacks using props or stack outputs. CDK handles the cross-stack references automatically via CloudFormation exports/imports.
+
+---
+
+### 10. **How do you share values across stacks?**
+**Answer:**  
+Pass values via constructor props or use the `ExportValue` and `Fn.importValue` methods. CDK automatically wires them using CloudFormation exports.
+
+---
+
+### 11. **What is a Nested Stack and when do you use it?**
+**Answer:**  
+A Nested Stack is a stack within a parent stack used to organize resources and avoid hitting resource limits 
+(e.g., 500 resources per stack). Use it when modularity and separation of concerns are needed.
+
+---
+
+## 🔧 **CDK in Action (Use Cases)**
+
+### 12. **How do you create an S3 bucket in CDK?**
+**TypeScript Example:**
+```ts
+import * as s3 from 'aws-cdk-lib/aws-s3';
+const bucket = new s3.Bucket(this, 'MyBucket', {
+  versioned: true,
+  removalPolicy: RemovalPolicy.DESTROY,
+});
+```
+
+---
+
+### 13. **How do you give a Lambda permission to read from an S3 bucket?**
+```ts
+bucket.grantRead(myLambda);
+```
+This automatically creates the necessary IAM policy.
+
+---
+
+### 14. **How do you manage environment-specific config?**
+Use environment variables, JSON config files, or context values:
+```ts
+const env = this.node.tryGetContext('env'); // "dev", "prod"
+```
+
+---
+
+## 🔁 **CDK + CloudFormation**
+
+### 15. **How does CDK interact with CloudFormation?**
+**Answer:**
+CDK generates (synthesizes) CloudFormation templates from your code. Then it uses the CloudFormation service to deploy those templates.
+
+---
+
+### 16. **What is an escape hatch?**
+**Answer:**
+An escape hatch lets you add raw CloudFormation properties when CDK doesn’t support a specific feature yet.
+```ts
+const cfnBucket = bucket.node.defaultChild as s3.CfnBucket;
+cfnBucket.addPropertyOverride('BucketEncryption', {...});
+```
+
+---
+
+## 🚨 **Security and IAM**
+
+### 17. **How do you define IAM policies in CDK?**
+```ts
+const role = new iam.Role(this, 'MyRole', {
+  assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
+});
+role.addToPolicy(new iam.PolicyStatement({
+  actions: ['s3:GetObject'],
+  resources: ['*'],
+}));
+```
+
+---
+
+### 18. **What’s the difference between `grantRead`, `grantWrite`, and `grant`?**
+- `grantRead`: Grants `s3:GetObject` permissions.
+- `grantWrite`: Grants `s3:PutObject`, etc.
+- `grant`: Customizable, lets you specify actions.
+
+---
+
+## 🧪 **Testing and Best Practices**
+
+### 19. **How do you test CDK code?**
+Use the **assertions library**:
+```ts
+import { Template } from 'aws-cdk-lib/assertions';
+const template = Template.fromStack(stack);
+template.hasResource('AWS::S3::Bucket', {});
+```
+
+---
+
+### 20. **What are some best practices for large CDK projects?**
+- Organize code by feature/module
+- Use L3 constructs for reusability
+- Store configs externally
+- Use environment variables/context
+
+---
+
+## ⚙️ **Advanced Concepts**
+
+### 21. **What is bootstrapping in CDK?**
+`cdk bootstrap` provisions resources needed for deploying CDK apps — like an S3 bucket for storing templates and assets (especially for Lambda, CodePipeline).
+
+---
+
+### 22. **How do you handle multiple environments (multi-account/region)?**
+Use `env` in stacks:
+```ts
+new MyStack(app, 'ProdStack', {
+  env: { account: '123456789012', region: 'us-east-1' }
+});
+```
+Use `cdk deploy --profile prod` to target specific accounts.
+
+---
+
+---
+
+Would you like to continue with **hands-on coding scenarios** or prep with **mock Q&A**? I can also tailor these to Python, TypeScript, or Java depending on your preferred language.
+
+Absolutely! Here are a **few more AWS CDK interview questions**, especially ones that show up in more advanced interviews or involve edge cases:
+
+---
+
+### 🔁 **23. What is `cdk diff` and how is it used?**  
+**Answer:**  
+`cdk diff` compares the deployed stack with your local code and shows what changes will be made if you run `cdk deploy`. It’s useful for:
+- Reviewing updates before deployment
+- Ensuring infrastructure changes are intentional
+- Detecting drift or unexpected changes
+
+---
+
+### 🧱 **24. What are CDK Aspects and how do you use them?**  
+**Answer:**  
+Aspects allow you to apply operations to all constructs in a scope. They're useful for cross-cutting concerns like:
+- Enforcing tagging policies
+- Applying security rules
+
+**Example (Tagging):**
+```ts
+import { Aspects, Tag } from 'aws-cdk-lib';
+
+Aspects.of(this).add(new Tag('Environment', 'dev'));
+```
+
+---
+
+### 🔄 **25. How does CDK handle idempotency?**  
+**Answer:**  
+CDK ensures idempotency by using CloudFormation under the hood. If your infrastructure code hasn’t changed, CDK won’t update resources on re-deploy.
+
+---
+
+### 🔐 **26. How do you manage secrets in CDK?**  
+**Answer:**
+Use AWS Secrets Manager or SSM Parameter Store:
+```ts
+import * as sm from 'aws-cdk-lib/aws-secretsmanager';
+
+const secret = sm.Secret.fromSecretNameV2(this, 'ImportedSecret', 'my-db-secret');
+```
+
+Use `secret.secretValue` when injecting into other resources like Lambda.
+
+---
+
+### 🌍 **27. Can you deploy resources across multiple AWS accounts and regions using CDK?**  
+**Answer:**  
+Yes. You define `env` per stack:
+```ts
+new MyStack(app, 'ProdStack', {
+  env: { account: '123456789012', region: 'us-west-2' }
+});
+```
+Then deploy using different AWS profiles or CI/CD pipelines for each account.
+
+---
+
+### 🧬 **28. What is jsii in the context of CDK?**  
+**Answer:**  
+jsii is the technology that powers language interoperability in CDK. It allows CDK libraries (written in TypeScript) to be used in Python, Java, C#, etc., by generating bindings.
+
+---
+
+### 🏗️ **29. How do you define a custom construct?**
+**Answer:**
+Create a new class extending `Construct`, then compose resources inside:
+
+```ts
+import { Construct } from 'constructs';
+
+export class MyCustomBucket extends Construct {
+  constructor(scope: Construct, id: string) {
+    super(scope, id);
+    new s3.Bucket(this, 'MyBucket');
+  }
+}
+```
+
+Use it like this:
+```ts
+new MyCustomBucket(this, 'ReusableBucket');
+```
+
+---
+
+### 🧯 **30. What happens if a CDK deployment fails?**
+**Answer:**
+Since CDK uses CloudFormation, a failed deployment will:
+- Roll back all resources created in that stack
+- Show errors in the CloudFormation console
+- Output logs to the terminal
+
+You can disable rollback using `cdk deploy --no-rollback` for debugging.
+
+---
+
+Want more examples of **CDK Pipelines**, **CI/CD integration**, or a **code walkthrough** next?

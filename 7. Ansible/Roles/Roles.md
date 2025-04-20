@@ -1,6 +1,6 @@
 Roles in Ansible
-In Ansible, a role is a way of organizing and reusing automation tasks into separate units of functionality. Roles allow you to group tasks, variables, files, templates, and handlers in a structured manner, making it easier to manage complex automation.
-
+In Ansible, a role is a way of organizing and reusing automation tasks into separate units of functionality. 
+Roles allow you to group tasks, variables, files, templates, and handlers in a structured manner, making it easier to manage complex automation.
 
 Using the Role in a Playbook::
 

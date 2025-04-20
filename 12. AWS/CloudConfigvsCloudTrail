@@ -79,3 +79,52 @@ Would you like:
 - A shell script or Terraform example for setting them up?
 
 Let me know!
+
+
+Awesome! Here's a simple **diagram** that shows how **AWS CloudTrail** and **AWS Config** work together to provide full visibility into **who did what** and **what changed** in your AWS environment.
+
+---
+
+### 🌐 CloudTrail vs AWS Config – Visual Workflow
+
+```plaintext
+                  ┌─────────────────────────────┐
+                  │     User / IAM Role / CLI    │
+                  └────────────┬────────────────┘
+                               │
+                               ▼
+                      Makes an API Call (e.g., modify EC2)
+                               │
+         ┌─────────────────────┴──────────────────────┐
+         │                                            │
+         ▼                                            ▼
+┌────────────────────────────┐             ┌──────────────────────────┐
+│      AWS CloudTrail        │             │        AWS Config        │
+│ - Logs API call            │             │ - Detects resource change│
+│ - Who, what, when, where   │             │ - Captures full config   │
+│ - Sends logs to S3/CloudWatch │          │   snapshot               │
+└────────────┬───────────────┘             └────────────┬─────────────┘
+             │                                            │
+             ▼                                            ▼
+     CloudWatch Logs / S3                        AWS Config Timeline
+     (for audit & forensics)                    (for compliance & history)
+
+                               ▼
+                    ┌────────────────────┐
+                    │ Security / DevOps  │
+                    │ - Audit API usage  │
+                    │ - Check compliance │
+                    └────────────────────┘
+```
+
+---
+
+### 🔑 Key Notes:
+
+- **CloudTrail** focuses on *actions* (e.g., "Alice terminated an EC2").
+- **AWS Config** focuses on *state* (e.g., "EC2 instance type changed from t2.micro to t3.medium").
+- Both are essential for security, compliance, and operational visibility.
+
+---
+
+Would you like this turned into an image or PNG you can keep for interview prep? Or do you want Terraform or CLI to set up both?

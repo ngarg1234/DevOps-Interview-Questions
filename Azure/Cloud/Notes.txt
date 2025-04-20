@@ -1,0 +1,412 @@
+Creation Subscriptions .. give a name and that will be attach to your credit card..
+
+Resource Group.. when you provision a resource it asks for a resource hgroup.. you can have many resource group.. may be adavnatage for segregation purpose...
+
+Azure CLI::
+
+first do azure login..
+
+it asks for your microsoft account creds.. 
+
+once loggged in, you can manage azure resources in your azure account using azure cli,....
+
+az group create -l northeurope -n test-resourcegroup
+
+az group list
+
+Here's a **side-by-side comparison table** of commonly used services in **AWS vs Azure** — organized by category:
+
+---
+
+### ☁️ **AWS vs Azure Services Comparison Table**
+
+Azure vs AWS: Resource Group & Subscription Mapping
+
++------------------+------------------------+-----------------------------------------------+------------------------------------------------------------------------------------------+
+| Level            | Azure Concept          | AWS Equivalent                                 | Description                                                                              |
++------------------+------------------------+-----------------------------------------------+------------------------------------------------------------------------------------------+
+| Top Level        | Management Group       | AWS Organizations / Organizational Unit (OU)  | Groups multiple subscriptions or accounts to apply policies and manage access at scale. |
+| Billing Unit     | Subscription           | AWS Account                                    | Billing boundary and isolation unit; owns resources, quotas, and access configs.        |
+| Resource Scope   | Resource Group         | No direct match. Closest: Tags / CFN Stack     | Logical container for related resources. AWS uses Tags or CloudFormation Stack.         |
+| Access Control   | RBAC (IAM Roles)       | IAM (Roles, Policies, Permissions)            | Role-based access and permission management on both platforms.                          |
++------------------+------------------------+-----------------------------------------------+------------------------------------------------------------------------------------------+
+
+Notes:
+- Azure Resource Group is required to deploy any resource.
+- AWS doesn’t have a mandatory grouping but uses Tags or CloudFormation stacks.
+- Azure Subscription ≈ AWS Account in billing/isolation terms.
+- Azure Management Group ≈ AWS Organizations (OU) for large-scale management.
+
+
+
+| **Category**                | **AWS Service**                      | **Azure Service**                         |
+|----------------------------|--------------------------------------|-------------------------------------------|
+| **Compute**                | EC2 (Elastic Compute Cloud)          | Azure Virtual Machines                    |
+|                            | Lambda                               | Azure Functions                           |
+|                            | Elastic Beanstalk                    | Azure App Service                         |
+|                            | App Runner                           | Azure Container Apps                      |
+|                            | ECS / Fargate                        | Azure Container Instances (ACI)           |
+|                            | EKS (Elastic Kubernetes Service)     | Azure Kubernetes Service (AKS)            |
+|                            | Auto Scaling                         | Virtual Machine Scale Sets                |
+|                            | Lightsail                            | Azure Dev/Test Labs                       |
+|                            | Outposts                             | Azure Stack                               |
+| **Storage**                | S3 (Simple Storage Service)          | Azure Blob Storage (Unstructured data)                       |
+|                            | EBS (Elastic Block Store)            | Azure Disk Storage                        |
+|                            | EFS (Elastic File System)            | Azure Files                                |
+|                            | Glacier                              | Azure Archive Storage                     |
+| **Database**               | RDS (Relational DB Service)          | Azure SQL Database                        |
+|                            | Aurora                               | Azure SQL Managed Instance                |
+|                            | DynamoDB                             | Azure Cosmos DB                           |
+|                            | Redshift                             | Azure Synapse Analytics                   |
+|                            | ElastiCache                          | Azure Cache for Redis                     |
+|                            | Neptune                              | Azure Cosmos DB (Graph API)               |
+| **Networking**             | VPC (Virtual Private Cloud)          | Azure Virtual Network                     |
+|                            | Route 53                             | Azure DNS                                 |
+|                            | Elastic Load Balancer (ELB)          | Azure Load Balancer / App Gateway         |
+|                            | API Gateway                          | Azure API Management                      |
+|                            | CloudFront                           | Azure Front Door / CDN                    |
+|                            | Direct Connect                       | ExpressRoute                              |
+|                            | Transit Gateway                      | Azure Virtual WAN                         |
+| **Monitoring & Logging**   | CloudWatch                           | Azure Monitor / Application Insights      |
+|                            | CloudTrail                           | Azure Activity Log                        |
+|                            | X-Ray                                | Azure Application Insights (Distributed Tracing) |
+| **Security & IAM**         | IAM (Identity & Access Management)   | Azure Active Directory (AAD)              |
+|                            | AWS KMS                              | Azure Key Vault                           |
+|                            | AWS WAF                              | Azure Web Application Firewall (WAF)      |
+|                            | AWS Shield                           | Azure DDoS Protection                     |
+|                            | Cognito                              | Azure B2C / B2B / AAD Identity Protection |
+| **DevOps & CI/CD**         | CodePipeline                         | Azure Pipelines                           |
+|                            | CodeBuild                            | Azure Pipelines (Build)                   |
+|                            | CodeDeploy                           | Azure Pipelines (Release)                 |
+|                            | CodeCommit                           | Azure Repos                               |
+|                            | CodeArtifact                         | Azure Artifacts                           |
+|                            | CloudFormation                       | ARM Templates / Bicep                     |
+|                            | Cloud Development Kit (CDK)          | Azure Bicep / Azure Developer CLI         |
+| **Analytics & AI**         | Athena                               | Azure Data Explorer                       |
+|                            | SageMaker                            | Azure Machine Learning                    |
+|                            | Rekognition                          | Azure Computer Vision                     |
+|                            | Comprehend                           | Azure Text Analytics                      |
+| **Messaging & Events**     | SNS (Simple Notification Service)    | Azure Notification Hubs / Event Grid      |
+|                            | SQS (Simple Queue Service)           | Azure Queue Storage / Service Bus         |
+|                            | EventBridge                          | Azure Event Grid / Event Hub              |
+| **Serverless Workflow**    | Step Functions                       | Azure Logic Apps / Durable Functions      |
+
+---
+
+Would you like this in PDF format or styled for a slide deck or resume?
+
+
+Azure Storage Account
+- Blob Storage (Unstructured data)
+- Disk Storage ( EBS AWS)
+
+
+Retrieval?
+
+types -->
+
+Hot - Need frequently....
+Cold - Not that frequent
+Cool - Not so frequent
+Archive - Not so frequent
+
+Azure Blob Storage vs AWS S3
+
++-------------------------+----------------------------+----------------------------+
+|       Feature           |      Azure Blob Storage    |          AWS S3            |
++-------------------------+----------------------------+----------------------------+
+| Service Type            | Object Storage             | Object Storage             |
+| Container Name          | Container                  | Bucket                     |
+| Object Name             | Blob                       | Object                     |
+| Folder Structure        | Virtual via blob names     | Virtual via key prefixes   |
+| Public Access Control   | SAS Token, RBAC, IAM       | Bucket Policy, IAM, ACLs   |
+| Versioning              | Supported                  | Supported                  |
+| Lifecycle Management    | Blob lifecycle policies    | S3 lifecycle rules         |
+| Static Website Hosting  | Yes (via blob container)   | Yes (via S3 bucket)        |
+| Triggering Events       | Event Grid, Azure Functions| S3 Events (Lambda, SQS)    |
+| Storage Tiers           | Hot, Cool, Archive         | Standard, IA, Glacier      |
+
+
+Azure Compute Services:
+
+Azure -- Netrwork Security Group - is like AWS Security Group.....
+
+Azure User Data allows u to update the script from outside the VM without stopping or rebooting the VM and can be queried via GET VM/VMSS API with $expand option......
+
+Health Probe is attached to Load balancer.. similar to Health checks in AWS Load Balancer.....
+
+Here, Load balancer creation (after), we need to create the frontend ip configuration too..Scale Sets(Auto Scaling) group needs to be atatched with Backend pools.....
+
+
+Ah, got it! You're talking about **"backend pools"** in the context of **Azure Load Balancer** or **Azure Application Gateway**, especially when targeting a **Virtual Machine Scale Set (VMSS)** — not DevOps agent pools. Thanks for the clarification!
+
+---
+
+### ✅ **Azure Backend Pool with VM Scale Set**
+
+In Azure, when you're using:
+- **Azure Load Balancer** or  
+- **Azure Application Gateway**,  
+
+you define a **backend pool**, which is a group of backend resources (like VMs or VM scale sets) that receive traffic.
+
+#### 🔹 For VMSS:
+- You associate your **VM Scale Set** with the **backend pool**.
+- This enables automatic load balancing across VMs in the scale set.
+- Azure can **auto-register** VM instances from the scale set to the backend pool (no manual intervention needed).
+
+Example flow:
+```
+User → Load Balancer → Backend Pool → VMSS Instances
+```
+
+---
+
+### 🟨 AWS Equivalent
+
+AWS uses a similar concept in **Elastic Load Balancing (ELB)**:
+
+#### ✅ **AWS Auto Scaling Group + Target Group + Load Balancer**
+
+1. **Auto Scaling Group (ASG)** — equivalent to Azure VMSS.
+2. **Target Group** — equivalent to Azure Backend Pool.
+3. **Application Load Balancer (ALB) or Network Load Balancer (NLB)** — equivalent to Azure Application Gateway / Load Balancer.
+
+#### 🔁 Integration:
+- You attach the **ASG** to a **Target Group**.
+- The **Target Group** is registered with an **ALB/NLB**.
+- As instances launch/terminate in the ASG, AWS automatically registers/deregisters them from the Target Group.
+
+Example flow:
+```
+User → ALB/NLB → Target Group → EC2 Instances in ASG
+```
+
+---
+
+### 🔄 Comparison Summary
+
+| Concept                     | Azure                             | AWS                                      |
+|-----------------------------|------------------------------------|------------------------------------------|
+| Compute Group               | VM Scale Set (VMSS)               | Auto Scaling Group (ASG)                 |
+| Load Balancer               | Azure Load Balancer / App Gateway | ALB / NLB                                |
+| Traffic Routing Group       | Backend Pool                      | Target Group                             |
+| Auto Registration           | Yes (with VMSS)                   | Yes (with ASG and Target Group)          |
+
+---
+
+Let me know if you're building this in CDK / ARM / Terraform and need code examples — I can help with that too!
+
+Great follow-up! Let’s break it down — you're asking **why Azure Load Balancer requires a "Frontend IP"** while in **AWS, this concept feels more abstracted or implicit** in the setup. Here's the answer:
+
+---
+
+### 🧩 **What is a Frontend IP in Azure Load Balancer?**
+
+In **Azure Load Balancer** (or Application Gateway), a **Frontend IP** is:
+
+- The **entry point** for network traffic — this is the public or private IP that clients connect to.
+- You **explicitly define** this IP configuration in the load balancer.
+- It can be:
+  - **Public** IP: accessible from the internet.
+  - **Private** IP: internal to your virtual network.
+
+You then map this frontend IP to a backend pool via **load balancing rules** or **inbound NAT rules**.
+
+✅ **Why required in Azure?**
+- Azure requires you to **explicitly define all layers**: frontend IP → backend pool → rules.
+- This gives you **fine-grained control**, which is great for custom setups (but more config-heavy).
+
+---
+
+### ☁️ **AWS Equivalent**
+
+In **AWS**, when you create an **Application Load Balancer (ALB)** or **Network Load Balancer (NLB)**:
+
+- AWS **automatically allocates IP addresses** for the ALB/NLB in each subnet (called **nodes**).
+- You don't have to explicitly configure a "frontend IP" — it's **abstracted**.
+- You **get a DNS name** (e.g., `my-load-balancer-1234567890.us-west-2.elb.amazonaws.com`), and AWS handles the IPs behind the scenes.
+
+So even though ALBs/NLBs *do* have frontend IPs, AWS manages this layer for you.
+
+---
+
+### 🆚 **Azure vs AWS: Frontend IP Configuration**
+
+| Feature                      | Azure Load Balancer                     | AWS ALB/NLB                             |
+|------------------------------|------------------------------------------|------------------------------------------|
+| Frontend IP required?        | ✅ Yes (explicitly defined)              | ❌ No (handled by AWS internally)         |
+| IP type options              | Public or Private                        | Automatically public or private based on subnet |
+| Exposure to end users        | User-defined (IP shown to users)        | Users access via AWS-provided DNS name   |
+| Config flexibility           | High (you manage all layers)            | Simplified (less manual control)         |
+| Setup complexity             | More manual                             | More automated                           |
+
+---
+
+### 🎯 Why Azure does it this way?
+
+Azure gives **more granular control**, often catering to hybrid network scenarios (e.g., internal load balancer in VNet peering, custom IP ranges, etc.). So the **frontend IP becomes a necessary binding** to determine how traffic reaches the load balancer.
+
+---
+
+Want an example of setting this up in Azure or AWS with Terraform, CDK, or CLI? I can walk you through one too!
+
+
+Azure DevOps--
+
+Self Hosted Agent/Private... managed by us..
+
+Microsoft-hosted agents	 -- Pre-configured and maintained by Microsoft. You just choose the image (like windows-latest, ubuntu-latest, etc.). 
+                            They are ephemeral—a new VM is spun up each time.
+Self-hosted agents	     -- Installed and maintained by you on your own infrastructure (VMs, on-prem, EC2, etc.). 
+                            Useful for long-running processes, custom dependencies, or private networks.
+
+When you are using public proect, it can excute unlimited jobs parallelly for self hosted agents.
+However, for private, it is single agent.....
+
+
+Pipeline varibles and variable groups --> it can reused across multiple pipelines......
+
+PreDefined Variables:
+========================================================================================================================
+Variable                                  | | Description                                                            | |
+-----------------------------------------------------------------------------------------------------------------------
+Build.BuildId                             | | The ID of the record for the completed build.                          | | 
+Build.BuildNumber                         | | The build number (can be customized).                                  | |
+Build.SourceBranch                        | | The branch of the triggering repo (e.g., refs/heads/main).             | |
+Build.SourceBranchName                    | | Just the branch name (e.g., main).                                     | |
+Build.Repository.Name                     | | The name of the repo triggering the pipeline.                          | |
+System.Debug                              | | If true, enables debug logging.                                        | |
+System.JobId                              | | The ID of the current job.                                             | |
+Agent.OS                                  | | OS of the agent (Windows_NT, Linux, etc.).                             | |
+Agent.Name                                | | Name of the agent running the job.                                     | |
+Build.ArtifactStagingDirectory            | | Local path to where artifacts are staged.                              | |
+Pipeline.Workspace                        | | A common directory where artifacts, source, and other files are stored.| |
+System.AccessToken                        | | A token to access the REST API. Useful for scripting.                  | |
+========================================================================================================================
+
+Service Connection::
+
+You can create a service connection from Azure Pipelines to external and remote services for executing tasks in a Job.Ex. to Azure Subscription for deploying doe to AZure VM,
+GitHub Rrpository like that....
+
+
+An **Azure App Service** is a **fully managed platform** for building, deploying, and scaling web apps, REST APIs, and mobile backends.
+
+Think of it as **“Web Hosting as a Service”** — you just push your code and Azure handles the infrastructure, security, scaling, and patching for you.
+
+---
+
+### 🔹 Key Features of Azure App Service
+
+| Feature | Description |
+|---------|-------------|
+| **Multiple language support** | Supports .NET, .NET Core, Java, Node.js, PHP, Python, Ruby, and custom containers. |
+| **Automatic scaling** | Scales up (CPU/memory) or out (more instances) based on demand. |
+| **Continuous Deployment** | CI/CD support from Azure DevOps, GitHub, Bitbucket, etc. |
+| **Custom domains & SSL** | Add your own domain and secure it with HTTPS easily. |
+| **Authentication & Authorization** | Built-in integration with Microsoft Identity, Google, Facebook, etc. |
+| **Staging slots** | Test new versions in staging before swapping to production. |
+| **Integrated monitoring** | Built-in logging, metrics, and integration with Azure Monitor and App Insights. |
+
+---
+
+### 🔹 Types of Apps You Can Host
+
+- Web apps (e.g., ASP.NET, React, Flask, etc.)
+- REST APIs
+- Backend for mobile apps
+- Containerized apps (via App Service for Containers)
+
+---
+
+### 🔹 App Service Plan
+
+When you create an App Service, it runs in an **App Service Plan**, which defines:
+
+- **Region/Location** (e.g., East US)
+- **VM size and capacity** (CPU, RAM, etc.)
+- **Pricing tier** (Free, Shared, Basic, Standard, Premium)
+
+> 💡 Multiple apps can share a single App Service Plan.
+
+---
+
+### 🔹 Basic Architecture
+
+```text
+You (Code) → GitHub / Azure DevOps → Azure App Service
+                                  ↘️
+                            Built, Hosted, and Scaled by Azure
+```
+
+---
+
+### 🔹 Common Use Case
+
+Let’s say you have a web app built in Node.js:
+
+1. Create an App Service (select Node.js as runtime).
+2. Push your code via GitHub.
+3. Azure builds it and hosts it.
+4. Your app is live at `https://yourappname.azurewebsites.net`.
+
+---
+
+### 🔹 Example: Deploy a Flask App
+
+```bash
+az webapp up --name myflaskapp --runtime "PYTHON|3.9" --location "eastus"
+```
+
+This command:
+- Creates an App Service
+- Creates an App Service Plan
+- Deploys your local code to it
+
+---
+
+Let me know if you want help deploying a specific app (e.g., .NET, Node.js, Docker) or integrating it with CI/CD!
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------
+Release Pipeline Concepts here below::::::
+
+Pre Deployment Approval....
+
+PostDeployment Approval....
+
+You can have Gates too .. like SonarQube Quality checks.. execute some work item.. or it can be any any thing thing..................
+
+Query work items - If work item is not closed or still in "WIP" stage, dont go ahead with Deployment/Release....
+
+The there is an option where we can tell it to deploy the last succeesfully deployed version (lets say in production), if current release failed.. 
+
+there will make sure we have working version.. Concept name is "Auto-redeploytrigger"
+
+Use Library/Variable Group in Pipelines....
+
+A Task group allows you to group/encapsulate sequence of tasks..
+
+ARM Template contains the following sections:
+
+Parameters: Provides values during deployment that allow the same template to be used with different environments..
+
+Variables: Define values that can be reused in your templates.
+
+User defined functions: Custom function.
+
+Resources: resource we required for our use case.
+
+Outputs: provides output from our resources.
+
+In Azure DevOps Pipelines, We have ARM tenplate Deployment Task already defined by Azure.....
+
+A Deployment Group, is a logical set of deployment target machine that have agents installed on each one.. like dev, prod , qa and testing etc....
+
+then add Deolyment, and then you can deploy it.....
+
+In Azure DevOps, there is a concept of Key Vault to store secrets and generate keys..... and then in varibale it allows you to pull the secrets from Key vaults directly.....
+just we need to set up the service connection for connection with azure key vault in Azure DevOps.....
+In ARm templates, we can refer the Key vault instead of direct password hardcoding in the codebase....

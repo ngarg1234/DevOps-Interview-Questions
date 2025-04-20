@@ -3,7 +3,8 @@
 Q. How you setup ansible machine?
 1. Install Ansible: Install Ansible on the machine that will be used to run Ansible commands and playbooks. 
 $$ sudo apt update && sudo apt install ansible -y
-2. Configure Ansible inventory: Create an Ansible inventory file that specifies the target machines that Ansible will manage. The inventory file can be in the form of a simple text file or an INI-style file.
+2. Configure Ansible inventory: Create an Ansible inventory file that specifies the target machines that Ansible will manage. 
+The inventory file can be in the form of a simple text file or an INI-style file.
 3. Create an Ansible playbook: Create an Ansible playbook in YAML format that defines the tasks and actions that Ansible will perform on the target machines.
 4. Configure Ansible credentials: Configure Ansible to use the appropriate credentials to access the target machines. This can include SSH keys, user names, and passwords.
 5. Run Ansible commands: Use Ansible commands and playbooks to manage the target machines. 

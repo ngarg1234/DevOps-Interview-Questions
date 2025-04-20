@@ -1,5 +1,6 @@
 1. Using a separate file for user data
-You can store your user data script in a separate file, such as user_data.sh, and then reference it in your Terraform script. This approach keeps the user data more maintainable and allows you to reuse the script across multiple instances.
+You can store your user data script in a separate file, such as user_data.sh, and then reference it in your Terraform script. 
+This approach keeps the user data more maintainable and allows you to reuse the script across multiple instances.
 
 terraform-project/
 ├── main.tf               # Main Terraform configuration file

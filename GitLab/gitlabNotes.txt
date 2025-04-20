@@ -1,0 +1,84 @@
+It is a Open Source Platform//
+
+developed gitlab Duo for AI..
+
+In Azure devops, it is organisations and in it, we have projects..
+
+in Git Lab, Group and projects the same way.....
+
+Create a file .gitlab-ci.yml and you can apply the template....
+
+Similar to Jenkins, Pipeline .. Stages .. Jobs (steps in jenkins)....
+
+.gitlab-ci.yml
+
+Here we have runner like agent in Jenkins.....
+
+stages:
+    - build
+    - test
+    - push
+    - deploy
+
+variables:
+    DEPLOY_ENV: "production"
+    GITLAB_USER_KEY: "this-is-my-secret-key"
+
+build_job:
+    stage: build
+    script:
+        - echo "This $CI_PROJECT_NAME build is done using command <docker build -t tag .>"
+    tags:
+        - dev
+
+test_job:
+    stage: test
+    script:
+        - echo "This is testing of out docker build done by $CI_COMMIT_AUTHOR"
+        - mkdir -p logs
+        - echo "these are my test results" > logs/app.log
+        
+    artifacts:
+        paths:
+            - logs/
+        expire_in: 1 week
+    tags:
+        - dev
+
+
+push_job:
+    stage: push
+    script:
+        - echo "this"
+        - echo "is pushing to docker hub for $DEPLOY_ENV"
+    tags:
+        - dev
+
+deploy_job:
+    stage: deploy
+    script:
+        - echo "this"
+        - echo "is deploying to EC2 instance for $DOCKERHUB_USER"
+        - echo "this log is from $CI_JOB_STAGE" >> logs/app.log
+    artifacts:
+        paths:
+            - logs/
+        expire_in: 1 week
+    tags:
+        - dev
+
+
+dev_test_job:
+    stage: test
+    script:
+        - echo "tested for dev using $GITLAB_USER_KEY"
+    tags:
+        - dev
+
+
+prd_test_job:
+    stage: test
+    script:
+        - echo "tested for prd $GITLAB_USER_KEY"
+    tags:
+        - dev

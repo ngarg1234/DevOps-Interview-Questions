@@ -2492,15 +2492,20 @@ Q. how do you delete deployment?
 1. Argo Rollouts
 2. Flagger
 3. Service Mesh (e.g., Istio)
+https://www.youtube.com/watch?v=eSNetKBe7Z8
+https://www.youtube.com/redirect?event=video_description&redir_token=QUFFLUhqa3U2UTZveENPbkNrYm5lbHlFQnF6VUhSM01sd3xBQ3Jtc0tuUEZXMVdCNGVvbEpDU2hBUVo3Q2RWYUtsNzBxZVN0Y2JqZlNyMzkybjZWR1d4ZFZ2QzVxTVpTRWdiSUVCWUZHb0V0MjBEYnRCbTN0WUZ3am1PSkw5ck1pRWJjYTVmNWlkZTRIV1lLdEF1dUxkSXhaZw&q=https%3A%2F%2Ffluttering-comet-85b.notion.site%2FService-Mesh-Explained-with-a-Project-1aba554f368c803eb8b7ca3be6908b65%3Fpvs%3D4&v=RIAe1EazB5M
+https://www.youtube.com/watch?v=RIAe1EazB5M&t=45s
 
 ✅ Istio/Service Mesh: (managing microservices)
 -----------------------------------------------
-💡 Istio is an open-source service mesh that provides a dedicated infrastructure layer for managing service-to-service communication within a Kubernetes cluster (or across multiple clusters).
+💡 Istio is an open-source service mesh that provides a dedicated infrastructure layer
+for managing service-to-service communication within a Kubernetes cluster (or across multiple clusters).
 -> It provides a set of features for managing and securing microservices applications. 
 -> It is built on top of the Kubernetes platform and is designed to work seamlessly with it.
 
 ✅ Key Responsibilities of Istio:
-1. Traffic Management — Fine-grained control of traffic routing (e.g., canary deployments, blue-green, A/B testing), Routing rules (path, headers, version-based), Retries, timeouts, fault injection, Load balancing, mirroring (traffic shadowing).
+1. Traffic Management — Fine-grained control of traffic routing (e.g., canary deployments, blue-green, A/B testing), Routing rules (path, headers, version-based),
+Retries, timeouts, fault injection, Load balancing, mirroring (traffic shadowing).
 2. Observability — Telemetry, tracing, and monitoring of service communication.
 -- Metrics via Prometheus, dashboards in Grafana
 -- Distributed tracing via Jaeger or Zipkin, Access logs.
