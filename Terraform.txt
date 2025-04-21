@@ -52,7 +52,7 @@ During Terraform init, if version argument is not specified, the most recent pro
 For Production use, you should constrain the acceptable provider versions via configurations, 
 to ensure that new versions with breaking chnages will not be automatically installed.
 
-When you create contsraints, it creates terraform lock file..then tf looks at this lock file for constraints..
+When you create constraints, it creates terraform lock file..then tf looks at this lock file for constraints..
 
 you need to delte this file, if contstarinst you wnat to chnage, otherise it will keep looking at this lock file....
 ------------------------------------------------------------------------------------------------------------------------------
@@ -257,7 +257,7 @@ This is a perfect scenario for `for_each` as it allows you to handle unique argu
 
 Terraform Provisioners:
 
-Proviosners are used to execute script son local and remote machine as part of rresioruce craetion/destrcution preocess...
+Proviosners are used to execute script on local and remote machine as part of rresioruce craetion/destrcution preocess...
 
 types : local exec or remote exec
 

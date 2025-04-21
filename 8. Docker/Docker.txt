@@ -138,7 +138,8 @@ $$ docker system df: Disk usage summary
 $$ docker system df -v: Disk usage summary all container, all images, including cache etc
 $$ docker stats: Monitor container resource usage, real-time statistics for running containers, including CPU usage, memory usage, network I/O, and disk I/O
 $$ docker inspect <container_id_or_name>: detailed information about containers, images, volumes, and networks. You can use it to review security settings for a container (e.g., capabilities, mount points, network settings). provides detailed information on constructs controlled by Docker, render results in a JSON array
-$$ docker scan <image_name>:  is used to scan Docker images for known vulnerabilities, It integrates with Snyk, a tool that helps to identify and fix security vulnerabilities in your images.
+$$ docker scan <image_name>:  is used to scan Docker images for known vulnerabilities,
+It integrates with Snyk, a tool that helps to identify and fix security vulnerabilities in your images.
 $$ docker exec -it <container_id_or_name> <command>
 $$ docker info: provides general information about the Docker daemon and its configuration, including security-related settings such as: Cgroup driver, Security options (AppArmor, SELinux, etc.), User namespaces, Docker daemon and client version
 $$ docker info --security: This shows security configurations related to the Docker daemon, which is useful for auditing and ensuring that best practices are followed for container security.
@@ -211,15 +212,16 @@ Q. docker layer
 -> the fundamental building blocks for creating, deploying, and scaling systems.
 -> Docker stores all caches in /var/lib/docker/<driver> , where <driver> is the storage driver overlay2 again
 
-
 ---------------------------------------------------------------------------
 Q. How To Leverage Docker Cache for Optimizing Build Speeds?
 -> Leveraging Docker cache can significantly speed up your builds by reusing layers from previous builds.
 
 ** How the Docker Build Cache Works
--> Docker images are built in layers, where each instruction in the Dockerfile creates a new layer. For example, instructions like FROM, RUN, COPY, and ADD each create a new layer in the resulting image.
+-> Docker images are built in layers, where each instruction in the Dockerfile creates a new layer.
+   For example, instructions like FROM, RUN, COPY, and ADD each create a new layer in the resulting image.
 -> Docker uses a "content-addressable storage mechanism" to manage image layers. 
--> Each layer is identified by a unique hash that Docker calculates based on the contents of the layer. Docker compares these hashes to determine if it can reuse a layer from the cache.
+-> Each layer is identified by a unique hash that Docker calculates based on the contents of the layer. Docker compares these hashes to determine
+   if it can reuse a layer from the cache.
 
 -> When Docker builds an image, it goes through each instruction in the Dockerfile and performs a cache lookup to see if it can reuse a previously built layer.
 
@@ -232,12 +234,16 @@ Note: Changes to Dockerfile application code etc. invalidate the cache. All subs
 
 ** To sum up, here’s what you need to know about docker build cache:
 -> Docker builds images layer by layer. If a layer hasn’t changed, Docker can reuse the cached version of that layer.
--> If a layer changes, all subsequent layers are rebuilt. Therefore, putting instructions that do not change often (such as the base image, dependency installations, initialization scripts) much earlier in the Dockerfile can help maximize cache hits.
+-> If a layer changes, all subsequent layers are rebuilt. 
+   Therefore, putting instructions that do not change often (such as the base image, dependency installations, 
+   initialization scripts) much earlier in the Dockerfile can help maximize cache hits.
 
 ** Best Practices to Leverage Docker’s Build Cache
 -> To take advantage of the Docker build cache, you can structure your Dockerfile in a way that maximizes cache hits. Here are some tips:
-1. Order instructions by frequency of change: Place instructions that change less frequently higher up in the Dockerfile. And place frequently changing instructions, such as COPY or ADD of application code towards the end of the Dockerfile.
-2. Separate dependencies from application code: Separate instructions that install dependencies from those that copy the source code. This way, dependencies are only reinstalled if they change.
+1. Order instructions by frequency of change: Place instructions that change less frequently higher up in the Dockerfile. And place frequently changing instructions,
+   such as COPY or ADD of application code towards the end of the Dockerfile.
+2. Separate dependencies from application code: Separate instructions that install dependencies from those that copy the source code. This way,
+   dependencies are only reinstalled if they change.
 
 -----------------------------------------------------------------------------------------
 ** Dangling images and how to delete them.
@@ -272,7 +278,11 @@ $$ docker image prune :Remove all dangling images.
 Why Docker
 ----------
 Suppose there are four developers in a team working on a single project.
-Meanwhile, one is having a Windows system, the second is owning a Linux system, and the third & fourth ones are working with macOS. Now, as you see, they are using the distinct environments for creating a single application or software they will be required to carry on the things in accordance with their respective machines such as the installation of different libraries & files for their system, etc. And such situations, especially on an organizational or larger level, often cause numerous conflicts and problems throughout the entire software development life cycle. However, the containerization tools such as Docker eliminates this problem.
+Meanwhile, one is having a Windows system, the second is owning a Linux system, and the third & fourth ones are working with macOS.
+Now, as you see, they are using the distinct environments for creating a single application or software they will be required to carry
+on the things in accordance with their respective machines such as the installation of different libraries & files for their system, etc.
+And such situations, especially on an organizational or larger level, often cause numerous conflicts and problems throughout the entire software development life cycle.
+However, the containerization tools such as Docker eliminates this problem.
 
 -------------------------------------------------------------------------------------
 ** Tomcat: Tomcat is widely used by web developers when working on web application development. 
@@ -299,7 +309,8 @@ Docker (Docker --Version: 20.10.12):
 
 -------------------------------------------------------------------------------------
 Containerization and virtualization:
--> Virtualization aims to run multiple OS instances on a single server, whereas containerization runs a single OS instance, with multiple user spaces to isolate processes from one another.
+-> Virtualization aims to run multiple OS instances on a single server,
+ whereas containerization runs a single OS instance, with multiple user spaces to isolate processes from one another.
 -> This means containerization makes sense for one AWS cloud user that plans to run multiple processes simultaneously.
 
 ---------------------------------------------------------------------------------------
@@ -720,7 +731,8 @@ Ex: RUN apt-get update && apt-get install -y curl
 -> (e.g., node:alpine, python:alpine), or Node.js, prefer node:alpine over node to save space
 
 ➡️ USe ENTRYPOINT and CMD Correctly:
--> ENTRYPOINT should define the main process, and CMD should define default arguments to that process. This allows flexibility while ensuring the container runs the intended process.
+-> ENTRYPOINT should define the main process, and CMD should define default arguments to that process.
+This allows flexibility while ensuring the container runs the intended process.
 # Using CMD and ENTRYPOINT together
 ENTRYPOINT ["npm", "run"]
 CMD ["start"]
@@ -961,6 +973,7 @@ bash
 Copy
 docker network connect <network_name> <container_id>
 docker network disconnect <network_name> <container_id>
+
 2. Host Network:
 Removes network isolation between the container and the host machine. Containers use the host's IP address and network interface.
 
@@ -1025,7 +1038,7 @@ Supports encryption and encapsulation for secure data transfer.
 Can be used with Docker Compose in multi-host configurations.
 
 Summary of Network Types:
-Network Type |	 Description	                                |  Use Case
+Network Type |	 Description	                             |  Use Case
 Bridge	    |  Default, private network for containers.	  |  When containers need to communicate on the same Docker host.
 Host	       |  Containers use the host’s network.	        |  When containers need direct access to the host network.
 None	       |  No network access, only loopback.	        |  For full isolation or tasks requiring no network access.
@@ -1059,7 +1072,8 @@ docker service create --name my_service --replicas 2 --network my_overlay_networ
 
 
 ## PUBLISH: 
--> When you run a Docker container, you need to make the container's internal ports accessible to the outside world. This is done using the -p (or --publish) flag with the docker run command, which binds a port on the host to a port on the container.
+-> When you run a Docker container, you need to make the container's internal ports accessible to the outside world.
+ This is done using the -p (or --publish) flag with the docker run command, which binds a port on the host to a port on the container.
 -> allow containers to talk to each other and  to the outside world 
 	$$ PUBLISH = EXPOSE + PUBLISH 
 -> the service inside the container is accessible from anywhere 

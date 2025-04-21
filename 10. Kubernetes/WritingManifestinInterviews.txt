@@ -39,7 +39,7 @@ spec:
 
 ---
 
-### 2. **Deployment**
+### 2. **Deployment**  A - K -M - S R S M A T MLA
 ```yaml
 apiVersion: apps/v1
 kind: Deployment

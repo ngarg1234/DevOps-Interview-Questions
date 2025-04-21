@@ -31,6 +31,12 @@ EXPOSE 80
 # Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
 
+#🔍 Breakdown:
+# nginx: the command to start the Nginx server.
+
+# -g: passes a global configuration directive.
+
+# "daemon off;": tells Nginx not to run in the background (as a daemon) — instead, it runs in the foreground, which is required in Docker so the container stays alive.
 
 # 🔑 Explanation of Each Stage:
 #     1️⃣ Stage 1 (Builder Stage)

@@ -33,10 +33,11 @@ but where as in monolithic its more of a single language.
    of services as per traffic.
 -> Ex for microservice: Kubernetes.
 
-		Monolithic				                            	Microservices
-modules, together deployed with tight coupling		deploy k8s, modules will be individually 
-through ansible,                                  automation Jenkins			 
-downtime high						                          no downtime, i.e, downtime other application is not possible
+	 Monolithic				                            	 | Microservices
+  ------------------------------------------------------------------------------------------------------------------
+    modules, together deployed with tight coupling |	deploy k8s, modules will be individually                         
+    through ansible,                               |   automation Jenkins			 
+    downtime high						                       |   no downtime, i.e, downtime other application is not possible
 
 -> Container orchestration is the automation of much of the operational effort required to run containerized workloads and services.
    This includes a wide range of things software teams need to manage a container's lifecycle, including provisioning, deployment, scaling (up and down),
@@ -95,7 +96,8 @@ Kubernetes Overview: {K8S-Container orchestration tool}
 
 Kubernetes Features:
 --------------------
-1. Self-healing: Restarts containers that fail, replaces and reschedules containers when nodes die, kills containers that don't respond to your user-     defined health check, and doesn't advertise them to clients until they are ready to serve. (Probe)
+1. Self-healing: Restarts containers that fail, replaces and reschedules containers when nodes die, kills containers that don't respond to your user-  
+   defined health check, and doesn't advertise them to clients until they are ready to serve. (Probe)
 
 2. Automated rollouts and rollbacks: Kubernetes progressively rolls out changes to your application or its configuration,
  while monitoring application health to ensure it doesn't kill all your instances at the same time. 
@@ -442,10 +444,13 @@ Pod patterns / Container types:
 -------------------------------
 
 -> In a multi-container pod, each container is expected to run a process that stays alive as long as the POD's lifecycle.
--> For example in the multi-container pod that we talked about earlier that has a web application and logging agent, both the containers are expected to stay alive at all times.
+-> For example in the multi-container pod that we talked about earlier that has a web application and logging agent, 
+both the containers are expected to stay alive at all times.
 -> The process running in the log agent container is expected to stay alive as long as the web application is running. If any of them fail, the POD restarts.
--> But at times you may want to run a process that runs to completion in a container. For example, a process that pulls a code or binary from a repository that will be used by the main web application.
--> That is a task that will be run only one time when the pod is first created. Or a process that waits for an external service or database to be up before the actual application starts.
+-> But at times you may want to run a process that runs to completion in a container. 
+For example, a process that pulls a code or binary from a repository that will be used by the main web application.
+-> That is a task that will be run only one time when the pod is first created. 
+Or a process that waits for an external service or database to be up before the actual application starts.
 
 1. INIT CONTAINER:
 ------------------
@@ -455,7 +460,8 @@ Pod patterns / Container types:
 -> Each init container must complete successfully before the next one starts.
 
 ** When to use this pattern ?
--> when our main container needs some prerequisites such as installing some supportive software, database setup, seeding the DB, permissions on the file system before starting.
+-> when our main container needs some prerequisites such as installing some supportive software,
+database setup, seeding the DB, permissions on the file system before starting.
 -> we can use this pattern to delay the start of the main conateiner.
 
 apiVersion: v1
@@ -2356,13 +2362,14 @@ No internal routing or load balancing	It only helps your pod resolve a name, not
 Direct connection from Pod to external service	After DNS resolves, the pod directly connects to the external endpoint.
 
 
-==========================================================================================
+========================================================================================== Read this also Naman bro======================================
 Kubernetes Deployment strategies
 --------------------------------
 
 Rollout and Versioning:
 -----------------------
--> A rollout is the process of gradually deploying or upgrading your application containers. When you first create a deployment, it triggers a "rollout". A new rollout creates a new Deployment "revision". 
+-> A rollout is the process of gradually deploying or upgrading your application containers.
+ When you first create a deployment, it triggers a "rollout". A new rollout creates a new Deployment "revision". 
 
 $$ kubectl rollout status deployment/myapp-deployment
 $$ kubectl rollout history deployment/myapp-deployment
@@ -3290,7 +3297,8 @@ Liveness Probe: (Health of application, if a container is still running and resp
 -> A Liviness Probe in Kubernetes checks if a container is still running and responsive. If the liveness probe fails, Kubernetes automatically restarts the container.
 -> The livenessProbe is used to determine the health of the applicaiton running inside the pod.
 -> If livenessProbe fails the container will be restarted.
--> Ex: Due to some reason like memory leaks in applicaiton or due to high CPU/RAM usage the applicaiton is not responding to our requests, Then in this situation livenessProbe will fail and it will restart the pod.
+-> Ex: Due to some reason like memory leaks in applicaiton or due to high CPU/RAM usage the applicaiton is not responding to our requests,
+   Then in this situation livenessProbe will fail and it will restart the pod.
 -> we can define livenessProbe with 3 endpoints 
 	
 		livenessProbe:
