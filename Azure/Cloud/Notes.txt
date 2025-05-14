@@ -1,5 +1,56 @@
 Creation Subscriptions .. give a name and that will be attach to your credit card..
 
+
+An Availability Set in Azure is a high availability feature designed to ensure that your virtual machines (VMs) are distributed across multiple isolated hardware nodes within a datacenter. This protects your application from hardware failures and maintenance events that could bring down multiple VMs if they were all on the same host.
+
+Key Concepts:
+Fault Domain (FD):
+
+Represents a group of VMs that share a common power source and network switch.
+
+VMs in different fault domains are isolated from single points of failure.
+
+Azure typically supports 2 or 3 FDs.
+
+Update Domain (UD):
+
+Represents a group of VMs that can be rebooted at the same time during planned maintenance.
+
+VMs in different update domains are rebooted one UD at a time.
+
+Azure supports up to 20 UDs.
+
+Use Case:
+
+Ideal for workloads requiring high availability within a single region/datacenter.
+
+Commonly used for multi-tier applications, ensuring web and database VMs are not on the same host.
+
+VM Behavior:
+
+Azure distributes VMs in an availability set across different FDs and UDs.
+
+This ensures that at least one instance is available during a host or maintenance failure.
+
+Not Cross-Region or Zone:
+
+Availability Sets do not provide zone-level redundancy or cross-region disaster recovery.
+
+For higher SLAs, use Availability Zones or Azure Site Recovery.
+
+SLA:
+With at least 2 VMs in an availability set, Azure provides a 99.95% SLA for VM uptime.
+
+Example (Azure CLI):
+bash
+Copy
+Edit
+az vm availability-set create \
+  --name MyAvailabilitySet \
+  --resource-group MyResourceGroup \
+  --platform-fault-domain-count 2 \
+  --platform-update-domain-count 5
+
 Resource Group.. when you provision a resource it asks for a resource hgroup.. you can have many resource group.. may be adavnatage for segregation purpose...
 
 Azure CLI::
@@ -138,7 +189,8 @@ Health Probe is attached to Load balancer.. similar to Health checks in AWS Load
 Here, Load balancer creation (after), we need to create the frontend ip configuration too..Scale Sets(Auto Scaling) group needs to be atatched with Backend pools.....
 
 
-Ah, got it! You're talking about **"backend pools"** in the context of **Azure Load Balancer** or **Azure Application Gateway**, especially when targeting a **Virtual Machine Scale Set (VMSS)** — not DevOps agent pools. Thanks for the clarification!
+Ah, got it! You're talking about **"backend pools"** in the context of **Azure Load Balancer** or **Azure Application Gateway**,
+, especially when targeting a **Virtual Machine Scale Set (VMSS)** — not DevOps agent pools. Thanks for the clarification!
 
 ---
 
@@ -261,7 +313,7 @@ Microsoft-hosted agents	 -- Pre-configured and maintained by Microsoft. You just
 Self-hosted agents	     -- Installed and maintained by you on your own infrastructure (VMs, on-prem, EC2, etc.). 
                             Useful for long-running processes, custom dependencies, or private networks.
 
-When you are using public proect, it can excute unlimited jobs parallelly for self hosted agents.
+When you are using public project, it can excute unlimited jobs parallelly for self hosted agents.
 However, for private, it is single agent.....
 
 
@@ -379,7 +431,7 @@ PostDeployment Approval....
 
 You can have Gates too .. like SonarQube Quality checks.. execute some work item.. or it can be any any thing thing..................
 
-Query work items - If work item is not closed or still in "WIP" stage, dont go ahead with Deployment/Release....
+Query work items - If work item is not closed or still in "WIP" stage, please please ,, ,, dont go ahead with Deployment/Release....
 
 The there is an option where we can tell it to deploy the last succeesfully deployed version (lets say in production), if current release failed.. 
 

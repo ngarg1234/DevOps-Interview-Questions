@@ -470,19 +470,19 @@ else
         echo "file does not exist"
 fi
 __________________________________________________________________________________________________
-2.Write a shell script to retain recent 30 files in a perticular directory and delete other files. 
+2.Write a shell script to retain files recent 7 days and delete other files. 
 -------------------------------------
 #!/bin/bash
-total=`ls -l | wc -l`
-remaining=`expr $total - 30`  
 
-if [ $remaining -gt 0 ]; then
-        ls -rt | head -$remaining | xargs rm -rf
-        echo "Recent 30 files are retained and others files are deleted"
-else
-        echo "there are no more than 30 files"
-fi
+TARGET_DIR="/path/to/your/directory"
+
+# Delete files older than 7 days
+find "$TARGET_DIR" -type f -mtime +7 -exec rm -f {} \;
+
+echo "Deleted files older than 7 days."
 ---------------------------------------------
+
+
 
 ** CRONTAB: The crontab is a list of commands that you want to run on a regular schedule, 
 and also the name of the command used to manage that list.
@@ -625,8 +625,51 @@ DATE=$(date +%Y-%m-%d)
 # Create a tar archive of only modified files
 find "$BACKUP_FROM" -type f -mtime -1 -print | tar -cvf demo-$DATE.tar -T -
 
+
 # Upload the tar file to S3
 aws s3 cp demo-$DATE.tar "$BACKUP_TO/demo-$DATE.tar"
+
+
+
+In your command:
+
+```bash
+find "$BACKUP_FROM" -type f -mtime -1 -print | tar -cvf demo-$DATE.tar -T -
+```
+
+### Explanation of `-print`:
+
+The `-print` action in `find` **outputs the path of each file that matches the criteria** — in this case:
+
+* `"$BACKUP_FROM"`: directory to search.
+* `-type f`: look for files.
+* `-mtime -1`: files modified in the **last 1 day** (i.e., in the past 24 hours).
+* `-print`: outputs each matching file path, one per line, to **standard output**.
+
+This output is then **piped** (`|`) to `tar` using `-T -`, which tells `tar` to **read the list of files from stdin**.
+
+### Why `-print` is needed:
+
+* Without `-print`, `find` may not output anything to the pipe, especially in older versions of `find` (though in modern GNU `find`, `-print` is implicit if no other output action is given).
+* Using `-print` ensures compatibility and clarity — explicitly telling `find` to output the paths.
+
+### Example simplified:
+
+```bash
+find . -type f -mtime -1 -print
+```
+
+Prints:
+
+```
+./file1.txt
+./subdir/file2.log
+```
+
+Then `tar -T -` takes those paths and archives them.
+
+Would you like a version that compresses the tarball too (e.g., `tar.gz`)?
+
 ====================================================================================
 
 2. User account creation: A shell script can be created to automate the process of creating user accounts. 

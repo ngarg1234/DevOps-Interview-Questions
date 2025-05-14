@@ -257,7 +257,8 @@ Q. What are the main use cases of Ansible?
 
 ----------------------------------------------------------------------------
 ** What is configuration Management:
--> In terms of Ansible, it maintains configuration of the product performance by keeping a record and updating detailed information which describes an enterprise's hardware and software.
+-> In terms of Ansible, 
+it maintains configuration of the product performance by keeping a record and updating detailed information which describes an enterprise's hardware and software.
 
 ** How Ansible works:
 -> Ansible works by connecting nodes and pushing out small programs called "Ansible Modules" to nodes.
@@ -634,6 +635,66 @@ Windows        Win_copy 	Win_command 	Win_msi 	Win_ping 	Win_msq 	Win_shell 	Win
 * Host/inventory file: Contains the entry of the nodes that need to be managed.
 * Ansible.cfg file: Located by default at /etc/ansible/ansible.cfg, it has the necessary privilege escalation options 
   and the location of the inventory file
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Here’s a **sample `ansible.cfg` file** that includes the most commonly used and practical settings, suitable for real-world projects:
+
+---
+
+### 📁 `ansible.cfg`
+```ini
+[defaults]
+inventory      = ./inventory
+remote_user    = ubuntu
+private_key_file = ~/.ssh/id_rsa
+host_key_checking = False
+retry_files_enabled = False
+deprecation_warnings = False
+forks         = 10
+timeout       = 30
+gathering     = smart
+fact_caching  = jsonfile
+fact_caching_connection = ./facts_cache
+roles_path    = ./roles
+collections_paths = ./collections
+log_path      = ./ansible.log
+nocows        = 1
+
+[privilege_escalation]
+become = True
+become_method = sudo
+become_user = root
+become_ask_pass = False
+
+[ssh_connection]
+ssh_args = -o ControlMaster=auto -o ControlPersist=60s
+pipelining = True
+```
+
+---
+
+### 🔍 **Explanation of Key Sections**
+- **`[defaults]`**: General configuration
+  - `inventory`: Inventory file path
+  - `remote_user`: Default SSH user
+  - `fact_caching`: Speeds up repeated runs
+  - `roles_path`: Custom path for roles
+  - `log_path`: Where Ansible logs are written
+
+- **`[privilege_escalation]`**: Handles `become` (sudo/root access)
+
+- **`[ssh_connection]`**:
+  - `pipelining`: Improves speed by reducing SSH operations
+  - `ControlMaster/ControlPersist`: Speeds up SSH connections
+
+---
+
+Would you like this included as a downloadable template or added to a larger Ansible starter project structure?
+
+------------------------------------------------------------------------------------------------------------------------------
+
+
 * Main file: A playbook that has modules that perform various tasks on a host listed in an inventory or host file
 
 ## Working with Ansible Modules:

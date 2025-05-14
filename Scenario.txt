@@ -1,5 +1,8 @@
 #Scenario1. 
-Q. While running a .#Terraform pipeline, the .#Devops engineer canceled the process during the terraform apply phase. This left the Terraform state locked in S3 and DynamoDB. Later, after making changes to the Terraform code, the engineer attempted to rerun the pipeline, but encountered an error stating that the state was locked. This blocked the pipeline from proceeding further. 
+Q. While running a .#Terraform pipeline, the .#Devops engineer cancelled the process during the terraform apply phase. 
+This left the Terraform state locked in S3 and DynamoDB. 
+Later, after making changes to the Terraform code, the engineer attempted to rerun the pipeline, but encountered an error stating that the state was locked.
+This blocked the pipeline from proceeding further. 
 -> 
 #Solution:
 Here's how he resolved it
@@ -18,15 +21,21 @@ Here's how he resolved it
 3️⃣ Ran 𝐭𝐞𝐫𝐫𝐚𝐟𝐨𝐫𝐦 𝐟𝐨𝐫𝐜𝐞-𝐮𝐧𝐥𝐨𝐜𝐤 <𝐋𝐎𝐂𝐊_𝐈𝐃> to forcefully remove the lock, which basically removes the lock from backend.
 4️⃣ Resumed the pipeline again.
 
-While using terraform force-unlock can resolve locked state issues, it is not advisable to force-unlock the state unless you are certain the lock was caused by your actions (e.g., canceling a pipeline or Terraform process).
-Forcing an unlock while another process is genuinely using the state can lead to state corruption or inconsistent infrastructure changes. Always double-check that no active Terraform processes are running.
+While using terraform force-unlock can resolve locked state issues, 
+it is not advisable to force-unlock the state unless you are certain the lock was caused by your actions (e.g., canceling a pipeline or Terraform process).
+Forcing an unlock while another process is genuinely using the state can lead to state corruption or inconsistent infrastructure changes.
+Always double-check that no active Terraform processes are running.
 
 =====================================================================
 #Scenario 2
-** A large organization manages multiple AWS accounts and VPCs across several regions, each supporting a different business unit. The company’s .#Cloud & .#DevOps teams frequently provision new VPCs and subnets for application deployments, but they are running into overlapping IP addresses, causing routing conflicts and connectivity issues. The teams also lack visibility into the IP address usage across different accounts, leading to inefficient IP allocation, potential security risks, and costly reconfiguration.
+** A large organization manages multiple AWS accounts and VPCs across several regions, each supporting a different business unit.
+The company’s .#Cloud & .#DevOps teams frequently provision new VPCs and subnets for application deployments, but they are running into overlapping IP addresses,
+causing routing conflicts and connectivity issues. The teams also lack visibility into the IP address usage across different accounts,
+leading to inefficient IP allocation, potential security risks, and costly reconfiguration.
 
 #Challenge
-Q. How can the organization manage IP address allocation across multiple AWS accounts and regions to avoid IP conflicts, ensure efficient use of address space, and maintain compliance with IP management ?
+Q. How can the organization manage IP address allocation across multiple AWS accounts and regions to avoid IP conflicts,
+ensure efficient use of address space, and maintain compliance with IP management ?
 
 #Solution
 AWS IP Address Manager (.#IPAM) can streamline the organization’s IP management by providing centralized control, monitoring, and visibility. Here’s how IPAM addresses this challenge:
@@ -78,9 +87,13 @@ In the world of .#Dev & .#DevOps, .𝐢𝐠𝐧𝐨𝐫𝐞 files are often over
 👉 Pro Tip: Review your `.ignore` files regularly to ensure they are up to date and aligned with your current project requirements.
 
 ========================================================================================
-#Scenario: A DevOps Engineer is working on multiple projects simultaneously, each requiring commits with different Git user profiles. The engineer contributes to client projects, open-source projects and internal company repositories, using different email addresses and usernames for each. 
+#Scenario: A DevOps Engineer is working on multiple projects simultaneously, each requiring commits with different Git user profiles. 
+The engineer contributes to client projects, open-source projects and internal company repositories, using different email addresses and usernames for each. 
 
-.#Challenge: The DevOps Engineer struggles with efficiently managing multiple Git user profiles for different repositories. Each time the engineer switch projects, he have to update the Git configuration which is time consuming and may lead to errors which may lead to misunderstandings with collaborators and potential issues with maintaining proper code ownership.
+.#Challenge: The DevOps Engineer struggles with efficiently managing multiple Git user profiles for different repositories.
+Each time the engineer switch projects, he have to update the Git configuration which is time consuming
+and may lead to errors which may lead to misunderstandings with collaborators and potential issues with
+maintaining proper code ownership.
 
 .#Solution: To make the process of switching Git profiles easier, the DevOps Engineer creates convenient shell aliases for configuring Git user settings. 𝐇𝐞𝐫𝐞’𝐬 𝐡𝐨𝐰 𝐭𝐨 𝐝𝐨 𝐢𝐭:
 1. Open the shell configuration file, such as ~/.bashrc or ~/.zshrc, using a text editor
@@ -121,7 +134,10 @@ It offers a streamlined way to manage communication between services natively wi
 
 ================================================================
 .#Scenario
-You're a DevOps engineer managing a microservices application on a Production Kubernetes cluster. One day, your `auth-service`, which handles user authentication, starts crashing and experiencing delays. You try looking at logs and metrics but can’t pinpoint the root cause. The issue seems tied to the container's environment and isn’t easy to reproduce.
+You're a DevOps engineer managing a microservices application on a Production Kubernetes cluster. 
+One day, your `auth-service`, which handles user authentication, 
+starts crashing and experiencing delays. You try looking at logs and metrics but can’t pinpoint the root cause.
+The issue seems tied to the container's environment and isn’t easy to reproduce.
 
 .#Challenge
 You tried with standard troubleshooting methods but ran into below challenges 
@@ -143,7 +159,8 @@ example :- 𝐤𝐮𝐛𝐞𝐜𝐭𝐥 𝐝𝐞𝐛𝐮𝐠 𝐚𝐮𝐭𝐡-�
 
 ==================================================================================================
 #Scenario:
-A DevOps engineer is managing an e-commerce application on a Linux-based server during a major festive sale(Diwali). As traffic surges, customers report slow load times and occasional timeouts. The engineer needs to diagnose the issue fast to restore smooth operation.
+A DevOps engineer is managing an e-commerce application on a Linux-based server during a major festive sale(Diwali).
+As traffic surges, customers report slow load times and occasional timeouts. The engineer needs to diagnose the issue fast to restore smooth operation.
 
 .#Challenge:
 - Huge volume of logs and metrics makes identifying issues time-consuming.
@@ -255,7 +272,8 @@ In .#𝐊𝐮𝐛𝐞𝐫𝐧𝐞𝐭𝐞𝐬 , Do you know the difference betwe
 
  ====================================================================================================
  #Scenario
-A development team is already using a Kubernetes cluster for their applications and now wants to run their CI/CD jobs on the same cluster for better scalability and resource efficiency. However, they face key .#Challenges
+A development team is already using a Kubernetes cluster for their applications and 
+/now wants to run their CI/CD jobs on the same cluster for better scalability and resource efficiency. However, they face key .#Challenges
 1. 𝐒𝐞𝐜𝐮𝐫𝐢𝐭𝐲 𝐑𝐢𝐬𝐤𝐬 𝐰𝐢𝐭𝐡 𝐊𝐮𝐛𝐞𝐂𝐨𝐧𝐟𝐢𝐠: They want to connect GitLab pipelines to Kubernetes without storing KubeConfig files, as it poses a security risk.
 2. 𝐁𝐮𝐢𝐥𝐝𝐢𝐧𝐠 𝐃𝐨𝐜𝐤𝐞𝐫 𝐈𝐦𝐚𝐠𝐞𝐬: With Kubernetes moving away from Docker, they need an alternative to Docker-in-Docker (DinD) to build images within the CI/CD pipeline.
 3. 𝐌𝐮𝐥𝐭𝐢-𝐄𝐧𝐯𝐢𝐫𝐨𝐧𝐦𝐞𝐧𝐭 𝐃𝐞𝐩𝐥𝐨𝐲𝐦𝐞𝐧𝐭𝐬: They need a simplified way to deploy across dev, test, and prod using a single Helm chart, avoiding complex configurations.
@@ -463,15 +481,20 @@ Here's a solution! There is this open-source tool called 𝐋𝐨𝐠 𝐌𝐨�
 
 ================================================================================================================
 #Scenario:
-Lets imagine there is a new CI/CD pipeline for building Docker images of microservices, pushing them to Artifactory, and deploying them via Helm on Kubernetes . The images are tagged with branch name.
+Lets imagine there is a new CI/CD pipeline for building Docker images of microservices, pushing them to Artifactory, and deploying them via Helm on Kubernetes .
+ The images are tagged with branch name.
 
 For example, if the branch is `feature-X`, the image tags would be:
 - `feature-X’
 
-A developer creates a new feature branch called `feature-X` and successfully deploys it. During testing, the developer discovers that the new feature is incomplete. They push additional changes to the same branch, and the pipeline runs successfully. However, after the deployment, the developer notices that the updated feature is not reflected in the microservice.
+A developer creates a new feature branch called `feature-X` and successfully deploys it. 
+During testing, the developer discovers that the new feature is incomplete.
+They push additional changes to the same branch, and the pipeline runs successfully.
+However, after the deployment, the developer notices that the updated feature is not reflected in the microservice.
 
 hashtag#Challenge:
-As a DevOps engineer, you are tasked with troubleshooting the issue. Despite the pipeline showing a successful build and deployment, the service still runs the old version of the code. 
+As a DevOps engineer, you are tasked with troubleshooting the issue.
+ Despite the pipeline showing a successful build and deployment, the service still runs the old version of the code. 
 
 hashtag#Troubleshooting Steps:
 - You started by checking the CI/CD pipeline logs and verified that the image is build and pushed and also Helm is reporting a successful deployment.

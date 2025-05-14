@@ -23,6 +23,7 @@ You can use any text editor or Integrated Development Environment (IDE) that you
 If you're using Visual Studio Code, you can install the Python extension to get features like IntelliSense, linting, debugging, etc.
 Write your Python script:
 You can now start writing your Python script using the installed libraries.
+
 Example of a simple script that uses requests and BeautifulSoup:
 import requests
 from bs4 import BeautifulSoup

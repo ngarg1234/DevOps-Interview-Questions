@@ -12,7 +12,11 @@ Observability tells us the internal state of our system..
 
 It is based on these three pillars:
 
+Metrices- Infra Monitoring, Events, Logs, Traces 
+
 metrices - What -- state of the machine.. tells us the historical data like cpu , memory, disk and https requests..
+
+Events:
 
 Logging --- Why .. tells the logs of why it happended..applications logs....
 

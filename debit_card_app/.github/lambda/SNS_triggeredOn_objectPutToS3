@@ -27,3 +27,6 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': json.dumps('S3 bucket list sent to SNS')
     }
+
+
+#s3.upload_file(Filename, Bucket, Key)
