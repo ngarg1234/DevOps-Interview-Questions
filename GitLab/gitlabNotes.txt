@@ -24,6 +24,12 @@ variables:
     DEPLOY_ENV: "production"
     GITLAB_USER_KEY: "this-is-my-secret-key"
 
+before_script:
+  - echo "🔧 Setting up environment"
+
+after_script:
+  - echo "🧹 Cleaning up resources"
+
 build_job:
     stage: build
     script:

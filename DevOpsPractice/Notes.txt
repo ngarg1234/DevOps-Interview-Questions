@@ -299,7 +299,9 @@ Here’s a clean and modern `Jenkinsfile` tailored for a **Docker-based CI/CD pi
 
 ```groovy
 pipeline {
-    agent any
+    agent any or   agent {
+        label 'ec2-agent'  // Replace with your actual EC2 agent label
+    }
 
     environment {
         IMAGE_NAME = "my-app"
@@ -329,7 +331,7 @@ pipeline {
                 sh "docker run --rm ${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} npm test" // change to your test cmd
             }
         }
-
+    
         stage('Push to Registry') {
             steps {
                 echo '📤 Pushing Docker image...'

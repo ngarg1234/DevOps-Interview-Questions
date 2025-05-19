@@ -7,6 +7,27 @@ Authorization,
 Actions,and
 Resources.
 
+### 🌐 What is **Federation** in AWS?
+
+**Federation** means allowing **external identities** (like corporate users, Google Workspace, Active Directory, or SAML-based IdP
+s) to **access AWS resources** **without creating IAM users** in AWS.
+
+---
+
+## 🤝 What Are **Federated Users**?
+
+**Federated users** are **temporary AWS identities** created when an external user signs in through a **trusted identity provider (IdP)** such as:
+
+* **AWS IAM Identity Center (formerly AWS SSO)**
+* **Active Directory (AD/ADFS)**
+* **SAML 2.0 providers**
+* **Social logins** (e.g., Google, Facebook)
+* **OpenID Connect (OIDC) providers**
+
+These users **don’t exist in IAM**. Instead, AWS **trusts the external IdP**, verifies the user, and then **issues temporary credentials** using **STS (Security Token Service)**.
+
+===---
+
 Principal Request to perfform Actions  on Resources.
 
 Naman requets to update EC2(ec2) instance size on particular Instance.

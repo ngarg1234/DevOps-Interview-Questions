@@ -1,11 +1,11 @@
 1. primary and key skills such as Cloud.AWS, Containerisation, CI/CD, and IaC.
 2. CI/CD stages & quality gates concept
-3.  most common 0-downtime deployment strategies.
-4.  standard SDLC methodologies
+3. Most common 0-downtime deployment strategies.
+4. Standard SDLC methodologies
 5. Networking and Security principles (organization, Service, ) in AWS
 6. high available and cost-effective setups.
 7. experience with Python
-8. infrastructure as a code approach
+8. Infrastructure as a code approach
 9. Terraform experience and readiness to follow best practices
 10. Hands-on experience with Linux containers and Kubernetes
 11. Soft skills
@@ -33,7 +33,7 @@ We should not use IAM user credentials in our code , instead use Role to do this
 
 Cross Account Access - using IAM Role -- https://aws.amazon.com/blogs/security/how-to-enable-cross-account-access-to-the-aws-management-console/
 
-https://medium.com/awesome-cloud/aws-vpc-endpoints-overview-intro-getting-started-guide-91ca23b5af8d
+https://medium.com/awesome-cloud/aws-vpc-endpoints-overview-intro-getting-started-guide-91ca23b5af8d - Gateway and Interface Endpoints....
 
 required Account need to assume role from destination account ( add the source account here while creating role -- add another account option )
 
@@ -200,7 +200,7 @@ Ops team should not be able to delete Permission Boundary..
 
 IAM Policies and Permission boundaries can be used together .. very good use case..
 
-Resources(to resource) Based Policy and Identity(IAM user, group or role) Based Policy
+Resources(to resource) Based Policy(Inline only) and Identity(IAM user, group or role) Based Policy
 https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_identity-vs-resource.html
 https://docs.aws.amazon.com/IAM/latest/UserGuide/access_controlling.html
 
@@ -230,10 +230,165 @@ https://docs.aws.amazon.com/IAM/latest/UserGuide/access_controlling.html
     ]
 }
 
+Here's a **step-by-step guide to set up and run AWS Inspector** (Amazon Inspector v2, the latest version as of now):
+
+---
+
+## 🔧 **Step 1: Prerequisites**
+
+1. ✅ **IAM Permissions**: Ensure your IAM role/user has the following:
+
+   * `inspector2:*`
+   * `ssm:*` (for EC2 scanning)
+   * `ec2:DescribeInstances`
+   * `ecr:*` (if scanning container images)
+
+2. ✅ **Systems Manager Agent (SSM Agent)** installed and running on EC2 instances.
+
+---
+
+## 🚀 **Step 2: Enable Amazon Inspector**
+
+### Console Method:
+
+1. Go to the **[Amazon Inspector console](https://console.aws.amazon.com/inspector/)**
+2. Click **“Enable”**
+3. Choose:
+
+   * **EC2 scanning** (optional)
+   * **ECR scanning** (container image scanning)
+
+Inspector will automatically:
+
+* Start scanning EC2 instances with the SSM agent.
+* Monitor Amazon ECR for new images.
+
+---
+
+## 🔄 **Step 3: Configure EC2 Instance Scanning**
+
+1. Ensure EC2 instances are:
+
+   * Managed by **AWS Systems Manager** (SSM Agent installed).
+   * Have a **role with `AmazonSSMManagedInstanceCore`**.
+2. Amazon Inspector automatically discovers EC2s and starts scans.
+3. Results will be available in the **“Findings”** tab.
+
+---
+
+## 🐳 **Step 4: Configure Amazon ECR Scanning (for containers)**
+
+1. Inspector automatically starts **ECR image scanning** upon image push.
+2. To scan older images:
+
+   * Navigate to **Amazon ECR > Repositories**.
+   * Select an image.
+   * Click **“Scan image”** or use CLI:
+
+     ```bash
+     aws ecr start-image-scan --repository-name <repo> --image-id imageTag=<tag>
+     ```
+
+---
+
+## 📊 **Step 5: View Findings**
+
+Go to the **Amazon Inspector Console > Findings**:
+
+* Filter by resource (EC2, ECR).
+* View CVEs, severity, remediation guidance.
+
+---
+
+## ✅ **Step 6: Optional – Enable Across Accounts (Using AWS Organizations)**
+
+If you're using AWS Organizations:
+
+1. Enable **Inspector delegated administrator** in the management account.
+2. Inspector will be enabled across member accounts.
+
+---
+
+## 🧪 CLI Setup Example
+
+```bash
+# Enable Inspector
+aws inspector2 enable
+
+# Confirm status
+aws inspector2 get-enablement-status
+
+# List findings
+aws inspector2 list-findings
+
+# Get details for a finding
+aws inspector2 get-findings --finding-arns <arn>
+```
+
+---
+
+## 🔐 IAM Policy Sample for Amazon Inspector
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "inspector2:*",
+        "ssm:DescribeInstanceInformation",
+        "ec2:DescribeInstances",
+        "ecr:Describe*",
+        "ecr:BatchGetImage",
+        "ecr:GetDownloadUrlForLayer"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+---
+
+## 📌 Best Practices
+
+* Enable Inspector across all accounts using AWS Organizations.
+* Automate remediation with **Security Hub + Lambda**.
+* Integrate with **AWS Config** for compliance checks.
+* Monitor findings severity and track remediations.
+
+---
+
+Would you like a **CloudFormation/CDK script**, or to set up **Inspector alerts using CloudWatch or Security Hub**?
+
+
 AWS IAM Access Analyser analyses the resources based policies like s3,iam,kms,lambda,sqs -- 
 Helps us Analyze or Identify the Resources in your organizations or your Accounts such as Amazon S3 or IAM Roles , 
 that are shared with an external entity,
- This lets you identify unintended access to your resources and data, which is security risk..
+This lets you identify unintended access to your resources and data, which is security risk..
+
+IAM Access Analyzer helps you:
+
+Identify resources that are shared externally (i.e., accessible from outside your AWS account).
+
+Validate IAM policies (e.g., least privilege).
+
+Generate policies based on access activity logs.
+
+✅ Supported resources:
+
+IAM roles
+
+S3 buckets
+
+KMS keys
+
+Lambda functions
+
+SQS queues
+
+Secrets Manager secrets
  
 New update, it will send you a notification if a respurce is used outisde your organization or aws account.,
 
@@ -291,6 +446,16 @@ as they may go down if your max prce is lesser than current proce.
 6. Ec2 instance to Lambda if possible..  
 7. Intelligent Tiering in S3 -- analyse for some time.. move it to Infrequest access Tier /Archive of S3. 
 8. Savings Plan .. similar to Reservered Instances..  applied to ec2,lambda,fargate or ec2 as you choose..
+9.Deallocate unused EIPs
+
+Use the CLI or console to release IPs not associated with running instances. 
+Elastic IP Cost Considerations
+✅ Free (under these conditions):
+One Elastic IP address is associated with a running EC2 instance.
+
+🔴 You are charged if:
+Scenario	Cost implication
+Elastic IP is not associated with a running resource	$0.005/hour ($3.60/month)
 
 https://www.incredibuild.com/blog/whats-the-difference-between-on-demand-reserved-and-spot-instances
 
@@ -2092,3 +2257,17 @@ SCM repo overrides
 🛠 Scriptable and version-controlled
 
 Would you like a Git-based setup, DSL code for pipeline jobs, or help integrating this with folders or environments?
+
+To deploy redundant (highly available) applications using Terraform, you need to architect your infrastructure for fault tolerance and resilience. Below is a step-by-step guide to deploy a redundant web application in AWS using Terraform.
+
+🧭 Overview of Redundant Application Deployment
+Key AWS components to use:
+Auto Scaling Group: Ensures multiple EC2 instances are running
+
+Elastic Load Balancer (ALB): Distributes traffic
+
+Multi-AZ Deployment: Ensures redundancy across Availability Zones
+
+Launch Template/Launch Configuration: Defines instance settings
+
+Terraform Modules: Clean and reusable infrastructure
