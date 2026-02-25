@@ -1,0 +1,7 @@
+
+=> terraform state show <resource_name>
+
+
+terraform state show command is used to output the state of a particular resource
+
+exampe: terraform state show aws_instance.webapp

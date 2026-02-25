@@ -1,0 +1,156 @@
+AWS WAF (Web Application Firewall): Overview
+============================================
+
+-> AWS Web Application Firewall (WAF) is a security tool that helps you to protect the application against web attacks. 
+-> WAF monitors and controls unusual bot traffic, and blocks common attack patterns, such as SQL Injection or Cross-site scripting, etc. 
+-> It also lets you monitor the HTTP and HTTPS requests that are forwarded to an Amazon API Gateway API, Amazon CloudFront, or an Application Load Balancer.
+
+** Amazon WAF allows you to control your content by using an IP address from where the request originates.
+** Three things make Amazon WAF work – "Access control lists (ACL), Rules, and Rule Groups".
+** Amazon WAF manages Web ACL capacity units (WCU) for rules, rule groups, and web ACLs.
+
+-- A Web ACL (Access Control List) Capacity Unit (WCU) is a metric used to represent the computational resources needed to evaluate and process rules in your Web ACL. 
+-> It reflects the cost of inspecting web requests based on the number of rules and conditions within the Web ACL.
+-- Each WCU represents the amount of processing power required to evaluate one web request against the rules and conditions in your Web ACL. The more complex your rules and conditions are, the higher the WCU consumption will be.
+
+** Amazon WAF includes a full-featured API that you can use to automate the creation, deployment, and maintenance of security rules.
+
+** Associate WAF with Amazon CloudFront distributions, Application Load Balancers, and/or Amazon API Gateway.
+
+How It Works
+=============
+-> AWS Web Application Firewall protects the applications from malicious attacks. The working of WAF in AWS mentioned below.
+
+** AWS Firewall Manager: It Manages multiple AWS Web Application Firewall Deployments
+** AWS WAF: Protect deployed applications from common web exploits.
+** Create a Policy: Now you can build your own rules using the visual rule builder.
+** Block Filter: Block filters protect against exploits and vulnerabilities attacks.
+** Monitor: Use Amazon CloudWatch for incoming traffic metrics & Amazon kinesis firehose for request details, then tune rules based on metrics and log data.
+
+
+Common Web Attacks:
+-------------------
+1. DDoS(Denial-Of-Service) attacks: This is probably the most common attack. Attackers overload an application by sending bulk requests to the web servers. Thousands of hosts infected with malware are used in this attack, which utilizes more than one unique IP address or machine. This slows down the application and significantly hurt the value of a brand.
+2. SQL injections:  SQL injection is a code injection procedure that might destroy your SQL database. Attackers can run malicious SQL queries on your web applications.
+3. Cross-Site Scripting: If your application is vulnerable to cross-site scripting, then the attacker can run or inject malicious scripts, generally in the form of a browser-side script. These scripts can even rewrite the content of the HTML pages.
+
+
+1. AWS load balancer
+-> A web application firewall that helps protect web applications from attacks by allowing you to configure rules that allow, block, or monitor (count) web requests based on conditions that you define.
+-> These conditions include:
+1. IP addresses
+2. HTTP headers
+3. HTTP body
+4. URI strings
+5. SQL injection
+6. cross-site scripting.
+
+Features:
+---------
+-> Web traffic filtering: WAF lets you create rules to filter web traffic based on conditions that include IP addresses, HTTP headers and body, or custom URIs.
+-> Monitor Rules: You can also create rules that block common web exploits like SQL injection and cross site scripting.
+-> For application layer attacks, you can use WAF to respond to incidents. You can set up proactive rules like "Rate Based Blacklisting" to automatically block bad traffic, or respond immediately to incidents as they happen.
+-> WAF provides real-time metrics and captures raw requests that include details about IP addresses, geo locations, URIs, User-Agent and Referers.
+-> AWS WAF can parse request body JSON content to inspect specific keys or values in the JSON content with WAF rules. This helps you protect your APIs by checking for valid JSON structure, inspecting the JSON content for common threats against your application, and reducing false positives by inspecting only the keys or values in the JSON content.
+-> AWS WAF Security Automations is a solution that automatically deploys a single web access control list (web ACL) with a set of AWS WAF rules designed to filter common web-based attacks. The solution supports log analysis using Amazon Athena and AWS WAF full logs.
+
+Conditions, Rules, and Web ACLs
+-------------------------------
+-> You define your conditions, combine your conditions into rules, and combine the rules into a web ACL.
+-> Conditions define the basic characteristics that you want WAF to watch for in web requests.
+-> You combine conditions into rules to precisely target the requests that you want to allow, block, or count. WAF provides two types of rules:
+
+1. Add an AWS Managed Rules rule group: AWS Managed Rules provides you with a collection of managed rule groups. The majority of these are free for Amazon WAF users. After adding managed rule group, choose to save the rule.
+
+2. Add managed rule groups: The rules we’re going to create will define the patterns we want to allow/block. We’ll add 2 rules only.
+  1. Regular rules – This rule protects the application from SQL injection attacks. It will check if the URI path contains an SQL injection. 
+  2. Rate-based rules – are similar to regular rules, with a rate limit.
+  -- This rule blocks the requests made from the same IP address after they exceed a certain limit in a time period.  
+
+** Set Rule priority
+
+-> Rate-based rules count the requests that arrive from a specified IP address every five minutes. The rule can trigger an action if the number of requests exceed the rate limit.
+1. WAF Managed Rules are an easy way to deploy pre-configured rules to protect your applications common threats like application vulnerabilities. All Managed Rules are automatically updated by AWS Marketplace security Sellers.
+-> After you combine your conditions into rules, you combine the rules into a web ACL. This is where you define an action for each rule—allow, block, or count—and a default action, which determines whether to allow or block a request that doesn’t match all the conditions in any of the rules in the web ACL.
+-> You can insert HTTP headers to a user request when WAF allows the request to reach your application. You can use the custom HTTP headers to validate the requests made to your application passed through WAF, and configure your application to only allow requests that contain the custom header values that you specify. You can also insert headers so your application can process the request differently based on the presence of the header, or log the header in your application logs for reporting and analytics.
+-> WAF lets you configure the HTTP status code and the response body returned to the user when a request is blocked.
+
+
+
+Add my own rules and rule groups:
+---------------------------------
+
+RULE TYPE:
+=========
+1. IP set: Use IP sets to identify a specific list of IP addresses.
+2. Rule builder: Use a custom rule to inspect for patterns including query strings, headers, countries, and rate limit violations.
+3. Rule group: Use a rule group to combine rules into a single logical set.
+
+RULE BUILDER:
+==============
+  a. Regular rules – This rule protects the application from SQL injection         attacks. It will check if the URI path contains an SQL injection. 
+  b. Rate-based rules – are similar to regular rules, with a rate limit.
+  -- This rule blocks the requests made from the same IP address after they exceed a certain limit in a time period.
+
+If a request:
+==============
+a. matches the statement
+b. matches all the statements AND (For multiple conditions)
+c. matches at least one of the statements (OR)
+d. doesn't match the statement (NOT)
+
+STATEMENT:
+Inspect: 
+1. Originates from a country in
+2. Originates from an Ip address in
+3. Has a label
+
+Request components:
+a. Single header
+b. All headers
+c. Cookies
+d. Single query parameter
+e. All query parameters.
+f. URI path
+g. Query string
+h. Body
+i. HTTP method
+j. JA3 fingerprint
+k. Header order
+
+
+THEN:
+=====
+
+Actions:
+a. allow
+b. count
+c. block
+d. Captcha
+e. Challenge
+
+
+SET RULE PRORITY:
+=================
+
+CONFIGURE METRICS:
+==================
+
+----------------------------------------------------------------------------------------
+LOGGING:
+========
+
+1. CloudWatch logs log group
+2. Amazon Data Firehouse stream (Kinesis feature)
+3. S3 bucket
+
+1. CloudWatch:
+Log group name should start with: "aws-waf-logs"
+
+Redacted fields:
+a. HTTP method
+b. Query string
+c. URI path
+d. Single header
+
+

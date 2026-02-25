@@ -1,0 +1,79 @@
+1. Configure AWS CLI
+Set up AWS CLI with your credentials and region.
+aws configure
+
+2. List S3 Buckets
+List all S3 buckets in your account.
+aws s3 ls
+
+3. Create an S3 Bucket
+Create a new S3 bucket.
+aws s3 mb s3://my-new-bucket
+
+4. Upload File to S3
+Upload a local file to an S3 bucket.
+aws s3 cp localfile.txt s3://my-bucket/
+
+5. Download File from S3
+Download a file from an S3 bucket to the local machine.
+aws s3 cp s3://my-bucket/file.txt ./localfile.txt
+
+6. Delete an S3 Bucket
+Delete an S3 bucket (must be empty first).
+aws s3 rb s3://my-bucket --force
+
+7. List EC2 Instances
+List all EC2 instances in your account.
+aws ec2 describe-instances
+
+8. Start an EC2 Instance
+Start a stopped EC2 instance.
+aws ec2 start-instances --instance-ids i-1234567890abcdef0
+
+9. Stop an EC2 Instance
+Stop a running EC2 instance.
+aws ec2 stop-instances --instance-ids i-1234567890abcdef0
+
+10. Terminate an EC2 Instance
+Terminate an EC2 instance.
+aws ec2 terminate-instances --instance-ids i-1234567890abcdef0
+
+11. Create an EC2 Instance
+Launch a new EC2 instance (example with Amazon Linux AMI).
+aws ec2 run-instances --image-id ami-0c55b159cbfafe1f0 --count 1 --instance-type t2.micro --key-name MyKeyPair
+
+12. Describe Security Groups
+List all security groups in your account.
+aws ec2 describe-security-groups
+
+13. Create an IAM User
+Create a new IAM user.
+aws iam create-user --user-name newuser
+
+14. Attach IAM Policy to a User
+Attach an IAM policy to a user (e.g., AmazonS3ReadOnlyAccess).
+aws iam attach-user-policy --user-name newuser --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+
+15. List IAM Users
+List all IAM users in your account.
+aws iam list-users
+
+16. Create an RDS Database Instance
+Create an Amazon RDS database instance.
+aws rds create-db-instance --db-instance-identifier mydb --db-instance-class db.t2.micro --engine mysql --allocated-storage 20
+
+17. Describe RDS Instances
+List all RDS database instances.
+aws rds describe-db-instances
+
+18. Start an RDS Database Instance
+Start an RDS database instance.
+aws rds start-db-instance --db-instance-identifier mydb
+
+19. Stop an RDS Database Instance
+Stop an RDS database instance.
+aws rds stop-db-instance --db-instance-identifier mydb
+
+20. List CloudWatch Logs
+List all CloudWatch logs groups.
+aws logs describe-log-groups

@@ -1,0 +1,12 @@
+The below is the command to save the terraform plan output to a file 
+
+terraform plan -out=demopath
+
+plan will be saved to the file called demopath
+
+you can use the saved plan file to run the terraform apply command
+
+        terraform apply demopath
+
+
+So the main use of saving plan to a file is that - whenever any changes happen to the code by any mistake and you don't want to apply it - you can apply the configuration using the saved plan.

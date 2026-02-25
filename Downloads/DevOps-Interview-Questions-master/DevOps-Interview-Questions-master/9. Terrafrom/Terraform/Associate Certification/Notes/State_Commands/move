@@ -1,0 +1,52 @@
+
+
+=== terraform state mv 
+
+terraform state mv command is used to move items in a terraform state 
+
+This command is used in many situation in which you want to rename a resource instead of destroying and recreating it.
+
+example,
+
+resource "aws_instance" "demo"{
+    ami = "ami-0261755bbcb8c4a84"
+    instance_type = "t2.micro"
+}
+
+suppose that you want to change the name of above resource from demo to webapp, 
+
+    if you just try to edit the configuration and change the name from demo to webapp, the plan output will looks like the following,
+
+    Plan: 1 to add, 0 to change, 1 to destroy.
+
+    that means, it will destroy and recreate the resource
+
+    ==>> in order to overcome that, you can use -> terraform state mv command 
+
+    ==> terraform state mv command just rename the resource (it won't destroy it)
+
+example:
+
+    terraform state mv aws_instance.demo aws_instance.webapp
+
+
+
+IMP NOTE: Once the state is moved, you should update the resource name manually in the terraform configuration, otherwise next terraform plan will be -> Plan: 1 to add, 0 to change, 1 to destroy.
+
+coz, in code your resource will still be demo and in statefile -> webapp
+
+so, once statefile is updated with the new resource name (ie, webapp in this case), yyou should change the resource name in the code
+
+ie,
+
+resource "aws_instance" "demo"{
+    ami = "ami-0261755bbcb8c4a84"
+    instance_type = "t2.micro"
+}
+
+should be changed to,
+
+resource "aws_instance" "webapp"{
+    ami = "ami-0261755bbcb8c4a84"
+    instance_type = "t2.micro"
+}

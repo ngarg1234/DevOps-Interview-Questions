@@ -1,0 +1,20 @@
+Install the CloudWatch agent using the command line:
+====================================================
+
+1. Download the CloudWatch agent package
+$$ sudo yum install amazon-cloudwatch-agent
+
+** To use the command line to download and install the CloudWatch agent package
+
+Download the CloudWatch agent.:
+$$ wget https://amazoncloudwatch-agent.s3.amazonaws.com/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+
+
+Install the package. If you downloaded an RPM package on a Linux server, change to the directory containing the package and enter the following::
+$$ sudo rpm -U ./amazon-cloudwatch-agent.rpm
+
+
+
+2. Create IAM roles and users for use with CloudWatch agent.:
+-------------------------------------------------------------
+

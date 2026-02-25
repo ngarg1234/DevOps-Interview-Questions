@@ -1,0 +1,11 @@
+The file provisioner copies files or directories from the machine running Terraform to the newly created resource. The file provisioner supports both ssh and winrm type
+
+
+resource "aws_instance" "web" {
+  # ...
+
+  # Copies the myapp.conf file to /etc/myapp.conf
+  provisioner "file" {
+    source      = "conf/myapp.conf"
+    destination = "/etc/myapp.conf"
+  }

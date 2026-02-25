@@ -1,0 +1,44 @@
+
+
+
+our module was expecting a list(string) but formatlist function was producing a list of lists so that we were getting an error
+
+
+error output -- you = [
+  [
+    "arn:aws:iam::499604764704:root",
+    "arn:aws:iam::670689373697:root",
+    "arn:aws:iam::394333930054:root",
+    "arn:aws:iam::305366777960:root",
+    "arn:aws:iam::189539755066:root",
+    "arn:aws:iam::693793123069:root",
+    "arn:aws:iam::453130194223:root",
+    "arn:aws:iam::755264997877:root",
+  ],
+]
+
+
+
+corrected output 
+
+you = [
+  "arn:aws:iam::499604764704:root",
+  "arn:aws:iam::670689373697:root",
+  "arn:aws:iam::394333930054:root",
+  "arn:aws:iam::305366777960:root",
+  "arn:aws:iam::189539755066:root",
+  "arn:aws:iam::693793123069:root",
+  "arn:aws:iam::453130194223:root",
+  ]
+
+
+
+
+
+locals {
+ all_root_account_arns_errored_one = [
+     formatlist("arn:aws:iam::%s:root", values(var.aws_account_id)),
+ ]
+ all_root_account_arns_corrected_one =flatten(formatlist("arn:aws:iam::%s:root", values(var.aws_account_id)),)
+  
+}

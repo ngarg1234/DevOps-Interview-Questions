@@ -1,0 +1,478 @@
+11. What are the Errors you have come across while working on Kubernetes?
+
+Below are Some Known Kuberenets errors:
+
+✅𝐏𝐨𝐝 𝐏𝐞𝐧𝐝𝐢𝐧𝐠: Pods may remain in the "Pending" state if there are insufficient resources, such as CPU or memory, available on the cluster. Check the resource requests and limits for the pod, and ensure that the node has enough capacity.
+
+✅𝐂𝐫𝐚𝐬𝐡𝐋𝐨𝐨𝐩𝐁𝐚𝐜𝐤𝐎𝐟𝐟: If a pod repeatedly crashes and enters a "CrashLoopBackOff" state, check the container logs using kubectl logs to identify the issue. Common causes include misconfigured application settings or missing dependencies.
+
+✅𝐈𝐦𝐚𝐠𝐞𝐏𝐮𝐥𝐥𝐁𝐚𝐜𝐤𝐎𝐟𝐟: This error occurs when Kubernetes is unable to pull the container image specified in the pod's manifest. Ensure that the image name and credentials (if needed) are correctly configured. Also, check if there are any issues with the image repository.
+
+✅𝐍𝐨𝐝𝐞 𝐍𝐨𝐭𝐑𝐞𝐚𝐝𝐲: Nodes in a cluster may become "NotReady" due to various reasons, such as network problems, resource exhaustion, or system issues. Investigate the node's status using kubectl describe node and resolve any underlying problems.
+
+✅𝐒𝐞𝐫𝐯𝐢𝐜𝐞 𝐔𝐧𝐚𝐯𝐚𝐢𝐥𝐚𝐛𝐥𝐞: If a service is not accessible, ensure that the service and its associated pods are running. Use kubectl get pods and kubectl get services to check their statuses.
+
+✅𝐏𝐞𝐫𝐬𝐢𝐬𝐭𝐞𝐧𝐭𝐕𝐨𝐥𝐮𝐦𝐞𝐂𝐥𝐚𝐢𝐦 (𝐏𝐕𝐂) 𝐈𝐬𝐬𝐮𝐞𝐬: Problems with PVCs can lead to pod failures. Check the status of PVCs using kubectl get pvc and make sure they are bound to a PersistentVolume (PV). Also, ensure that the PV is available and in the correct state.
+
+✅𝐑𝐁𝐀𝐂 𝐀𝐮𝐭𝐡𝐨𝐫𝐢𝐳𝐚𝐭𝐢𝐨𝐧 𝐄𝐫𝐫𝐨𝐫𝐬: If you encounter permission errors, it may be related to Role-Based Access Control (RBAC) settings. Ensure that ServiceAccounts, Roles, and RoleBindings are correctly configured.
+
+✅𝐍𝐞𝐭𝐰𝐨𝐫𝐤 𝐏𝐨𝐥𝐢𝐜𝐢𝐞𝐬: If you have Network Policies in place, misconfigured policies can lead to network-related issues. Verify that your network policies are correctly defined and applied.
+
+✅𝐒𝐭𝐨𝐫𝐚𝐠𝐞𝐂𝐥𝐚𝐬𝐬 𝐍𝐨𝐭 𝐅𝐨𝐮𝐧𝐝: When using dynamic volume provisioning, make sure that the appropriate StorageClass exists and is accessible. Ensure that the PVC references the correct StorageClass.
+
+✅𝐑𝐞𝐬𝐨𝐮𝐫𝐜𝐞 𝐐𝐮𝐨𝐭𝐚𝐬 𝐚𝐧𝐝 𝐋𝐢𝐦𝐢𝐭𝐬: Resource quotas and limits can lead to pods being unable to start or scale. Check the resource limits defined for your namespaces and pods.
+
+✅𝐈𝐧𝐠𝐫𝐞𝐬𝐬 𝐂𝐨𝐧𝐭𝐫𝐨𝐥𝐥𝐞𝐫 𝐈𝐬𝐬𝐮𝐞𝐬: If you're using Ingress controllers for routing traffic to services, errors can occur due to misconfigured Ingress resources. Review your Ingress definitions and ensure they match your cluster setup.
+
+You can find good websites/articles for understanding and troubleshooting these errors in more detail on the internet.
+
+COICPS
+
+1. CrashLoopBackOff
+✅ Cause:
+-> App inside the pod is crashing repeatedly.
+-> Readiness/Liveness probes failing.
+-> Configuration/Secrets/Environment issues.
+
+Troubleshooting:
+-- Check pod logs: $$ kubectl logs <pod-name> -n <namespace>
+-- Check events: $$ kubectl describe pod <pod-name> -n <namespace>
+
+-- Validate configs, secrets, env variables.
+-- Probe failures? Fix readiness/liveness probes.
+-- Fix image-specific issues (dependencies, runtime).
+
+
+2. OOMKilled
+✅ Cause:
+-> Pod/container is killed because it used more memory than allowed (limit).
+
+Troubleshooting:
+-- Describe pod to confirm OOMKilled reason: $$ kubectl describe pod <pod-name> -n <namespace>
+-- Adjust resource limits:
+resources:
+  requests:
+    memory: "512Mi"
+  limits:
+    memory: "1Gi"
+-> Optimize application memory usage.
+
+
+3. ImagePullBackOff / ErrImagePull
+✅ Cause:
+-> Invalid image name or tag.
+-> Private registry access issue.
+-> Image doesn't exist.
+
+Troubleshooting:
+-- Check image name/tag.
+-- Validate registry secrets (if private):
+$$ kubectl get secret <secret-name> -n <namespace>
+
+-- Check DockerHub or ECR/GCR permissions.
+-- Inspect pod events for exact pull error.
+
+
+4. CreateContainerConfigError
+✅ Cause:
+-> Misconfigured spec (wrong env/volume/secret/configMap reference).
+
+Troubleshooting:
+-- Describe pod to see config error.
+-- Check referenced secrets/configMaps exist
+$$ kubectl get secret/configmap <name> -n <namespace>
+-- Validate environment variables and volume mounts.
+
+
+5. CreateContainerError
+✅ Cause:
+-> Kubernetes unable to create container (init errors, wrong CMD/ENTRYPOINT).
+
+Troubleshooting:
+-- Check pod logs (init container and app)
+$$ kubectl logs <pod-name> --container <container-name> -n <namespace>
+-- Check events to confirm error.
+-- Review Dockerfile CMD/ENTRYPOINT if custom.
+
+
+6. RunContainerError
+✅ Cause:
+-> Container started but failed immediately.
+-> SecurityContext issues, missing permissions.
+
+Troubleshooting:
+-- Review pod logs.
+-- Check SecurityContext:
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 3000
+  fsGroup: 2000
+-- Validate volumes and mount points.
+
+
+7. Pod Stuck in Pending
+✅ Cause:
+-> No available nodes with sufficient resources
+
+
+8. FailedMount / VolumeMount Error
+✅ Cause:
+-> PersistentVolume (PV) or PersistentVolumeClaim (PVC) issues.
+-> StorageClass issues.
+-> CSI driver errors.
+
+Troubleshooting:
+$$ kubectl describe pod <pod-name> -n <namespace>
+$$ kubectl get pvc -n <namespace>
+$$ kubectl get pv
+$$ kubectl logs -n kube-system <csi-driver-pod-name>
+
+-- Check PVC/PV status.
+-- Review CSI logs (EBS, EFS, etc.).
+-- Validate StorageClass.
+
+
+9. Certificate Errors (Pod TLS)
+✅ Cause:
+-> Expired Kubernetes certificates.
+-> Invalid kubelet client/server certificates.
+-> API server certificates expired.
+
+Troubleshooting:
+-- Rotate certificates if needed.
+-- Monitor expiration proactively.
+$$ openssl x509 -in /etc/kubernetes/pki/apiserver.crt -text -noout
+$$ kubectl get csr
+
+
+10. Service/Endpoint Not Ready (Connection refused, no endpoints)
+✅ Cause:
+-> Service pointing to pods not ready.
+-> Selector mismatch between service and pods.
+
+Troubleshooting:
+$$ kubectl describe svc <service-name> -n <namespace>
+$$ kubectl get ep <service-name> -n <namespace>
+$$ kubectl get pods -l <selector>
+
+-- Check pod readiness and labels.
+-- Ensure service selector matches pod labels.
+
+************************************************************************
+NODE ERRORS:
+============
+
+11. Node Disk Pressure
+✅ Cause:
+-> Node running out of disk space.
+
+Troubleshooting:
+-- Check node status: $$ kubectl describe node <node-name>
+
+-- Free disk space on node.
+-- Set evictionHard threshold in kubelet config.
+-- Clean up unused image
+$$ docker system prune
+
+
+12. Node Not Ready
+✅ Cause:
+-> Kubelet down, networking issues, system-level problems.
+
+Troubleshooting:
+-- Describe node to check issue.
+-- SSH to node, check kubelet and container runtime
+$$ systemctl status kubelet
+$$ systemctl status containerd/docker
+
+-- Check CNI plugins.
+-- Verify node’s IP and routing.
+
+
+13. Evicted Pods
+✅ Cause:
+-> Node runs out of CPU, memory, or disk.
+-> Kubelet evicts pods based on Eviction Policy.
+
+Troubleshooting:
+$$ kubectl get pods --all-namespaces --field-selector=status.phase=Failed
+$$ kubectl describe pod <pod-name> -n <namespace>
+
+-- Look for Evicted reason.
+-- Adjust resource limits and requests.
+-- Add more nodes or optimize workloads.
+-- Set PodDisruptionBudgets to prevent critical pods from eviction.
+
+
+************************************************************************
+Network-related Errors
+=======================
+
+14. Network Issues / DNS Errors
+✅ Cause:
+-> CoreDNS pod issues.
+-> CNI misconfiguration.
+-> IP exhaustion.
+
+Troubleshooting:
+$$ kubectl get pods -n kube-system
+$$ kubectl logs <coredns-pod> -n kube-system
+
+Test DNS from pod:
+$$ kubectl run -i --tty busybox --image=busybox -- sh
+$$ nslookup kubernetes.default
+-- Check CNI logs (e.g., aws-node in EKS).
+
+
+15. Service/Endpoint Not Ready (Connection refused, no endpoints)
+✅ Cause:
+-> Service pointing to pods not ready.
+-> Selector mismatch between service and pods.
+
+Troubleshooting:
+$$ kubectl describe svc <service-name> -n <namespace>
+$$ kubectl get ep <service-name> -n <namespace>
+$$ kubectl get pods -l <selector>
+
+-- Check pod readiness and labels.
+-- Ensure service selector matches pod labels.
+
+
+************************************************************************
+Storage-related Errors
+=======================
+
+16. FailedMount / VolumeMount Error
+✅ Cause:
+-> PersistentVolume (PV) or PersistentVolumeClaim (PVC) issues.
+-> StorageClass issues.
+-> CSI driver errors.
+
+Troubleshooting:
+-- Check PVC/PV status.
+-- Review CSI logs (EBS, EFS, etc.).
+-- Validate StorageClass.
+$$ kubectl describe pod <pod-name> -n <namespace>
+$$ kubectl get pvc -n <namespace>
+$$ kubectl get pv
+$$ kubectl logs -n kube-system <csi-driver-pod-name>
+
+
+************************************************************************
+Control Plane / API Server Issues
+=================================
+
+17. Unauthorized (401/403), Forbidden
+✅  Cause:
+-> ServiceAccount missing permissions.
+-> IAM roles for service account (IRSA) misconfigured (in AWS EKS).
+
+Troubleshooting:
+-> Check ClusterRoleBinding or RoleBinding.
+$$ kubectl auth can-i list pods --as=system:serviceaccount:<namespace>:<serviceaccount-name>
+
+
+18. ResourceQuota Denied
+✅ Cause:
+-> Namespace hits resource limits (CPU, memory, pods count).
+
+Troubleshooting:
+-- Adjust quotas or optimize usage.
+$$ kubectl describe quota -n <namespace>
+$$ kubectl get quota -n <namespace>
+
+
+19. API Rate Limiting (429)
+✅ Cause:
+-> Too many API calls (from controllers, apps).
+-> HPA or custom operator flooding API.
+
+Troubleshooting:
+-- Check kube-apiserver metrics.
+-- Review kubectl get --raw /metrics.
+-- Rate-limit custom controllers or apps.
+
+
+20. Certificate Errors (SSL/TLS Issues)
+✅ Cause:
+-> Expired Kubernetes certificates.
+-> Invalid kubelet client/server certificates.
+-> API server certificates expired.
+
+Troubleshooting:
+-- Rotate certificates if needed.
+-- Monitor expiration proactively.
+$$ openssl x509 -in /etc/kubernetes/pki/apiserver.crt -text -noout
+$$ kubectl get csr
+
+
+
+21. Secret/ConfigMap Not Mounted
+✅ Cause:
+-> Referencing a non-existent secret/configMap.
+-> Wrong namespace reference.
+-> RBAC issue denying access.
+
+Troubleshooting:
+-- Validate secret/configMap existence.
+-- Ensure correct namespace and RBAC permissions.
+$$ kubectl get secret <secret-name> -n <namespace>
+$$ kubectl describe pod <pod-name> -n <namespace>
+
+
+
+===========================================================================================================
+
+✅ Kubernetes HTTP Error Codes with Causes & Troubleshooting
+
+1. Informational responses ( 100 – 199 ): don't indicate an error. You don't need to troubleshoot these errors.
+-> server has received the request and is continuing to process it, about the progress of the request.
+
+
+**********************************************************************************
+2. Successful responses ( 200 – 299 ): no troubleshooting, 
+-> the server has successfully processed the request and sent a valid response back to the client.
+
+✅ 200 OK: Successful request.
+Cause: Normal operation.
+Troubleshoot: No action needed.
+
+✅ 201 Created: Resource successfully created.
+Cause: Successful create request.
+Troubleshoot: No action needed.
+
+✅ 204 No Content: Successful, but no content returned.
+Cause: DELETE or successful update.
+Troubleshoot: No action needed.
+
+
+**********************************************************************************
+3. Redirects ( 300 – 399): make sure that the endpoint that the probe is trying to access is correct and that there are no issues with the DNS.
+
+
+**********************************************************************************
+4. Client errors ( 400 – 499 ): indicate that the client has made a mistake in the request.
+
+✅ 400 Bad Request: Invalid request.
+Cause: Malformed YAML, wrong API fields.
+Troubleshoot: Review API request, YAML.
+Command: kubectl apply -f <file>.yaml --validate=true
+
+✅ 401 Unauthorized: Authentication failed.
+Cause: Invalid/expired token, wrong user.
+Troubleshoot: Check kubeconfig, tokens, IAM roles.
+Command: kubectl config view, kubectl auth can-i get pods
+
+✅ 403 Forbidden: Access denied.
+Cause: RBAC permission issue.
+Troubleshoot: Check Role, ClusterRole, RoleBinding.
+Command: kubectl auth can-i <verb> <resource> --as <user>
+
+✅ 404 Not Found: Resource not found.
+Cause: Wrong resource name/namespace, deleted resource.
+Troubleshoot: Check resource existence, correct namespace.
+Command: kubectl get <resource> -n <namespace>
+
+✅ 405 Method Not Allowed: Invalid HTTP method used.
+Cause: Wrong verb (e.g., POST on GET API).
+Troubleshoot: Use correct API method.
+Command: Review API spec, kubectl api-resources
+
+✅ 408 Request Timeout: API request timed out.
+Cause: Overloaded API server, slow backend.
+Troubleshoot: Check API server health, node load.
+Command: kubectl get --raw='/healthz', kubectl describe node
+
+✅ 409 Conflict: Resource version conflict.
+Cause: Concurrent updates to resource.
+Troubleshoot: Retry with latest resourceVersion.
+Command: kubectl get <resource> -o yaml (check resourceVersion)
+
+✅ 410 Gone: Resource permanently deleted.
+Cause: TTL expired, GC removed resource.
+Troubleshoot: Recreate resource if needed.
+Command: kubectl apply -f <resource>.yaml
+
+✅ 413 Payload Too Large: Payload exceeds limit.
+Cause: Huge YAML, large configMap/secret.
+Troubleshoot: Split resource into smaller pieces.
+Command: Split manifest, avoid huge ConfigMaps.
+
+✅ 422 Unprocessable Entity: Validation failed.
+Cause: Invalid spec, field errors.
+Troubleshoot: Check exact error message, fix fields.
+Command: kubectl apply -f <file>.yaml (read error details)
+
+✅ 429 Too Many Requests: Rate limit hit.
+Cause: API server throttling, too many requests.
+Troubleshoot: Back off retries, optimize client interactions.
+Command: kubectl get --raw='/metrics' | grep apiserver_request_total
+
+
+**********************************************************************************
+5. Server errors ( 500 – 599 ):  indicate that the server was unable to fulfill the request due to an error on the server side.
+
+✅ 500 Internal Server Error: Server crash/internal failure.
+Cause: API server crash, webhook failure.
+Troubleshoot: Check API server and webhook logs.
+Command: kubectl logs -n kube-system kube-apiserver-<node>, kubectl logs -n <namespace> <webhook-pod>
+
+✅ 502 Bad Gateway: Proxy can’t reach backend.
+Cause: Ingress backend service/pod down.
+Troubleshoot: Check pod/service status, endpoints.
+Command: kubectl get svc,pods,endpoints -n <namespace>
+
+✅ 503 Service Unavailable: Service not reachable or overloaded.
+Cause: Backend pod not ready, DNS failure, API down.
+Troubleshoot: Check pods, readiness probes, DNS.
+Command: kubectl get pods, kubectl describe pod <pod>, kubectl exec <pod> -- nslookup <svc>
+
+✅ 504 Gateway Timeout: Timeout reaching backend.
+Cause: Network issues, backend app slow.
+Troubleshoot: Check pod health, network, timeouts.
+Command: kubectl describe pod <pod>, kubectl logs <pod>
+
+**********************************************************************************
+
+
+✅ Summary of Troubleshooting Commands:
+Check resources: kubectl get <resource> -n <namespace>
+Describe for events/issues: kubectl describe <resource> -n <namespace>
+Check pod logs: kubectl logs <pod> -n <namespace>
+Check API health: kubectl get --raw='/healthz'
+Validate access: kubectl auth can-i <action> <resource>
+Review endpoints: kubectl get endpoints <svc> -n <namespace>
+Check network/DNS: kubectl exec <pod> -- nslookup <svc>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

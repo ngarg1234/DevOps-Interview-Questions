@@ -1,0 +1,25 @@
+
+
+Initially i had provided the s3 location as -> statefiles and did a terraform apply
+
+later, i have changed the s3 location to statafiles/terraform.tfstate , and i recived the below message 
+
+
+shyamjith_sa@EPINCHEW00D1 02_implemeting_s3_backend % terraform init 
+
+Initializing the backend...
+Backend configuration changed!
+
+Terraform has detected that the configuration specified for the backend
+has changed. Terraform will now check for existing state in the backends.
+
+
+Do you want to copy existing state to the new backend?
+  Pre-existing state was found while migrating the previous "s3" backend to the
+  newly configured "s3" backend. No existing state was found in the newly
+  configured "s3" backend. Do you want to copy this state to the new "s3"
+  backend? Enter "yes" to copy and "no" to start with an empty state.
+
+  Enter a value: yes
+
+  Since there was no infra change, the same(old) statefile got moved to the new location 

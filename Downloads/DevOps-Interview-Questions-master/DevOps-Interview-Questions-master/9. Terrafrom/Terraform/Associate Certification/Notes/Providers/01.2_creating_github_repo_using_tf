@@ -1,0 +1,13 @@
+You can do operations on github using github plugin
+
+terraform{
+    required_providers{
+        github = {
+            source = "integrations/github"
+            version = "~> 5.0"
+        }
+    }
+}
+provider "github"{
+    token = "put your token here"
+}

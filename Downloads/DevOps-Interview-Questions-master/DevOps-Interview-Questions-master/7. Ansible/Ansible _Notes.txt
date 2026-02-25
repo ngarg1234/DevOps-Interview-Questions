@@ -1,0 +1,285 @@
+Below is a **clean, practical guide** to **Ansible ad-hoc commands** and **executing playbooks**,
+, with real examples you can use immediately.
+
+---
+
+# Ansible Ad-hoc Commands & Playbooks
+
+---
+
+## 1️⃣ What is an Ansible ad-hoc command?
+
+**Ad-hoc commands** are:
+
+* One-line Ansible commands
+* Used for **quick tasks**
+* No YAML playbook needed
+
+Best for:
+
+* Checking status
+* Restarting a service
+* Copying a file
+* Running shell commands
+
+---
+
+## 2️⃣ Basic ad-hoc command syntax
+
+```bash
+ansible <hosts> -m <module> -a "<arguments>"
+```
+
+### Example: Ping all hosts
+
+```bash
+ansible all -m ping
+```
+
+---
+
+## 3️⃣ Common ad-hoc command examples
+
+### 🔹 Check uptime
+
+```bash
+ansible all -m command -a "uptime"
+```
+
+### 🔹 Check disk usage
+
+```bash
+ansible all -m shell -a "df -h"
+```
+
+### 🔹 Create a directory
+
+```bash
+ansible all -m file -a "path=/opt/app state=directory"
+```
+
+### 🔹 Copy a file
+
+```bash
+ansible all -m copy -a "src=app.conf dest=/etc/app.conf"
+```
+
+### 🔹 Install package (Linux)
+
+```bash
+ansible all -m yum -a "name=nginx state=present"   # RHEL
+ansible all -m apt -a "name=nginx state=present"   # Ubuntu
+```
+
+### 🔹 Restart a service
+
+```bash
+ansible all -m service -a "name=nginx state=restarted"
+```
+
+---
+
+## 4️⃣ Inventory usage
+
+### Default inventory
+
+```bash
+ansible all -m ping
+```
+
+### Custom inventory file
+
+```bash
+ansible -i inventory.ini all -m ping
+```
+
+---
+
+## 5️⃣ Using sudo / root access
+
+```bash
+ansible all -m ping --become
+```
+
+With user:
+
+```bash
+ansible all -m ping --become --become-user=root
+```
+
+---
+
+## 6️⃣ Limit hosts
+
+```bash
+ansible webservers -m ping
+ansible all -m ping --limit server1
+```
+
+---
+
+## 7️⃣ Running ad-hoc commands on a single host
+
+```bash
+ansible server1 -m shell -a "free -m"
+```
+
+---
+
+## 8️⃣ When NOT to use ad-hoc commands
+
+❌ Multi-step automation
+❌ Complex logic
+❌ Reusable tasks
+❌ CI/CD pipelines
+
+➡ Use **playbooks**
+
+---
+
+# ▶️ Executing Ansible Playbooks
+
+---
+
+## 9️⃣ What is an Ansible playbook?
+
+Playbooks:
+
+* Written in **YAML**
+* Define **desired state**
+* Idempotent
+* Version controlled
+
+---
+
+## 🔟 Basic playbook structure
+
+```yaml
+---
+- name: Install and start nginx
+  hosts: webservers
+  become: yes
+
+  tasks:
+    - name: Install nginx
+      yum:
+        name: nginx
+        state: present
+
+    - name: Start nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+```
+
+---
+
+## 1️⃣1️⃣ Run a playbook
+
+```bash
+ansible-playbook site.yml
+```
+
+With inventory:
+
+```bash
+ansible-playbook -i inventory.ini site.yml
+```
+
+---
+
+## 1️⃣2️⃣ Dry run (check mode)
+
+```bash
+ansible-playbook site.yml --check
+```
+
+---
+
+## 1️⃣3️⃣ Show differences
+
+```bash
+ansible-playbook site.yml --diff
+```
+
+---
+
+## 1️⃣4️⃣ Run on specific hosts
+
+```bash
+ansible-playbook site.yml --limit web1
+```
+
+---
+
+## 1️⃣5️⃣ Run specific tags
+
+```yaml
+tasks:
+  - name: Install nginx
+    yum:
+      name: nginx
+    tags: install
+```
+
+```bash
+ansible-playbook site.yml --tags install
+```
+
+---
+
+## 1️⃣6️⃣ Run with extra variables
+
+```bash
+ansible-playbook site.yml -e "env=prod"
+```
+
+---
+
+## 1️⃣7️⃣ Run as another user (sudo)
+
+```bash
+ansible-playbook site.yml --become
+```
+
+---
+
+## 1️⃣8️⃣ Run playbook from CI/CD
+
+```bash
+ansible-playbook site.yml \
+  -i inventory.ini \
+  --become \
+  --extra-vars "env=prod"
+```
+
+---
+
+## 1️⃣9️⃣ Ad-hoc vs Playbook (quick comparison)
+
+| Feature         | Ad-hoc     | Playbook |
+| --------------- | ---------- | -------- |
+| YAML            | ❌          | ✅        |
+| Multi-step      | ❌          | ✅        |
+| Idempotent      | ⚠️ Limited | ✅        |
+| Version control | ❌          | ✅        |
+| CI/CD           | ❌          | ✅        |
+
+---
+
+## 🏁 Quick memory rule
+
+> **Ad-hoc = quick one-time command**
+> **Playbook = repeatable automation**
+
+---
+
+If you want next, I can:
+
+* Share **top 20 ad-hoc commands**
+* Explain **Ansible inventory best practices**
+* Show **roles vs playbooks**
+* Provide **real production playbook example**
+
+Just tell me 👍

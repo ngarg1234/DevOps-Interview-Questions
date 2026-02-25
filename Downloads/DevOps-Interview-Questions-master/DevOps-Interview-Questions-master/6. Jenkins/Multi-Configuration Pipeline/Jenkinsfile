@@ -1,0 +1,77 @@
+pipeline {
+    agent none  // This means no global agent, matrix will handle the agents
+    stages {
+        stage('Build and Test') {
+            matrix {
+                axes {
+                    axis {
+                        name 'JDK'
+                        values '8', '11'
+                    }
+                    axis {
+                        name 'OS'
+                        values 'Ubuntu', 'Windows'
+                    }
+                    axis {
+                        name 'BROWSER'
+                        values 'chrome', 'firefox', 'edge'
+                    }
+                }
+                stages {
+                    stage('Checkout') {
+                        agent { label "${OS}" }  // Runs on the appropriate OS node
+                        steps {
+                            git 'https://github.com/your-repo/your-project.git'
+                        }
+                    }
+                    stage('Set up JDK') {
+                        steps {
+                            script {
+                                if (JDK == '8') {
+                                    // Set up JDK 8
+                                    tool name: 'JDK8', type: 'Tool'
+                                } else {
+                                    // Set up JDK 11
+                                    tool name: 'JDK11', type: 'Tool'
+                                }
+                            }
+                        }
+                    }
+                    stage('Build') {
+                        steps {
+                            script {
+                                echo "Building with JDK ${JDK} on ${OS}"
+                                sh 'mvn clean install'
+                            }
+                        }
+                    }
+                    stage('Test') {
+                        steps {
+                            script {
+                                echo "Running tests with JDK ${JDK} on ${OS}"
+                                sh 'mvn test'
+                            }
+                        }
+                    }
+                    stage('Start Test') {
+                        agent { label "${OS}" }
+                        steps {
+                            script {
+                                echo "Testing on ${BROWSER} in ${OS}"
+                                // Commands to run tests, for example:
+                                sh "./run-tests.sh --browser ${BROWSER} --os ${OS}"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Cleaning up after the pipeline.'
+        }
+    }
+}
+
+

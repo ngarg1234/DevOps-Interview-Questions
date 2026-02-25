@@ -1,0 +1,9 @@
+replace searches a given string for another given substring, and replaces each occurrence with a given replacement string.
+
+replace(string, substring, replacement)
+
+> replace("1 + 2 + 3", "+", "-")
+1 - 2 - 3
+
+> replace("hello world", "/w.*d/", "everybody")
+hello everybody

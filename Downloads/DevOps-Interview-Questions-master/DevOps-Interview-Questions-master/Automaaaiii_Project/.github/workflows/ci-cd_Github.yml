@@ -1,0 +1,87 @@
+name: CI/CD pipeline that uses Git as the source control management (SCM) system, Maven for building, Amazon S3 for file storage and retrieval, SonarQube for code quality analysis, and Docker for containerization and Kubernetes for deployment
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'adoptopenjdk'
+
+    - name: Install AWS CLI
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y awscli
+
+    - name: Download file from S3
+      run: |
+        aws s3 cp s3://my-source-bucket/my-file.zip my-file.zip
+
+    - name: Extract downloaded file
+      run: |
+        unzip my-file.zip -d extracted
+
+    - name: Build with Maven
+      run: |
+        cd extracted
+        mvn clean install
+
+    - name: Upload build artifacts to S3
+      run: |
+        aws s3 cp target/my-app.jar s3://my-destination-bucket/my-app.jar
+
+    - name: Run SonarQube analysis
+      uses: sonarsource/sonarcloud-github-action@v1
+      with:
+        args: >
+          -Dsonar.projectKey=my-project-key
+          -Dsonar.organization=my-organization
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.login=${{ secrets.SONARQUBE_TOKEN }}
+
+    - name: Build Docker image
+      run: |
+        docker build -t my-app:latest .
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+    - name: Push Docker image
+      run: |
+        docker tag my-app:latest ${{ secrets.DOCKER_HUB_USERNAME }}/my-app:latest
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/my-app:latest
+
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v2
+      with:
+        version: '1.24.0'
+
+    - name: Configure Kubernetes cluster
+      run: |
+        kubectl config set-cluster my-cluster --server=${{ secrets.K8S_API_SERVER }}
+        kubectl config set-credentials my-user --token=${{ secrets.K8S_TOKEN }}
+        kubectl config set-context my-context --cluster=my-cluster --user=my-user
+        kubectl config use-context my-context
+
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -f k8s/pod.yaml
+        kubectl apply -f k8s/service.yaml
+        kubectl apply -f k8s/deployment.yaml

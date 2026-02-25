@@ -1,0 +1,205 @@
+✅ What is Amazon ECR?
+-> Amazon Elastic Container Registry (ECR) is a fully managed Docker container registry that makes it easy to store,
+manage, and deploy container images securely.
+
+Here are the Key Features of ECR as lines:
+
+-- Fully Managed: No need to manage registry infrastructure.
+-- Secure: Supports encryption at rest (AWS KMS) and in-transit (TLS).
+-- Integrated with IAM: Fine-grained access control for container images.
+-- Integrated with CI/CD: Works seamlessly with CodePipeline, CodeBuild, Jenkins.
+-- Supports OCI images: Compatible with Open Container Initiative (OCI) image standards.
+-- VPC Endpoints: Provides private connectivity to ECR using AWS PrivateLink.
+-- Image Scanning: Automatically detects vulnerabilities in container images.
+-- Replication: Supports cross-region replication for multi-region and high availability architectures.
+
+
+-> When Immutable is selected, image tags are prevented from being overwritten. After the repository is configured for immutable tags, an ImageTagAlreadyExistsException error is returned if there is an attempt to push an image with a tag that is already in the repository.
+
+Q. Why to choose ECR over Dockerhub
+1. IF you are already managing infra on AWS cloud, it will be easy to provide the access to container registry using iam roles
+-> if we use doeckerhub, we have to again have the headache of creating user account and passwords
+2. Dockerhub is more useful for public repo
+-> ECR has very better inegration with EKS, ECS
+ 
+NOTE: ECR is region specific,
+        once created ecr name can't be changed
+ 
+ 
+ECR images are encrypted at rest using KMS key, and encrypted at transit using TLS
+ 
+** Key Benefits of ECR
+1. Security: ECR offers encryption at rest, and images are stored in private repositories by default, ensuring the security of your container images.
+2. Integration: ECR integrates smoothly with AWS services like ECS and EKS, simplifying the deployment process.
+3. Scalability: As a managed service, ECR automatically scales to meet the demands of your container image storage.
+4 Availability: ECR guarantees high availability, reducing the risk of image unavailability during critical times.
+5. Lifecycle Policies: You can define lifecycle policies to automate the cleanup of unused or old container images, helping you save on storage costs.
+ 
+ 
+High availability in AWS regions
+-------------------------------- 
+ 
+Login
+ -> Retrieve an authentication token and authenticate your Docker client to your registry.
+$$ aws ecr get-login-password --region <your-region> | docker login --username AWS --password-stdin <your-aws-account-id>.dkr.ecr.<your-region>.amazonaws.com
+ 
+ 
+Push
+$$ docker tag shyam:latest 676206929059.dkr.ecr.us-east-1.amazonaws.com/shyam:latest
+$$ docker push <your-aws-account-id>.dkr.ecr.<your-region>.amazonaws.com/<your-repository-name>:<tag>
+ 
+-> ECR images can be replicted into other regions as well accounts for higher availability
+ 
+Lifecycle
+ -> example:  you can set lifecycle like, if the image is more than 360 days older, delete it
+-> example2: if image count is more than 100, delete the image
+ 
+
+
+⚙️ How ECR Works (End-to-End Flow)
+1. Push Docker image to ECR from a build system.
+2. Store and manage versions/tags of images.
+3. Pull Docker image to deploy on ECS, EKS, EC2.
+4. Use IAM roles/policies to control access (push/pull).
+5. Scan images for vulnerabilities before deployment.
+
+🚀 Common Use Cases
+-- Store custom container images for Kubernetes (EKS) or ECS.
+-- Store Lambda container images (Lambda supports container packaging).
+-- Store images for microservices architectures.
+-- Automate image builds and pushes from CI/CD pipelines (CodeBuild, Jenkins).
+
+🔁 Replication for Multi-Region Resilience — What is it?
+-> Replication for Multi-Region Resilience refers to automatically copying and synchronizing data (like container images, secrets, databases, etc.) across multiple AWS regions, so that:
+1. Your application/data is available even if an entire AWS region goes down.
+2. You can serve users from the closest region for better performance.
+3. Disaster Recovery (DR) is easier because your data is not tied to a single region.
+
+✅ Why is Multi-Region Replication Important?
+-- High Availability (HA): Protects your application from regional outages.
+-- Low Latency: Serve global customers from the nearest region.
+-- Disaster Recovery: Data is ready in other regions for quick failover.
+-- Compliance: Meet legal/regulatory requirements to store data in specific countries/regions.
+
+
+✅ Step-by-Step Guide to Use ECR
+1. Create an ECR Repository
+$$ aws ecr create-repository --repository-name my-app-repo --region us-east-1
+
+🔑 Important Flags:
+--image-scanning-configuration scanOnPush=true for auto vulnerability scan.
+--encryption-configuration encryptionType=KMS for KMS encryption.
+
+
+2. Authenticate Docker to ECR (Login)
+$$ aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.us-east-1.amazonaws.com
+
+
+3. Tag and Push Image to ECR
+$$ docker tag my-app:latest <account-id>.dkr.ecr.us-east-1.amazonaws.com/my-app-repo:latest
+$$ docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/my-app-repo:latest
+
+
+4. Pull Image from ECR
+$$ docker pull <account-id>.dkr.ecr.us-east-1.amazonaws.com/my-app-repo:latest
+
+
+🔐 IAM Policies for ECR Access
+Example Push & Pull Policy:
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:PutImage",
+        "ecr:InitiateLayerUpload",
+        "ecr:UploadLayerPart",
+        "ecr:CompleteLayerUpload"
+      ],
+      "Resource": "arn:aws:ecr:us-east-1:account-id:repository/my-app-repo"
+    }
+  ]
+}
+
+
+
+
+🔄 ECR with CI/CD (CodePipeline + CodeBuild)
+-> Pipeline Flow:
+1. CodeCommit/GitHub Repo ➡️ CodePipeline
+2. CodeBuild builds Docker image
+3. CodeBuild pushes image to ECR
+4. ECS/EKS pulls image and deploys.
+-- CodeBuild Role Example Policy:
+{
+  "Effect": "Allow",
+  "Action": [
+    "ecr:GetAuthorizationToken",
+    "ecr:BatchCheckLayerAvailability",
+    "ecr:CompleteLayerUpload",
+    "ecr:GetDownloadUrlForLayer",
+    "ecr:InitiateLayerUpload",
+    "ecr:PutImage",
+    "ecr:UploadLayerPart"
+  ],
+  "Resource": "*"
+}
+
+
+
+🧑‍💻 Vulnerability Scanning
+-> Enable image scanning on push:
+$$ aws ecr put-image-scanning-configuration \
+    --repository-name my-app-repo \
+    --image-scanning-configuration scanOnPush=true
+
+
+
+🔑 Security Best Practices
+1. Enable Image Scanning on Push.
+2. Use IAM roles with least privilege for services/CI/CD pipelines.
+3. Enable encryption with KMS.
+4. Use VPC Endpoints for private ECR access.
+5. Tag images properly (versioning, environments).
+
+
+📊 Monitoring & Metrics
+-> CloudWatch Metrics:
+-- Image pull and push counts.
+-- Image scan findings.
+-- Replication metrics.
+-> CloudTrail:
+-- API calls for audit and compliance.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

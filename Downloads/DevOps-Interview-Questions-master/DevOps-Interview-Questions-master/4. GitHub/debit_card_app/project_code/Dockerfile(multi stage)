@@ -1,0 +1,24 @@
+FROM ubuntu:latest as clone
+WORKDIR /tmp/docker
+ENV TZ=Asia/Kolkata
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN apt-get -y update && apt-get -y upgrade && apt-get -y install git
+RUN apt-get -y install openjdk-8-jdk
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
+RUN apt-get -y update && apt-get -y install maven
+RUN  mvn --version
+RUN ls
+RUN git clone https://github.com/Shyamjith06/debit_card_app.git
+RUN cd debit_card_app/project_code  &&  mvn clean install -Dmaven.test.skip=true
+RUN mkdir /usr/local/tomcat
+RUN  apt-get update && apt-get install -y curl
+
+
+
+FROM tomcat:9.0 as build
+RUN echo 'Deploying War on Server'
+RUN rm -rf /usr/local/tomcat/webapps/*
+COPY --from=clone /tmp/docker/debit_card_app/project_code/target/*.war  /usr/local/tomcat/webapps/ROOT.war
+#RUN cp /tmp/docker/debit_card_app/project_code/target/de /tmp/docker/usr/local/tomcat/webapps/ROOT.war
+EXPOSE 8080
+CMD ["catalina.sh", "run"]

@@ -1,0 +1,15 @@
+
+It is recommended to keep each module in a seperate repository
+
+Repository name must follow a strict naming convention as below,
+
+        the repo name contains 3 strings seperated by a -
+        the repo name should start with the string "terraform" 
+        second string should be name of the provider 
+        third string should be the module name 
+
+the final repo name will looks like -> terraform-<provider>-<module-name>
+
+example -> terraform-aws-eks
+
+Named terraform-<PROVIDER>-<NAME>. Module repositories must use this three-part name format, where <NAME> reflects the type of infrastructure the module manages and <PROVIDER> is the main provider where it creates that infrastructure. The <NAME> segment can contain additional hyphens. Examples: terraform-google-vault or terraform-aws-ec2-instance.

@@ -1,0 +1,66 @@
+# Configure 'Deployment' of mysql server
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-db
+  labels:
+    app: mysql
+    tier: database-db
+spec:
+  selector: # mysql Pod Should contain same labels 
+    matchLabels:
+      app: mysql-db
+      tier: database
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels: # Must match 'Service' and 'Deployment' selectors
+        app: mysql-db
+        tier: database
+    spec:
+      containers:
+      - image: mysql:5.7 # image from docker-hub
+        args:
+          - "--ignore-db-dir=lost+found" # Workaround for https://github.com/docker-library/mysql/issues/186
+        name: mysql 
+        env:
+        - name: MYSQL_ROOT_PASSWORD # Setting Root Password of mysql From a 'Secret'
+          valueFrom:
+            secretKeyRef:
+              name: db-root-credentials # Name of the 'Secret'
+              key: password   # 'key' inside the Secret which contains required 'value'
+        - name: MYSQL_USER # Setting USER username on mysql From a 'Secret'
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: username
+        - name: MYSQL_PASSWORD # Setting USER Password on mysql From a 'Secret'
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: password
+        - name: MYSQL_DATABASE # Setting Database Name from a 'ConfigMap'
+          valueFrom:
+            configMapKeyRef:
+              name: db-conf
+              key: name
+        ports:
+        - containerPort: 3306
+          name: mysql
+---          
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-db
+  labels:
+    app: mysql-db
+spec:
+  ports:
+  - name: db-port
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: mysql-db
+  type: ClusterIP

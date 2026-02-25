@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+data:
+  mapRoles: |
+    - rolearn:  arn:aws:iam::228699574855:role/factory_node
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
+  mapUsers: |
+    - userarn: arn:aws:iam::228699574855:root
+      username: root_user
+      groups:
+        - system:masters
+    - userarn: arn:aws:iam::228699574855:user/Shyam
+      username: shyam
+      groups:
+        - system:masters      
+    - userarn: arn:aws:iam::228699574855:user/trainee
+      username: eks_test_trainee  
+    - userarn: arn:aws:iam::228699574855:user/Dev
+      username: eks_developer 
+    - userarn: arn:aws:iam::228699574855:user/Jenkins
+      username: jenkins_user  
+    - userarn:  arn:aws:iam::228699574855:user/lahari
+      username: lahari
+      groups:
+        - developers
+    - userarn: arn:aws:iam::228699574855:user/admin
+      username: super-admin
+      groups:
+        - system:masters 
+     
+  
+    

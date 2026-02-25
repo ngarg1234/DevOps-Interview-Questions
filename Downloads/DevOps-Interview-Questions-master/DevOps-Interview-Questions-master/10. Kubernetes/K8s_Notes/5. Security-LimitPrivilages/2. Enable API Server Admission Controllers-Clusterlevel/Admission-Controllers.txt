@@ -1,0 +1,260 @@
+🚧 Enable API Server Admission Controllers
+-> Use admission controllers to enforce security policies.
+-> Recommended ones:
+1. NodeRestriction
+2. Pod Security / Pod Security Admission cpntroller
+3. NamespaceLifecycle
+4. AlwaysPullImages
+5. DenyEscalatingExec (Deprecated in v1.20)
+
+# Example API server flag
+--enable-admission-plugins=NodeRestriction,PodSecurity,NamespaceLifecycle
+
+
+🚀 What are Admission Controllers? [Admission Controllers: Should this request be allowed, modified, or rejected?]
+-> Admission controllers are plugins in Kubernetes that intercept API requests before they are persisted in etcd. 
+-> They modify or validate requests to enforce policies, security, and compliance.
+
+--------------------------------------------------------------------------------------
+2️⃣ Types of Admission Controllers in Kubernetes
+✅ Mutating Admission Controllers (Modify Requests)
+-> Automatically modify requests before they are stored in etcd.
+-> Used for setting defaults, adding security policies, or modifying resource specs.
+
+1. MutatingAdmissionWebhook: Calls external webhooks to modify objects (e.g., inject security settings).
+2. NamespaceAutoProvision: Creates a namespace automatically if it does not exist.
+3. PodPreset: Injects environment variables, volumes, etc., into Pods. (Deprecated in v1.20)
+4. DefaultStorageClass: Assigns a default StorageClass if none is specified in a PersistentVolumeClaim (PVC).
+5. DefaultTolerationSeconds: Assigns a default toleration to Pods for better scheduling.
+6. ServiceAccount: Automatically assigns a ServiceAccount to Pods.
+✅ Example: A MutatingAdmissionWebhook could add a securityContext to a Pod if the user didn’t define one.
+
+
+
+✅ Validating Admission Controllers (Reject Requests)
+-> Validate requests and can deny them if they violate security or policy rules.
+-> Used for enforcing compliance, security, and resource limits.
+Admission Controller	Description
+
+1. ValidatingAdmissionWebhook: Calls external webhooks to validate API requests.
+2. PodSecurity: Enforces Pod Security Standards (Baseline, Restricted, Privileged). (Replaces PodSecurityPolicy since v1.25)
+3. ResourceQuota: Ensures namespace resource quotas are not exceeded.
+4. LimitRanger: Restricts CPU, memory, or other resources for containers.
+5. NodeRestriction: Prevents kubelet from modifying or accessing resources outside its scope.
+6. AlwaysPullImages: Ensures all Pods pull images before starting (security feature).
+
+✅ Example: A ValidatingAdmissionWebhook could reject a Pod that runs as root if the security policy enforces runAsNonRoot.
+
+
+3️⃣ Special Admission Controllers
+-> Some admission controllers provide special functionalities:
+1. EventRateLimit: Limits the number of Kubernetes events generated to avoid API Server overload.
+2. DenyEscalatingExec: Prevents exec commands in privileged or high-privilege Pods. (Deprecated in v1.20)
+3. SecurityContextDeny: Blocks Pods from setting dangerous security contexts (like privileged: true). (Deprecated in v1.25, replaced by PodSecurity)
+4. RuntimeClass: Selects the appropriate container runtime (e.g., gVisor, Kata Containers).
+✅ Example: EventRateLimit can prevent excessive logs and event spam in the cluster.
+
+----------------------------------------------------------------------------------
+🔑 How Admission Controllers Work?
+1️⃣ User submits a request (kubectl apply -f pod.yaml).
+2️⃣ Authentication & Authorization (via RBAC or other methods).
+3️⃣ Admission Controllers process the request:
+-- Mutating Controllers modify the request.
+-- Validating Controllers check if the request is allowed.
+4️⃣ If the request passes, it is stored in etcd, and the resource is created.
+📌 Mutating controllers run before validating controllers.
+
+
+🛠️ How to Enable Admission Controllers
+-> In kube-apiserver (control plane), set the --enable-admission-plugins flag:
+$$ --enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,NodeRestriction,PodSecurity,ResourceQuota
+
+To disable some (if needed):
+$$ --disable-admission-plugins=AlwaysAdmit,AlwaysPullImages
+
+🌐 Webhook-Based Admission Controllers (OPA/Gatekeeper)
+-> Kubernetes also supports "Dynamic admission controllers" via webhooks:
+1. MutatingAdmissionWebhook — Modify resource spec (e.g., inject sidecars).
+2. ValidatingAdmissionWebhook — Accept/reject based on custom validation logic (e.g., compliance rules).
+-> Example use case: OPA (Open Policy Agent) as a Validating Webhook.
+
+✅ Best Practices for Admission Controllers
+1. Enable critical controllers like NamespaceLifecycle, ServiceAccount, PodSecurity, NodeRestriction.
+2. Use MutatingAdmissionWebhook to inject standard configs (e.g., logging sidecars).
+3. Use ValidatingAdmissionWebhook to enforce organizational policies.
+4. Combine with RBAC and Network Policies for layered security.
+5. Regularly audit and review policies enforced by controllers.
+
+----------------------------------------------------------------------------------
+⚙️ Commonly Used Admission Controllers
+Admission Controller		Type			Purpose
+1. NamespaceLifecycle  ->  Validating  ->  Ensures namespace exists, handles namespace deletion.
+2. LimitRanger  ->  Validating  ->  Enforces resource limits (CPU, memory).
+3. ServiceAccount  ->  Mutating  ->  Automates service account management for Pods.
+4. NodeRestriction  ->  Validating  ->  Limits kubelet actions (e.g., modifying pods).
+5. PodSecurity  ->  Validating  ->  Enforces Pod Security Standards (restricted, baseline).
+6. ResourceQuota  ->  Validating  ->  Enforces resource quotas per namespace.
+7. DefaultStorageClass  ->  Mutating  ->  Assigns default StorageClass to PVCs.
+8. MutatingAdmissionWebhook  ->  Mutating  ->  Allows custom external webhooks to mutate requests.
+9. ValidatingAdmissionWebhook  ->  Validating  ->  Allows custom external webhooks to validate requests.
+
+
+----------------------------------------------------------------------------------
+1. 🌐 What is NamespaceLifecycle?
+-> The NamespaceLifecycle admission controller is a validating admission plugin that ensures:
+a. All resources are created within valid namespaces.
+b. Prevents creation of resources in non-existent or terminating namespaces.
+c. Handles automatic deletion of all resources within a namespace when that namespace is deleted (namespace finalization process).
+
+----------------------------------------------------------------------------------
+2. 🚀 What is LimitRanger?
+-> The LimitRanger admission controller enforces resource usage constraints (like CPU & memory limits) on Pods and Containers at the time of creation.
+-> It ensures that Pods comply with resource limits/requests defined in the namespace using a LimitRange object.
+-> Helps prevent resource abuse and ensures fair usage among tenants in a cluster.
+🎯 Main Functions of LimitRanger
+Feature						Description
+Default resource requests/limits	Auto-assigns default CPU/memory if not specified.
+Max/min resource enforcement		Prevents Pods that exceed max/min thresholds.
+Enforces ratio constraints		Controls request/limit ratios to ensure balance.
+Applies to namespace-scoped resources	Works within individual namespaces.
+
+----------------------------------------------------------------------------------
+3. 🚀 What is ServiceAccount Admission Controller?
+-> The ServiceAccount admission controller automatically manages ServiceAccounts for Pods and injects tokens needed to authenticate to the Kubernetes API.
+
+🎯 Main Responsibilities:
+-- Automatically assigns a ServiceAccount to a Pod if one is not specified.
+-- Mounts the ServiceAccount token into the Pod so it can interact with the API securely.
+-- Ensures Pods are linked to Kubernetes RBAC permissions via their ServiceAccount.
+
+⚙️ By Default (Out-of-the-box Kubernetes cluster):
+-> The default service account has no permissions to access the Kubernetes API — unless you explicitly assign them using RoleBinding or ClusterRoleBinding.
+It cannot list, get, create, delete, or modify resources.
+
+✅ Best Practices with ServiceAccount Controller
+1. Use custom ServiceAccounts for Pods that need API access.
+2. Bind minimal RBAC roles to those ServiceAccounts — Principle of Least Privilege (PoLP).
+3. Disable automounting when unnecessary:
+$$ automountServiceAccountToken: false
+4. Avoid using the default SA for sensitive workloads — create namespace-specific ServiceAccounts.
+5. Rotate ServiceAccount tokens periodically (Kubernetes handles this automatically in newer versions).
+
+----------------------------------------------------------------------------------
+4. 🚀 What is the NodeRestriction Admission Controller?
+-> The NodeRestriction admission controller is a validating admission plugin that limits the actions that kubelets (nodes) can perform when interacting with the Kubernetes API on behalf of themselves.
+🔑 What Can Nodes Do with NodeRestriction Enabled?
+		Action				Allowed?
+Modify its own Node object (status updates)	✅ Yes
+Modify Pods scheduled on itself			✅ Yes (status updates, heartbeats)
+Read Secrets/ConfigMaps referenced by its Pods	✅ Yes (if bound via PodSpec)
+Create CSRs for its own identity		✅ Yes
+Access other nodes' Pods or modify them		❌ No
+Modify other Node objects			❌ No
+
+----------------------------------------------------------------------------------
+5. 🚀 What is the PodSecurity Admission Controller?
+-> The PodSecurity Admission (PSA) controller is a built-in Kubernetes admission controller that enforces Pod Security Standards (PSS) at the namespace level.
+
+🔐 Purpose:
+-- Ensure Pods comply with security best practices (e.g., no privileged containers, restricted host access).
+-- Prevent Pods from using insecure configurations before they're created.
+
+📊 PodSecurity vs PodSecurityPolicy (PSP)
+Feature		PodSecurity (PSA)		PodSecurityPolicy (PSP) (Deprecated)
+Admission type	Built-in Admission Controller	Built-in Admission Controller (deprecated)
+Granularity	Namespace level (via labels)	Cluster-wide policies
+Ease of use	Simple and declarative		Complex, required detailed RBAC
+Modes		Enforce, Audit, Warn		Only Enforce
+Kubernetes version	GA in 1.25+		Removed in 1.25
+
+----------------------------------------------------------------------------------
+6. 🚀 What is the ResourceQuota Admission Controller?
+-> The ResourceQuota Admission Controller is a built-in Kubernetes admission plugin that enforces resource usage limits in a namespace.
+-> It prevents users from exceeding defined quotas for resources like CPU, memory, and number of objects (e.g., Pods, Services).
+
+⚙️ How Does ResourceQuota Admission Controller Work?
+ResourceQuota object is defined per namespace.
+When a user creates or modifies a resource (like Pod, PVC):
+Admission controller intercepts the request.
+Checks current usage + requested amount against quota.
+If exceeds quota, the request is rejected with an error.
+
+🛡️ Why Use ResourceQuota?
+Benefit				Description
+Fair resource sharing		Prevent "noisy neighbors" from hogging resources.
+Multi-tenancy enforcement	Divide cluster resources among teams/projects.
+Cost and capacity control	Predict and manage usage, aiding capacity planning.
+Prevents resource exhaustion	Stops cluster-wide outages caused by overuse.
+
+🧠 Difference Between ResourceQuota & LimitRange
+Feature		ResourceQuota			LimitRange
+Scope	Namespace-wide resource limits	Default/min/max for individual Pods/containers
+Type	Aggregate control		Per-resource request/limit control
+Purpose	Prevent namespace overuse	Set default/fair container sizing
+✅ Best together: Use LimitRange to set default Pod sizes, and ResourceQuota to control total usage.
+
+----------------------------------------------------------------------------------
+7. 🚀 What is the DefaultStorageClass Admission Controller?
+-> DefaultStorageClass Admission Controller is a built-in Kubernetes admission plugin.
+-> Purpose:
+   -- Automatically assign the default StorageClass to a PersistentVolumeClaim (PVC) if the user doesn't specify any storageClassName.
+   -- Helps in automatic provisioning of storage without requiring users to know the available StorageClasses.
+
+⚙️ How Does It Work?
+1. Admin creates and marks a StorageClass as default.
+2. User creates a PVC without storageClassName.
+3. DefaultStorageClass admission controller:
+   -- Intercepts PVC creation.
+   -- Injects the default StorageClass name into the PVC.
+4. PVC is dynamically provisioned using the default StorageClass.
+
+🛡️ Why Use DefaultStorageClass Admission Controller?
+Benefit				Description
+Simplifies storage provisioning	Users don't need to specify storage classes manually.
+Enforces consistency		Ensures all PVCs get a StorageClass if none is provided.
+Enables dynamic provisioning	Ensures PVCs can trigger automatic PersistentVolume creation.
+Reduces user errors		Prevents failed PVC creation due to missing storage class.
+
+----------------------------------------------------------------------------------
+8. 🚀 What is the MutatingAdmissionWebhook Admission Controller?
+-> The MutatingAdmissionWebhook is a Kubernetes admission controller that allows dynamic modification (mutation) of Kubernetes API objects at the time of their creation or modification.
+-> It enables custom logic to intercept API requests and modify them before they are persisted into etcd (the Kubernetes data store).
+
+⚙️ How Does It Work?
+Flow:
+User submits API request (e.g., create Pod).
+Admission control phase is triggered.
+MutatingAdmissionWebhook sends the request object to registered webhooks.
+Webhook examines and optionally modifies the object.
+Modified object is returned to API server.
+Final object is persisted into etcd and deployed.
+
+💡 Why Use MutatingAdmissionWebhook?
+Benefit				Description
+Automatic defaults injection	Add default values like labels, annotations, tolerations.
+Sidecar injection		Add additional containers (e.g., for monitoring, security) to Pods.
+Security and compliance		Enforce security contexts, limit capabilities, inject secrets.
+Cross-cutting concerns		Inject configurations (e.g., logging agents, service mesh proxies).
+Infrastructure consistency	Enforce organizational policies dynamically.
+
+----------------------------------------------------------------------------------
+9. 🚀 What is the ValidatingAdmissionWebhook Admission Controller?
+-> ValidatingAdmissionWebhook is a Kubernetes admission controller that allows custom validation of Kubernetes API requests.
+-> It lets you define webhooks that accept or reject requests based on custom logic without modifying the object.
+-> Runs after any MutatingAdmissionWebhook (if configured).
+⚙️ How Does It Work?
+Request Flow:
+User submits API request (e.g., create Pod).
+Kubernetes API server invokes MutatingAdmissionWebhook (if enabled).
+After mutation, API server calls ValidatingAdmissionWebhook.
+Webhook evaluates the object and returns "allow" or "deny" decision.
+If allowed, object is persisted and deployed; if denied, user gets error message.
+
+🎯 Purpose of ValidatingAdmissionWebhook
+Goal				Description
+Enforce policies	Prevent insecure configurations (e.g., privileged Pods).
+Governance and compliance	Ensure all workloads comply with organizational policies.
+Prevent invalid configs	Deny deployments with invalid resource requests, labels, etc.
+Security enforcement	Block usage of disallowed images, privilege escalations.
+
+----------------------------------------------------------------------------------

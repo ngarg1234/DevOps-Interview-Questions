@@ -1,0 +1,71 @@
+## Yaml file for creating a Role and binding it with a USer
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: eks_developer_role
+  # "namespace" omitted since ClusterRoles are not namespaced
+rules:
+  - apiGroups: [""] #indicates the core API group 
+    resources: ["nodes", "namespaces", "pods"]
+    verbs: ["get", "list"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "daemonsets", "statefulsets", "replicasets"]
+    verbs: ["get", "list", "create"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: eks_developer_binding
+subjects:  # You can specify more than one "subject"
+  - kind: User ## kind can be user or group
+    name: eks_developer  ##This name must be used for binding IAM ROle with aws-auth configmap
+    apiGroup: rbac.authorization.k8s.io   ## NOTE - this is apiGroup not apiGroups
+roleRef:
+  kind: ClusterRole
+  name: eks_developer_role
+  apiGroup: rbac.authorization.k8s.io  ## NOTE - this is apiGroup not apiGroups
+
+
+
+
+# To grant permissions across a whole cluster, you can use a ClusterRoleBinding. The following ClusterRoleBinding allows any user in the group "manager" to read secrets in any namespace.
+
+# apiVersion: rbac.authorization.k8s.io/v1
+# # This cluster role binding allows anyone in the "manager" group to read secrets in any namespace.
+# kind: ClusterRoleBinding
+# metadata:
+#   name: read-secrets-global
+# subjects:
+# - kind: Group
+#   name: manager # Name is case sensitive
+#   apiGroup: rbac.authorization.k8s.io
+# roleRef:
+#   kind: ClusterRole
+#   name: secret-reader
+#   apiGroup: rbac.authorization.k8s.io
+
+
+
+# For a user named alice@example.com:
+
+# subjects:
+# - kind: User
+#   name: "alice@example.com"
+#   apiGroup: rbac.authorization.k8s.io
+# For a group named frontend-admins:
+
+# subjects:
+# - kind: Group
+#   name: "frontend-admins"
+#   apiGroup: rbac.authorization.k8s.io
+# For the default service account in the "kube-system" namespace:
+
+# subjects:
+# - kind: ServiceAccount
+#   name: default
+#   namespace: kube-system

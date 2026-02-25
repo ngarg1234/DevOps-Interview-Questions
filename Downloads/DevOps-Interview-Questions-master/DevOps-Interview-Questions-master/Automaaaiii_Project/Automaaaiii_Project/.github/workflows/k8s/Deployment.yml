@@ -1,0 +1,33 @@
+apiVersion: apps/v1       # Specifies the API version
+kind: Deployment          # Defines the resource type as a Deployment
+metadata:
+  name: my-app-deployment # Name of the deployment
+spec:
+  replicas: 3             # Number of desired Pod replicas
+  selector:               # Specifies how to find the Pods managed by this deployment
+    matchLabels:
+      app: my-app         # Label to match with the Pods (more on this below)
+  template:
+    metadata:
+      labels:
+        app: my-app       # Label assigned to Pods created by this deployment
+    spec:
+      containers:
+        - name: my-container
+          image: my-app:1.0
+          ports:
+            - containerPort: 3000 # The port the container exposes
+
+
+#A Deployment provides features such as scaling, self-healing, and rolling updates. It manages multiple replicas of Pods and ensures that the specified number of Pods is running at all times. Deployments make Pods fault-tolerant and scalable.
+
+#Purpose:
+# Manages the lifecycle of Pods.
+# Ensures that a specified number of Pod replicas are running.
+# Automatically replaces Pods if they fail.
+# Allows updates without downtime (rolling updates).
+
+# Benefits:
+# Scaling: You can scale your application by simply changing the replicas count.
+# Rolling Updates: Allows seamless application updates without downtime.
+# Self-healing: Automatically restarts Pods if they fail.

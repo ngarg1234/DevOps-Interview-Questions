@@ -1,0 +1,75 @@
+@Library('my-shared-library') _
+
+pipeline {
+    agent any
+
+    environment {
+        REPO_URL = 'https://github.com/your-org/your-repo.git'
+        BRANCH = 'main'
+        SONARQUBE_URL = 'http://sonarqube.yourcompany.com'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    checkoutCode(REPO_URL, BRANCH)
+                }
+            }
+        }
+
+        stage('Maven Build') {
+            steps {
+                script {
+                    mavenBuild('clean install')
+                }
+            }
+        }
+
+        stage('SonarQube Scan') {
+            steps {
+                script {
+                    sonarScan()
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    deploy('dev')  // Deploying to the dev environment
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                // Send email notification when build completes
+                emailext body: 'Build has completed',
+                subject: 'Build Notification',
+                to: 'user@example.com',
+                attachLog: true
+            }
+        }
+        success {
+            script {
+                // Send email notification when artifacts are stored
+                emailext body: 'Artifacts have been stored',
+                subject: 'Artifacts Notification',
+                to: 'user@example.com',
+                attachLog: true
+            }
+        }
+        failure {
+            script {
+                // Send email notification when deployment is completed
+                emailext body: 'Deployment has failed',
+                subject: 'Deployment Notification',
+                to: 'user@example.com
+            }
+        }
+
+    }
+}

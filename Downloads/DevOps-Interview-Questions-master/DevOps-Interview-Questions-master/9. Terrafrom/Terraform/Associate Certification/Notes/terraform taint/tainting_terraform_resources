@@ -1,0 +1,18 @@
+
+IMP: Terraform taint command is deprecated 
+
+The terraform taint command informs Terraform that a particular object has become degraded or damaged. Terraform represents this by marking the object as "tainted" in the Terraform state, and Terraform will propose to replace it in the next plan you create.
+
+Terraform taint 
+
+Warning: This command is deprecated. For Terraform v0.15.2 and later, we recommend using the -replace option with terraform apply instead
+
+terraform apply -replace="aws_instance.example[0]"
+
+
+terraform apply -replace="aws_iam_role.iam_role"
+
+IMP NOTE -replace command is availabe from terraform version 0.15.2 onwards
+
+
+

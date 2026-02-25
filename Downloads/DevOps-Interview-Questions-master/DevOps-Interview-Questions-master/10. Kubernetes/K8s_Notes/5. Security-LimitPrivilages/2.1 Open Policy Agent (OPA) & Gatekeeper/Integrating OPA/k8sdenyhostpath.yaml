@@ -1,0 +1,33 @@
+# 4️⃣ Restrict HostPath Volumes
+# 🚫 Prevent users from mounting HostPath volumes, which can expose the host system.
+
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdenyhostpath
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDenyHostPath
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sdenyhostpath
+
+        violation[{"msg": "HostPath volumes are not allowed"}] {
+          input.review.object.spec.volumes[_].hostPath
+        }
+
+---
+# 🔹 Constraint
+
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDenyHostPath
+metadata:
+  name: deny-hostpath-volumes
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]

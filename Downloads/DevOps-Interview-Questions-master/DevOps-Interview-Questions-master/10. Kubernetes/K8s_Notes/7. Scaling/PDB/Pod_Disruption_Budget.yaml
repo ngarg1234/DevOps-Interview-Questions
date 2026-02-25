@@ -1,0 +1,25 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: my-app-pdb
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: my-app
+
+# ➡️ Ensures at least 2 pods are always running for app: my-app.
+
+---
+
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: my-app-pdb
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: my-app
+
+# ➡️ Ensures no more than 1 pod is unavailable at any time.

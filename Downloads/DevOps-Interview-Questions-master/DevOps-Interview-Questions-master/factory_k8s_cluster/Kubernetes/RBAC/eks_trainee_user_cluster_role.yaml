@@ -1,0 +1,29 @@
+## Yaml file for creating a Role and binding it with a USer
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: trainee-clusterrole
+rules:
+  - apiGroups: [""] ## apiGroups is empty for nodes, pods and NS
+    resources: ["nodes", "pods"]
+    verbs: ["get", "list"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "daemonsets", "statefulsets", "replicasets"]
+    verbs: ["get", "list"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: trainee-clusterrole-binding
+subjects:  # You can specify more than one "subject"
+  - kind: User ## kind can be user or group
+    name: eks_test_trainee  ##This name must be used for binding IAM ROle with aws-auth configmap
+    apiGroup: rbac.authorization.k8s.io   ## NOTE - this is apiGroup not apiGroups
+roleRef:
+  kind: ClusterRole
+  name: trainee-clusterrole
+  apiGroup: rbac.authorization.k8s.io  ## NOTE - this is apiGroup not apiGroups

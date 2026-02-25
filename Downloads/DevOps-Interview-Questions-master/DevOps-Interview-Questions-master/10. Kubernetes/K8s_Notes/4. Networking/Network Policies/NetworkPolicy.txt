@@ -1,0 +1,56 @@
+🚀 What is a NetworkPolicy in Kubernetes?
+-> A NetworkPolicy is a Kubernetes resource that controls how pods are allowed to communicate with each other and with other network endpoints (e.g., external IPs).
+
+👉 It restricts or allows:
+1. Pod-to-pod communication
+2. Pod-to-external communication
+3. External-to-pod communication
+⚠️ By default, all pods can communicate with all other pods unless a NetworkPolicy restricts that.
+
+
+✅ Why Use NetworkPolicy?
+-> Restrict internal pod communication (e.g., only allow frontend to talk to backend).
+-> Secure sensitive services (e.g., databases only accessible to specific apps).
+-> Control egress traffic (e.g., only allow pods to connect to specific IPs or domains).
+
+🔑 Key Components of a NetworkPolicy
+Field			Purpose
+podSelector	Selects the pods to which this policy applies
+policyTypes	Whether it controls Ingress, Egress, or both
+ingress		Rules for incoming traffic
+egress		Rules for outgoing traffic
+namespaceSelector	Selects pods in other namespaces
+ipBlock		CIDR ranges to allow/deny
+
+
+✅ Basic Example: Allow traffic to specific pods (Ingress)
+-> Applies to pods labeled role: backend in app namespace.
+-> Only allows incoming traffic from pods labeled role: frontend.
+-> Only on TCP port 80.
+
+✅ Deny all traffic (default deny)
+➡️ This blocks all incoming traffic to pods in the app namespace unless explicitly allowed by other NetworkPolicies.
+
+✅ Example: Allow egress traffic only to specific CIDR
+➡️ Backend pods can only access IPs in 192.168.1.0/24 on TCP port 443 (e.g., HTTPS).
+
+
+🔑 Important Notes on NetworkPolicies:
+Aspect			Explanation
+Default behavior	No isolation; all pods can talk to each other
+Effect of first policy	Once any NetworkPolicy applies to a pod, all traffic is denied unless explicitly allowed
+Isolation applies	To pods selected by podSelector
+Policy scope		Namespace-scoped (only affects pods in same namespace unless namespaceSelector is used)
+
+
+🔐 Best Practices for NetworkPolicies:
+1. Start with "default deny" policies for both ingress and egress.
+2. Explicitly allow only the necessary traffic (least privilege).
+3. Use labels effectively to group and select pods for policies.
+4. Regularly review and update policies as your architecture evolves.
+5. Test policies to avoid accidentally breaking communication between essential services.
+
+
+✅ Command to Check NetworkPolicies
+$$ kubectl get networkpolicies -n <namespace>
+$$ kubectl describe networkpolicy <policy-name> -n <namespace>

@@ -1,0 +1,27 @@
+https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html?icmpid=docs_lambda_help 
+
+
+
+When you configure a function in Python, the value of the handler setting is the file name and the name of the handler module, separated by a dot. For example, main.Handler calls the Handler method defined in main.py. 
+
+
+
+https://docs.aws.amazon.com/lambda/latest/dg/python-package.html 
+
+
+https://stackoverflow.com/questions/44469725/aws-lambda-support-for-multiple-files#:~:text=At%20the%20end%20you%20want,lambda%20function%20and%20use%20it 
+
+
+How to deploy a lambda function that has multiple python files
+
+example: a lambda function contains 2 python files "script1.py" and "script2.py"
+
+the approach here is, you have to select those 2 files together and create a zip file(NOTE: don't create a folder and copy the 2 files and make a zip of the folder. i tried that but i didn't work)
+
+demo: on mac long press on command key and select both the files and compress it 
+
+        on windows long press ctrl and select 
+
+upload the zip to s3
+
+you can have same handler name on both the files 

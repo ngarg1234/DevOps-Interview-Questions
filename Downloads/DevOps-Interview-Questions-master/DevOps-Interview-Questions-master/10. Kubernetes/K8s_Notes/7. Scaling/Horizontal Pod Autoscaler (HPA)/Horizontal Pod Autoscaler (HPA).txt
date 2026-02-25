@@ -1,0 +1,68 @@
+-> In Kubernetes, Horizontal Pod Autoscaler (HPA) is a powerful feature that automatically scales the number of Pods in a deployment or replica set based on observed CPU utilization or other select metrics. 
+-> This feature is crucial in a DevOps environment for optimizing resource utilization, ensuring high availability, and handling variable workloads effectively.
+
+** Key Concepts of Horizontal Pod Autoscaler (HPA)
+
+1. Metrics:
+-> HPA can be configured to scale Pods based on specific metrics. 
+-> The most common metric is CPU utilization (cpu), but you can also use memory (memory) and custom metrics (e.g., from Prometheus).
+
+2. Scaling Criteria:
+-> Target Utilization: You specify a target value for a resource (CPU or memory) that the HPA should aim to maintain across all Pods. If the target is exceeded (or goes below), HPA adjusts the number of Pods accordingly.
+
+3. Automatic Scaling:
+-> HPA dynamically adjusts the number of replicas of your Pods based on the resource utilization. 
+-> If the CPU load is high, HPA will scale the deployment up (add more Pods). If the load decreases, HPA will scale the deployment down (remove Pods).
+
+** Prerequisites:
+-> A running Kubernetes cluster (e.g., Minikube, GKE, EKS, AKS, etc.).
+-> The Metrics Server should be installed and running in the cluster to collect metrics like CPU and memory usage. Kubernetes uses these metrics for autoscaling.
+-> Example: Setting up Horizontal Pod Autoscaler (HPA)
+-> We will create a simple Nginx Deployment and configure the HPA to scale it based on CPU utilization.
+
+** Step-by-Step Guide:
+1. Create a Simple Nginx Deployment with service 
+-> We will start by deploying an Nginx application. The deployment will have 1 replica initially, and we will set up HPA to scale it based on CPU utilization.
+
+->  Create a YAML file nginx-deployment.yaml:
+$$ kubectl apply -f nginx-deployment.yaml
+
+2. Install the Metrics Server
+-> If the Metrics Server is not already installed in your Kubernetes cluster, you need to install it because HPA relies on it to collect metrics like CPU and memory utilization. To install the Metrics Server:
+
+$$ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.5.0/components.yaml
+
+-> Check if the metrics server is installed and working correctly:
+$$ kubectl get deployment metrics-server -n kube-system
+
+
+3. Create the Horizontal Pod Autoscaler (HPA)
+-> Now, let’s create the HPA object that will scale the Pods in the Nginx deployment based on CPU utilization.
+
+-> Create a YAML file nginx-hpa.yaml:
+-> This configuration tells Kubernetes to scale the nginx-deployment based on CPU utilization, and the target CPU utilization is set to 50%. It will scale the Pods between 1 and 5 replicas depending on the load.
+
+-> Apply the HPA configuration:
+$$ kubectl apply -f nginx-hpa.yaml
+
+4. Verify the Horizontal Pod Autoscaler
+-> Once the HPA is created, you can check its status with the following command:
+
+$$ kubectl get hpa nginx-hpa
+
+-> You should see output like this, indicating that the HPA is active and scaling based on CPU utilization:
+NAME        REFERENCE                     TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+nginx-hpa   Deployment/nginx-deployment   20%/50%   1         5         1         2m
+
+-> In this case, the current CPU utilization is 20%, and the target is 50%. Since the utilization is below the target, it’s still using 1 replica.
+
+5. Test the Scaling:
+-> To test the autoscaling, you can artificially increase the CPU load of the Nginx Pods.
+
+-> For example, run a stress test inside the Pod to increase CPU usage:
+$$ kubectl run -i --tty load-generator --image=busybox /bin/sh
+
+-> Inside the pod, run a command to create load::
+$$ while true; do echo "stress"; done
+
+kubectl run -it --rm load-generator --image=busybox -- /bin/sh -c "while true; do wget -q -O- http://my-app-service.default.svc.cluster.local; done"

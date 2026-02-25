@@ -1,0 +1,542 @@
+#Scenario1. 
+Q. While running a .#Terraform pipeline, the .#Devops engineer cancelled the process during the terraform apply phase. 
+This left the Terraform state locked in S3 and DynamoDB. 
+Later, after making changes to the Terraform code, the engineer attempted to rerun the pipeline, but encountered an error stating that the state was locked.
+This blocked the pipeline from proceeding further. 
+-> 
+#Solution:
+Here's how he resolved it
+1️⃣ Configured the remote backend locally using the same backend configuration as the pipeline. This ensured the local setup matched the pipeline's state storage settings
+𝐞𝐱𝐚𝐦𝐩𝐥𝐞 𝐛𝐚𝐜𝐤𝐞𝐧𝐝 𝐜𝐨𝐧𝐟𝐢𝐠 
+𝘵𝘦𝘳𝘳𝘢𝘧𝘰𝘳𝘮 {
+ 𝘣𝘢𝘤𝘬𝘦𝘯𝘥 "𝘴3" {
+ 𝘣𝘶𝘤𝘬𝘦𝘵     = "𝘮𝘺-𝘵𝘦𝘳𝘳𝘢𝘧𝘰𝘳𝘮-𝘴𝘵𝘢𝘵𝘦-𝘣𝘶𝘤𝘬𝘦𝘵"
+ 𝘬𝘦𝘺      = "𝘦𝘯𝘷/𝘥𝘦𝘷/𝘵𝘦𝘳𝘳𝘢𝘧𝘰𝘳𝘮.𝘵𝘧𝘴𝘵𝘢𝘵𝘦"
+ 𝘳𝘦𝘨𝘪𝘰𝘯     = "𝘦𝘶-𝘸𝘦𝘴𝘵-3"
+ 𝘥𝘺𝘯𝘢𝘮𝘰𝘥𝘣_𝘵𝘢𝘣𝘭𝘦 = "𝘮𝘺-𝘵𝘦𝘳𝘳𝘢𝘧𝘰𝘳𝘮-𝘭𝘰𝘤𝘬-𝘵𝘢𝘣𝘭𝘦"
+ }
+}
+
+2️⃣ Ran 𝐭𝐞𝐫𝐫𝐚𝐟𝐨𝐫𝐦 𝐢𝐧𝐢𝐭 to Initialize Terraform to sync the backend configuration
+3️⃣ Ran 𝐭𝐞𝐫𝐫𝐚𝐟𝐨𝐫𝐦 𝐟𝐨𝐫𝐜𝐞-𝐮𝐧𝐥𝐨𝐜𝐤 <𝐋𝐎𝐂𝐊_𝐈𝐃> to forcefully remove the lock, which basically removes the lock from backend.
+4️⃣ Resumed the pipeline again.
+
+While using terraform force-unlock can resolve locked state issues, 
+it is not advisable to force-unlock the state unless you are certain the lock was caused by your actions (e.g., canceling a pipeline or Terraform process).
+Forcing an unlock while another process is genuinely using the state can lead to state corruption or inconsistent infrastructure changes.
+Always double-check that no active Terraform processes are running.
+
+=====================================================================
+#Scenario 2
+** A large organization manages multiple AWS accounts and VPCs across several regions, each supporting a different business unit.
+The company’s .#Cloud & .#DevOps teams frequently provision new VPCs and subnets for application deployments, but they are running into overlapping IP addresses,
+causing routing conflicts and connectivity issues. The teams also lack visibility into the IP address usage across different accounts,
+leading to inefficient IP allocation, potential security risks, and costly reconfiguration.
+
+#Challenge
+Q. How can the organization manage IP address allocation across multiple AWS accounts and regions to avoid IP conflicts,
+ensure efficient use of address space, and maintain compliance with IP management ?
+
+#Solution
+AWS IP Address Manager (.#IPAM) can streamline the organization’s IP management by providing centralized control, monitoring, and visibility. Here’s how IPAM addresses this challenge:
+
+1. 𝐂𝐞𝐧𝐭𝐫𝐚𝐥𝐢𝐳𝐞𝐝 𝐈𝐏 𝐀𝐝𝐝𝐫𝐞𝐬𝐬 𝐌𝐚𝐧𝐚𝐠𝐞𝐦𝐞𝐧𝐭 IPAM allows the organization to define IP pools and allocate CIDR blocks to each business unit's VPCs in multiple accounts and regions. This eliminates the need for manual tracking and reduces the risk of overlapping IPs.
+
+2. 𝐀𝐮𝐭𝐨𝐦𝐚𝐭𝐞𝐝 𝐌𝐨𝐧𝐢𝐭𝐨𝐫𝐢𝐧𝐠 𝐚𝐧𝐝 𝐂𝐨𝐦𝐩𝐥𝐢𝐚𝐧𝐜𝐞 IPAM automatically monitors IP usage, ensuring that each allocated CIDR follows the organization’s compliance rules. Alerts are generated when IP usage exceeds defined limits or if a conflict arises.
+
+3. 𝐄𝐟𝐟𝐢𝐜𝐢𝐞𝐧𝐭 𝐈𝐏 𝐀𝐥𝐥𝐨𝐜𝐚𝐭𝐢𝐨𝐧 𝐚𝐧𝐝 𝐑𝐞𝐩𝐨𝐫𝐭𝐢𝐧𝐠 IPAM provides insights into IP utilization across accounts, enabling teams to make informed decisions and better plan future allocations, thus avoiding underused or overused address spaces.
+
+Using AWS IPAM improves visibility and control over IP address allocation, preventing conflicts, enhancing security, and simplifying network management across a complex, multi-account AWS environment.
+
+================================================================
+#Terraform is a powerful .#IAC tool for provisioning infrastructure, but there’s a lot going on under the hood every time you hit 𝐚𝐩𝐩𝐥𝐲
+
+📜 Step 1: Parses and validates the .tf configurations, checking for syntax, variable correctness, and dependencies.
+🔄 Step 2: Refreshes the state to ensure Terraform has the latest details on all resources, from the local file or a remote backend.
+📊 Step 3: Creates a detailed execution plan—outlining what will be created, updated, or destroyed.
+🔒 Step 4: Sends secure API requests to AWS, using HTTPS and IAM authentication to create or modify each resource.
+📝 Step 5: Updates the state file to reflect the new infrastructure, whether stored locally or remotely.
+
+====================================================================================
+In the world of .#Dev & .#DevOps, .𝐢𝐠𝐧𝐨𝐫𝐞 files are often overlooked but are essential for optimizing workflows, ensuring security, and keeping things clean. Here's a quick summary of some crucial `.ignore` files and why they matter.
+
+ 1️⃣ .𝐠𝐢𝐭𝐢𝐠𝐧𝐨𝐫𝐞
+- 𝑷𝒖𝒓𝒑𝒐𝒔𝒆: Prevent unnecessary files (like `node_modules` or environment files) from being committed to your Git repository.
+- 𝑰𝒎𝒑𝒂𝒄𝒕: Keeps your repository clean and protects sensitive data.
+
+ 2️⃣ .𝐝𝐨𝐜𝐤𝐞𝐫𝐢𝐠𝐧𝐨𝐫𝐞
+- 𝑷𝒖𝒓𝒑𝒐𝒔𝒆: Exclude files from your Docker image build context to reduce image size and speed up builds.
+- 𝑰𝒎𝒑𝒂𝒄𝒕: Makes your Docker images lightweight and efficient.
+
+ 3️⃣  .𝐡𝐞𝐥𝐦𝐢𝐠𝐧𝐨𝐫𝐞
+- 𝑷𝒖𝒓𝒑𝒐𝒔𝒆: Ignore files when packaging Helm charts to deploy applications on Kubernetes.
+- 𝑰𝒎𝒑𝒂𝒄𝒕: Keeps your Helm charts compact and deployment-ready.
+
+ 4️⃣ .𝐜𝐟𝐢𝐠𝐧𝐨𝐫𝐞
+- 𝑷𝒖𝒓𝒑𝒐𝒔𝒆: Specify which files should be excluded when pushing an app to Cloud Foundry.
+- 𝑰𝒎𝒑𝒂𝒄𝒕: Ensures that only necessary code and resources are deployed.
+
+ 5️⃣ .𝐭𝐞𝐫𝐫𝐚𝐟𝐨𝐫𝐦𝐢𝐠𝐧𝐨𝐫𝐞
+- 𝑷𝒖𝒓𝒑𝒐𝒔𝒆: Ignore files in a Terraform module when initializing or publishing to the Terraform Registry.
+- 𝑰𝒎𝒑𝒂𝒄𝒕: Helps maintain a focused and efficient module structure.
+
+ 6️⃣ .𝐩𝐫𝐞𝐭𝐭𝐢𝐞𝐫𝐢𝐠𝐧𝐨𝐫𝐞 & .𝐞𝐬𝐥𝐢𝐧𝐭𝐢𝐠𝐧𝐨𝐫𝐞
+- 𝑷𝒖𝒓𝒑𝒐𝒔𝒆: Exclude files from code formatting and linting tools (Prettier and ESLint).
+- 𝑰𝒎𝒑𝒂𝒄𝒕: Saves time by avoiding checks on files that don’t need formatting or linting.
+
+👉 Pro Tip: Review your `.ignore` files regularly to ensure they are up to date and aligned with your current project requirements.
+
+========================================================================================
+#Scenario: A DevOps Engineer is working on multiple projects simultaneously, each requiring commits with different Git user profiles. 
+The engineer contributes to client projects, open-source projects and internal company repositories, using different email addresses and usernames for each. 
+
+.#Challenge: The DevOps Engineer struggles with efficiently managing multiple Git user profiles for different repositories.
+Each time the engineer switch projects, he have to update the Git configuration which is time consuming
+and may lead to errors which may lead to misunderstandings with collaborators and potential issues with
+maintaining proper code ownership.
+
+.#Solution: To make the process of switching Git profiles easier, the DevOps Engineer creates convenient shell aliases for configuring Git user settings. 𝐇𝐞𝐫𝐞’𝐬 𝐡𝐨𝐰 𝐭𝐨 𝐝𝐨 𝐢𝐭:
+1. Open the shell configuration file, such as ~/.bashrc or ~/.zshrc, using a text editor
+𝒗𝒊 ~/.𝒃𝒂𝒔𝒉𝒓𝒄 𝒐𝒓 ~/.𝒛𝒔𝒉𝒓𝒄
+
+2.Then add the following aliases at the end of the file, below are example users and emails.
+𝒂𝒍𝒊𝒂𝒔 𝒈𝒊𝒕-𝒂𝒎𝒂𝒓="𝒈𝒊𝒕 𝒄𝒐𝒏𝒇𝒊𝒈 𝒖𝒔𝒆𝒓.𝒏𝒂𝒎𝒆 ‘𝒂𝒎𝒂𝒓' && 𝒈𝒊𝒕 𝒄𝒐𝒏𝒇𝒊𝒈 𝒖𝒔𝒆𝒓.𝒆𝒎𝒂𝒊𝒍 '****@𝒈𝒎𝒂𝒊𝒍.𝒄𝒐𝒎'"
+𝒂𝒍𝒊𝒂𝒔 𝒈𝒊𝒕-𝒂𝒌𝒃𝒂𝒓="𝒈𝒊𝒕 𝒄𝒐𝒏𝒇𝒊𝒈 𝒖𝒔𝒆𝒓.𝒏𝒂𝒎𝒆 ‘𝒂𝒌𝒃𝒂𝒓' && 𝒈𝒊𝒕 𝒄𝒐𝒏𝒇𝒊𝒈 𝒖𝒔𝒆𝒓.𝒆𝒎𝒂𝒊𝒍 '****@***.𝒄𝒐𝒎'"
+𝒂𝒍𝒊𝒂𝒔 𝒈𝒊𝒕-𝒂𝒏𝒕𝒉𝒐𝒏𝒚="𝒈𝒊𝒕 𝒄𝒐𝒏𝒇𝒊𝒈 𝒖𝒔𝒆𝒓.𝒏𝒂𝒎𝒆 '𝒂𝒏𝒕𝒉𝒐𝒏𝒚' && 𝒈𝒊𝒕 𝒄𝒐𝒏𝒇𝒊𝒈 𝒖𝒔𝒆𝒓.𝒆𝒎𝒂𝒊𝒍 '****@****.𝒄𝒐𝒎'"
+
+3.Then save the file and reload the shell to apply the changes
+𝒔𝒐𝒖𝒓𝒄𝒆 ~/.𝒃𝒂𝒔𝒉𝒓𝒄 or 𝐬𝐨𝐮𝐫𝐜𝐞 ~/.𝐳𝐬𝐡𝐫𝐜 or the file you changed
+
+4. Now, you can quickly switch between Git user profiles within any GitHub repository by simply typing
+𝒈𝒊𝒕-𝒂𝒎𝒂𝒓 and press enter to use the "𝐚𝐦𝐚𝐫" profile.
+𝒈𝒊𝒕-𝒂𝒌𝒃𝒂𝒓 press enter to switch to the "𝐚𝐤𝐛𝐚𝐫" profile.
+𝒈𝒊𝒕-𝒂𝒏𝒕𝒉𝒐𝒏𝒚 press enter to activate the "𝐚𝐧𝐭𝐡𝐨𝐧𝐲" profile.
+
+
+================================================================
+As a Cloud and Devops engineer, imagine you are tasked to run your microservices on AWS ECS. The microservice architecture needs service to service communication for the whole system to work like serviceA needs to communicate with ServiceB and there are more services likewise. So, Let’s look at some of the methods along with their complications so that it will easier for you to choose the best one based on your requirements.
+
+1.𝐄𝐥𝐚𝐬𝐭𝐢𝐜 𝐋𝐨𝐚𝐝 𝐁𝐚𝐥𝐚𝐧𝐜𝐢𝐧𝐠
+ELB facilitates communication by distributing incoming traffic evenly across ECS tasks, ensuring that all services receive requests efficiently. It provides health checks and automatically routes traffic to healthy instances.
+𝐂𝐨𝐦𝐩𝐥𝐢𝐜𝐚𝐭𝐢𝐨𝐧𝐬: ELB needs to be carefully planned for configuring infrastructure for high availability and incur additional infrastructure cost.
+
+2.𝐀𝐦𝐚𝐳𝐨𝐧 𝐄𝐂𝐒 𝐒𝐞𝐫𝐯𝐢𝐜𝐞 𝐃𝐢𝐬𝐜𝐨𝐯𝐞𝐫𝐲
+Service Discovery simplifies inter-service communication by dynamically registering and discovering services using AWS Cloud Map or DNS. Microservices can locate each other through service names rather than static IPs, enabling flexibility and scalability as the infrastructure evolves.
+𝐂𝐨𝐦𝐩𝐥𝐢𝐜𝐚𝐭𝐢𝐨𝐧𝐬 : It often requires developers to write custom application code for collecting traffic metrics and for making network calls resilient
+
+3. 𝐒𝐞𝐫𝐯𝐢𝐜𝐞 𝐦𝐞𝐬𝐡𝐞𝐬 𝐥𝐢𝐤𝐞 𝐀𝐖𝐒 𝐀𝐩𝐩 𝐌𝐞𝐬𝐡
+It provides a powerful layer for managing service-to-service communication. They enable fine-grained traffic control, advanced routing capabilities.
+𝐂𝐨𝐦𝐩𝐥𝐢𝐜𝐚𝐭𝐢𝐨𝐧𝐬: It run outside of Amazon ECS despite having advanced traffic monitoring and routing features between services.
+
+4. 𝐄𝐂𝐒 𝐒𝐞𝐫𝐯𝐢𝐜𝐞 𝐂𝐨𝐧𝐧𝐞𝐜𝐭 
+It offers a streamlined way to manage communication between services natively within ECS. It automates service registration and connection, making inter-service communication straightforward. This method also provides built-in load balancing and simplifies configurations, ensuring that services connect and communicate efficiently without extensive manual setup.
+𝐂𝐨𝐦𝐩𝐥𝐢𝐜𝐚𝐭𝐢𝐨𝐧𝐬: Limited advanced features compared to service meshes. It is relatively a new method compared to others.
+
+================================================================
+.#Scenario
+You're a DevOps engineer managing a microservices application on a Production Kubernetes cluster. 
+One day, your `auth-service`, which handles user authentication, 
+starts crashing and experiencing delays. You try looking at logs and metrics but can’t pinpoint the root cause.
+The issue seems tied to the container's environment and isn’t easy to reproduce.
+
+.#Challenge
+You tried with standard troubleshooting methods but ran into below challenges 
+
+1. 𝐋𝐢𝐦𝐢𝐭𝐞𝐝 𝐀𝐜𝐜𝐞𝐬𝐬: Using `kubectl exec` only gives basic visibility into the container. You can't add new tools or make significant changes to diagnose the problem.
+2. 𝐓𝐫𝐚𝐧𝐬𝐢𝐞𝐧𝐭 𝐏𝐫𝐨𝐛𝐥𝐞𝐦𝐬: The issue comes and goes, and traditional methods like restarting the pod don’t offer enough insight.
+3. 𝐑𝐞𝐬𝐭𝐫𝐢𝐜𝐭𝐞𝐝 𝐄𝐧𝐯𝐢𝐫𝐨𝐧𝐦𝐞𝐧𝐭: Security rules and limited permissions make it tough to perform deeper diagnostics in a production setting.
+4. 𝐅𝐢𝐱𝐞𝐝 𝐂𝐨𝐧𝐭𝐚𝐢𝐧𝐞𝐫 𝐒𝐞𝐭𝐮𝐩: You can’t quickly add debugging tools to the existing container without going through the hassle of building and deploying a new image.
+
+.#Solution
+As a solution you used `𝐤𝐮𝐛𝐞𝐜𝐭𝐥 𝐝𝐞𝐛𝐮𝐠`. It provides an effective way to tackle these challenges. Lets see how
+
+1. 𝐌𝐨𝐫𝐞 𝐃𝐞𝐛𝐮𝐠𝐠𝐢𝐧𝐠 𝐎𝐩𝐭𝐢𝐨𝐧𝐬: It lets you create a temporary copy of the pod with extra debugging tools, giving you deeper access to troubleshoot.
+example :- 𝒌𝒖𝒃𝒆𝒄𝒕𝒍 𝒅𝒆𝒃𝒖𝒈 𝒂𝒖𝒕𝒉-𝒔𝒆𝒓𝒗𝒊𝒄𝒆-𝒑𝒐𝒅 --𝒊𝒎𝒂𝒈𝒆=𝒃𝒖𝒔𝒚𝒃𝒐𝒙 --𝒄𝒐𝒑𝒚-𝒕𝒐=𝒂𝒖𝒕𝒉-𝒔𝒆𝒓𝒗𝒊𝒄𝒆-𝒅𝒆𝒃𝒖𝒈
+2. 𝐋𝐢𝐯𝐞 𝐓𝐫𝐨𝐮𝐛𝐥𝐞𝐬𝐡𝐨𝐨𝐭𝐢𝐧𝐠: You can attach to the pod in real time, run diagnostic commands, and investigate without changing the original pod.
+example :- 𝐤𝐮𝐛𝐞𝐜𝐭𝐥 𝐝𝐞𝐛𝐮𝐠 𝐚𝐮𝐭𝐡-𝐬𝐞𝐫𝐯𝐢𝐜𝐞-𝐩𝐨𝐝 -𝐢𝐭 --𝐢𝐦𝐚𝐠𝐞=𝐛𝐮𝐬𝐲𝐛𝐨𝐱 --𝐭𝐚𝐫𝐠𝐞𝐭=𝐚𝐮𝐭𝐡-𝐜𝐨𝐧𝐭𝐚𝐢𝐧𝐞𝐫
+3. 𝐍𝐨𝐧-𝐃𝐢𝐬𝐫𝐮𝐩𝐭𝐢𝐯𝐞: You don’t need to restart or redeploy the service, keeping production stable while you debug.
+4. 𝐂𝐚𝐭𝐜𝐡 𝐈𝐧𝐭𝐞𝐫𝐦𝐢𝐭𝐭𝐞𝐧𝐭 𝐈𝐬𝐬𝐮𝐞𝐬: With `kubectl debug`, you have a better chance of catching issues as they happen.
+
+==================================================================================================
+#Scenario:
+A DevOps engineer is managing an e-commerce application on a Linux-based server during a major festive sale(Diwali).
+As traffic surges, customers report slow load times and occasional timeouts. The engineer needs to diagnose the issue fast to restore smooth operation.
+
+.#Challenge:
+- Huge volume of logs and metrics makes identifying issues time-consuming.
+- Basic tools like `top` and `netstat` provide limited, real-time information.
+- High traffic and fluctuating demand create sudden spikes, complicating root cause analysis.
+
+.#Solution:
+The devops engineer used nload and htop alongside atop for system-level performance analysis. Here’s how each tool helps:
+1. .#nload: This tool gives a real-time view of network traffic, allowing the engineer to monitor incoming and outgoing data rates per network interface. This way, they can spot unusual spikes in network usage that might be impacting performance.
+2. .#htop: Provides an interactive, real-time view of system resource usage (CPU, memory, and more) by each process. This allows quick identification of any process consuming unusually high resources.
+3. .#atop: For historical analysis, atop records system performance metrics over time, allowing the engineer to pinpoint exactly when and where a slowdown occurred. With this, they can correlate network spikes with CPU/memory usage spikes or I/O bottlenecks, gaining a comprehensive view of system health across time periods.
+
+=============================================================================================================================================================================================================================
+#Scenario
+You as a Devops engineer, supporting the data team in managing their Kubernetes workloads which are running on the latest Kubernetes version. The data engineering team runs a large-scale Kubernetes job with thousands of pods to process data overnight, setting a 𝐛𝐚𝐜𝐤𝐨𝐟𝐟𝐋𝐢𝐦𝐢𝐭 to retry failed pods up to three times.
+
+What is 𝐛𝐚𝐜𝐤𝐨𝐟𝐟𝐋𝐢𝐦𝐢𝐭 ?
+The backoffLimit in Kubernetes is a setting that limits the number of times Kubernetes will retry failed pods in a job. If a pod fails repeatedly, Kubernetes will keep restarting it until the retry count reaches the backoffLimit.
+
+.#Challenge
+You observed excessive pod restarts until reaching the backoffLimit lead to increased operating costs. This issue escalates when dealing with thousands of long-running pods across numerous nodes, as the cost of these retries quickly adds up. Now as a responsible .#Devops engineer you want to optimise this.
+
+.#Solution
+You suggested the Data team to use 𝐏𝐨𝐝 𝐅𝐚𝐢𝐥𝐮𝐫𝐞 𝐏𝐨𝐥𝐢𝐜𝐲, using this feature the team configures selective retries. For example, they set policies to skip retries on specific exit codes (e.g., external dependency errors) but retry on recoverable issues. This approach minimizes unnecessary retries and associated costs while ensuring efficient job processing.
+
+====================================================================================================================
+#Scenario
+Imagine a DevOps engineer is managing a single Kubernetes cluster that hosts development, testing, and production microservices. Among all, the production pods must run continuously, even during high usage periods, while dev and test pods can afford some downtime.
+
+.#Challenge
+The engineer needs to make sure that production pods are the last to be evicted when resources run low, prioritizing high availability for these critical services.
+
+.#Solution
+The engineer can assign a higher .#PriorityClass to production pods. This configuration gives them a higher priority over dev and test pods. When the cluster encounters resource constraints, Kubernetes will preempt (evict) lower-priority dev and test Pods to free resources for production pods, so that they operate uninterrupted.
+
+.#GoodtoKnow: How PriorityClass and Preemption Work 🧐
+- .#PriorityClass: In Kubernetes, it is a resource that defines the priority of Pods. A higher value means a higher priority, which Kubernetes uses to decide which Pods should stay active during resource shortages. 
+ 
+- .#Preemption: When a high-priority Pod cannot be scheduled due to a lack of resources, Kubernetes will attempt to preempt (evict) lower-priority Pods to make room. 
+
+==========================================================================================================================================================
+#Tip on .#AWS .#EC2 vs .#Fargate on .#ECS .#Containers 
+When choosing between .#EC2 and AWS .#Fargate for running containers with ECS, it’s important to evaluate your priorities
+
+- .#Pricing: With EC2, you pay for the instances you manage, and savings depend on how well you optimize utilization , poor utilization means wastage . On the other hand, Fargate charges based on the exact CPU and memory your task uses, offering more cost-efficiency for smaller or bursty workloads, even though the per-hour cost may seem higher.
+
+- .#Performance: EC2 offers a wide range of instance types for your specific needs (CPU, memory, network). Fargate abstracts this away, while you don’t choose hardware, it automatically upgrades over time. EC2 allows for better control and faster access to the latest hardware for performance-sensitive tasks.
+
+- .#AdministrativeOverhead: Running on EC2 requires maintaining instances, patching, and managing Docker updates. With Fargate, AWS handles all underlying infrastructure, so you can focus on building and scaling your app.
+
+- .#DemandVariance: Fargate shines in dynamic environments where demand fluctuates or for short-lived tasks like cron jobs. It allows you to scale down to minimal resources and pay only for what you use, while EC2 is more cost-effective for consistently high-demand, large-scale workloads.
+
+.#ProTip
+For startups, fast-growing teams, or bursty workloads, Fargate reduces operational burden and maximizes agility. For high and steady demand at scale, EC2 can be optimized for cost savings and performance.
+
+===================================================================================
+When you're running .#Terraform, one of the widely used .#IAC tool , the first step is always 𝐭𝐞𝐫𝐫𝐚𝐟𝐨𝐫𝐦 𝐢𝐧𝐢𝐭. Here is what happens behind the scenes when you run this command.
+- Validates the configuration for any missing variables and syntax errors.
+- Initializes any modules if needed.
+- It sets up backend configuration to manage the state.
+- Terraform downloads the necessary provider plugins.
+- Prepares your environment to apply infrastructure changes.
+
+🛠️ 𝐔𝐬𝐞𝐟𝐮𝐥 𝐭𝐞𝐫𝐫𝐚𝐟𝐨𝐫𝐦 𝐢𝐧𝐢𝐭 𝐎𝐩𝐭𝐢𝐨𝐧𝐬
+-𝐛𝐚𝐜𝐤𝐞𝐧𝐝-𝐜𝐨𝐧𝐟𝐢𝐠: Specify a custom backend configuration.
+-𝐠𝐞𝐭: Automatically download and update modules.
+-𝐢𝐧𝐩𝐮𝐭=𝐭𝐫𝐮𝐞: Ask for input if necessary. If false, will error if input was required.
+-𝐮𝐩𝐠𝐫𝐚𝐝𝐞: Upgrade modules and plugins.
+-𝐥𝐨𝐜𝐤-𝐭𝐢𝐦𝐞𝐨𝐮𝐭=<𝐝𝐮𝐫𝐚𝐭𝐢𝐨𝐧>: Override the time Terraform waits to acquire a state lock (default is 0s).
+-𝐥𝐨𝐜𝐤=𝐟𝐚𝐥𝐬𝐞: Disable state locking entirely.
+-𝐜𝐡𝐝𝐢𝐫=<𝐩𝐚𝐭𝐡>: Switch to a different working directory before executing.
+
+===================================================================================================
+Most of the .#Devops professional working with .#Kubernetes have used 𝐤𝐮𝐛𝐞𝐜𝐭𝐥 𝐭𝐨𝐩 command to check resource usage... but do you know how the command gets its output? 🤔 And what's the prerequisite for it to work in your cluster?
+
+𝐏𝐫𝐞𝐫𝐞𝐪𝐮𝐢𝐬𝐢𝐭𝐞: The 𝐌𝐞𝐭𝐫𝐢𝐜𝐬 𝐒𝐞𝐫𝐯𝐞𝐫 must be installed and running in your cluster to retrieve these metrics!
+And Here's a quick breakdown of the process
+- 𝐔𝐬𝐞𝐫: Executes kubectl top node or pod.
+- 𝐤𝐮𝐛𝐞𝐜𝐭𝐥: Sends the request to the API Server.
+- 𝐀𝐏𝐈 𝐒𝐞𝐫𝐯𝐞𝐫: Forwards it to the Metrics Server (pre-installed in the cluster).
+- 𝐌𝐞𝐭𝐫𝐢𝐜𝐬 𝐒𝐞𝐫𝐯𝐞𝐫: Collects data from Kubelet on each node.
+- 𝐊𝐮𝐛𝐞𝐥𝐞𝐭: Retrieves real-time CPU & memory metrics from cAdvisor.
+- 𝐌𝐞𝐭𝐫𝐢𝐜𝐬 𝐒𝐞𝐫𝐯𝐞𝐫: Aggregates the data from all nodes and share it to API Server
+- 𝐀𝐏𝐈 𝐒𝐞𝐫𝐯𝐞𝐫: Forwards the resource usage to the kubectl.
+
+===================================================================================================================
+Want to know how .#AWS .#SSM agent communicates with 𝐒𝐲𝐬𝐭𝐞𝐦 𝐌𝐚𝐧𝐚𝐠𝐞𝐫 𝐒𝐞𝐫𝐯𝐢𝐜𝐞 using 𝐕𝐏𝐂 𝐈𝐧𝐭𝐞𝐫𝐟𝐚𝐜𝐞 𝐞𝐧𝐝𝐩𝐨𝐢𝐧𝐭𝐬.
+
+1️⃣ 𝐂𝐚𝐥𝐥𝐬 𝐈𝐧𝐬𝐭𝐚𝐧𝐜𝐞 𝐌𝐞𝐭𝐚𝐝𝐚𝐭𝐚 𝐒𝐞𝐫𝐯𝐢𝐜𝐞: The SSM agent gets the instance metadata for example AWS region.
+2️⃣ 𝐃𝐍𝐒 𝐋𝐨𝐨𝐤𝐮𝐩 𝐟𝐨𝐫 𝐀𝐏𝐈 𝐄𝐧𝐝𝐩𝐨𝐢𝐧𝐭: The SSM agent attempts to resolve the API endpoint (e.g., ssm.<region>.amazonaws.com) via the private DNS.
+3️⃣ 𝐏𝐫𝐢𝐯𝐚𝐭𝐞 𝐃𝐍𝐒 𝐑𝐞𝐬𝐨𝐥𝐯𝐞𝐬 𝐭𝐨 𝐕𝐏𝐂 𝐄𝐧𝐝𝐩𝐨𝐢𝐧𝐭: The private DNS resolves the SSM API domain to the private IP address of the VPC interface endpoint’s ENI.
+4️⃣ 𝐓𝐫𝐚𝐟𝐟𝐢𝐜 𝐑𝐨𝐮𝐭𝐞𝐝 𝐭𝐨 𝐄𝐧𝐝𝐩𝐨𝐢𝐧𝐭 𝐄𝐍𝐈: The EC2 instance sends the API request to the private IP address of the VPC interface endpoint's ENI.
+5️⃣ 𝐏𝐫𝐢𝐯𝐚𝐭𝐞𝐋𝐢𝐧𝐤 𝐂𝐨𝐦𝐦𝐮𝐧𝐢𝐜𝐚𝐭𝐢𝐨𝐧: The VPC interface endpoint forwards the request over AWS PrivateLink to the AWS SSM service.
+6️⃣ 𝐒𝐒𝐌 𝐒𝐞𝐫𝐯𝐢𝐜𝐞 𝐏𝐫𝐨𝐜𝐞𝐬𝐬𝐞𝐬 𝐑𝐞𝐪𝐮𝐞𝐬𝐭: AWS Systems Manager processes the API request and Response Sent via PrivateLink to the VPC interface endpoint
+7️⃣ 𝐑𝐞𝐬𝐩𝐨𝐧𝐬𝐞 𝐃𝐞𝐥𝐢𝐯𝐞𝐫𝐞𝐝 𝐭𝐨 𝐒𝐒𝐌 𝐀𝐠𝐞𝐧𝐭: The VPC interface endpoint forwards the response to the EC2 instance, where the SSM agent receives and processes it.
+
+=========================================================================================================================
+In .#𝐊𝐮𝐛𝐞𝐫𝐧𝐞𝐭𝐞𝐬 , Do you know the difference between 𝐕𝐨𝐥𝐮𝐦𝐞 𝐁𝐢𝐧𝐝𝐢𝐧𝐠 and 𝐕𝐨𝐥𝐮𝐦𝐞 𝐌𝐨𝐮𝐧𝐭𝐢𝐧𝐠 ?
+
+𝐕𝐨𝐥𝐮𝐦𝐞 𝐁𝐢𝐧𝐝𝐢𝐧𝐠
+ - The PersistentVolume (PV)represents a storage resource in the cluster.
+ - The PersistentVolumeClaim (PVC)is a request for storage.
+ - The binding process occurs when a PVC is associated with a PV that meets the requested storage size and other specifications.
+ - This step is about reserving storage for the pod, but the actual storage is not yet attached to the pod.
+
+𝐕𝐨𝐥𝐮𝐦𝐞 𝐌𝐨𝐮𝐧𝐭𝐢𝐧𝐠
+ - After the binding is complete, the pod will mount the storage. 
+ - The mounted PV (from the PVC) is attached to a specific directory in the pod’s filesystem, allowing the pod to read from or write to the PV.
+
+ ====================================================================================================
+ #Scenario
+A development team is already using a Kubernetes cluster for their applications and 
+/now wants to run their CI/CD jobs on the same cluster for better scalability and resource efficiency. However, they face key .#Challenges
+1. 𝐒𝐞𝐜𝐮𝐫𝐢𝐭𝐲 𝐑𝐢𝐬𝐤𝐬 𝐰𝐢𝐭𝐡 𝐊𝐮𝐛𝐞𝐂𝐨𝐧𝐟𝐢𝐠: They want to connect GitLab pipelines to Kubernetes without storing KubeConfig files, as it poses a security risk.
+2. 𝐁𝐮𝐢𝐥𝐝𝐢𝐧𝐠 𝐃𝐨𝐜𝐤𝐞𝐫 𝐈𝐦𝐚𝐠𝐞𝐬: With Kubernetes moving away from Docker, they need an alternative to Docker-in-Docker (DinD) to build images within the CI/CD pipeline.
+3. 𝐌𝐮𝐥𝐭𝐢-𝐄𝐧𝐯𝐢𝐫𝐨𝐧𝐦𝐞𝐧𝐭 𝐃𝐞𝐩𝐥𝐨𝐲𝐦𝐞𝐧𝐭𝐬: They need a simplified way to deploy across dev, test, and prod using a single Helm chart, avoiding complex configurations.
+4. 𝐂𝐨𝐝𝐞 𝐐𝐮𝐚𝐥𝐢𝐭𝐲 𝐚𝐧𝐝 𝐒𝐞𝐜𝐮𝐫𝐢𝐭𝐲: Automated tools for code linting and vulnerability scanning are required to maintain high standards across environments.
+
+As a .#Devops engineer you are tasked to find an integrated solution to overcome these challenges and streamline their CI/CD process.
+
+.#Solution
+In my latest video, I showcase how to implement a complete  𝐂𝐈/𝐂𝐃 pipeline with 𝐆𝐢𝐭𝐋𝐚𝐛 𝐊𝐮𝐛𝐞𝐫𝐧𝐞𝐭𝐞𝐬 𝐑𝐮𝐧𝐧𝐞𝐫𝐬, integrating top .#DevOps tools like MegaLinter, Kaniko, Trivy, Helm, and the powerful 𝐆𝐢𝐭𝐋𝐚𝐛 𝐊𝐀𝐒 𝐀𝐠𝐞𝐧𝐭. 
+𝐖𝐡𝐚𝐭’𝐬 𝐢𝐧𝐬𝐢𝐝𝐞?
+- 𝐃𝐨𝐧’𝐭 𝐰𝐚𝐧𝐭 𝐭𝐨 𝐬𝐭𝐨𝐫𝐞 𝐊𝐮𝐛𝐞𝐂𝐨𝐧𝐟𝐢𝐠? 𝐍𝐨 𝐩𝐫𝐨𝐛𝐥𝐞𝐦! See how the 𝐆𝐢𝐭𝐋𝐚𝐛 𝐊𝐀𝐒 𝐀𝐠𝐞𝐧𝐭 connects to Kubernetes clusters.
+- 𝐄𝐟𝐟𝐨𝐫𝐭𝐥𝐞𝐬𝐬 𝐃𝐞𝐩𝐥𝐨𝐲𝐦𝐞𝐧𝐭𝐬 across dev, test, and prod using a single Helm chart.
+- 𝐊𝐮𝐛𝐞𝐫𝐧𝐞𝐭𝐞𝐬 𝐑𝐮𝐧𝐧𝐞𝐫𝐬 running isolated CI/CD jobs in scalable Kubernetes pods.
+- 𝐂𝐨𝐝𝐞 𝐐𝐮𝐚𝐥𝐢𝐭𝐲 𝐀𝐬𝐬𝐮𝐫𝐚𝐧𝐜𝐞 with MegaLinter to keep your codebase clean and compliant.
+- 𝐒𝐞𝐜𝐮𝐫𝐢𝐭𝐲 𝐅𝐢𝐫𝐬𝐭 with Automated vulnerability scanning using Trivy.
+- 𝐁𝐮𝐢𝐥𝐝 𝐚𝐧𝐝 𝐏𝐫𝐨𝐦𝐨𝐭𝐞 with 𝐊𝐚𝐧𝐢𝐤𝐨
+
+===================================================================================================================
+In .#DevOps, choosing between self-hosted and SaaS-provided runners for your CI/CD workflows can significantly impact performance, cost, and maintenance. Here’s a quick summary
+
+🌐 SaaS-Provided Runners (e.g., GitHub Actions, GitLab CI)
+Use when:
+- You want ease of use with minimal setup and no infrastructure to manage.
+- Your workload fluctuates and you need auto-scaling without any level of management.
+- You’re working on small to mid-scale projects, where predictable costs (pay-as-you-go) are more feasible.
+- You don’t require complex or custom configurations in the runner’s environment.
+
+Ideal for:
+- Teams needing a quick and scalable setup.
+- Projects with moderate resource requirements or intermittent jobs.
+
+🛠️ Self-Hosted Runners
+Use when:
+- You need full control over the environment (custom OS, software, resources).
+- High-volume pipelines or resource-heavy builds make SaaS pricing expensive.
+- You have specific compliance or security requirements that SaaS runners can’t meet.
+- You want to avoid usage limits or need dedicated resources for continuous builds.
+- You have the infrastructure and want to optimize cost-efficiency for large-scale CI/CD jobs.
+
+Ideal for:
+- Large enterprises, regulated industries, or teams with unique build environments.
+
+===============================================================================================
+#Scenario
+A team of developers are utilizing github actions as CI pipeline for building their application and using github runners for it. With the rapid increase in development the team is facing issues with the delay in pipeline completion as it is taking a lot of time for building.
+
+.#Challenge
+As a .#Devops engineer you are tasked to optimize the build time by using some mechanism but for now they won’t change the runners and continue using the github provided runners only.
+
+.#Solution
+You started by checking some of the completed pipeline build logs and found that some of the dependency installations are taking insane long time as for every pipeline execution the dependencies are installed from scratch.
+ As a solution you plan to implement GitHub Actions .#cache mechanism using ‘actions/cache@v4’ to store dependencies, allowing future runs to reuse these assets, which significantly speeds up the pipeline. 
+
+.#GoodToKnow
+Some of the other available Pre-built Cache Actions in GitHub which requires minimum configurations. 
+Below is the list of Package managers and their setup-* action for caching.
+1️⃣npm, Yarn, pnpm — setup-node
+2️⃣pip, pipenv, Poetry — setup-python
+3️⃣Gradle, Maven — setup-java
+4️⃣RubyGems — setup-ruby
+5️⃣Go go.sum — setup-go
+6️⃣.NET NuGet — setup-dotnet
+
+
+======================================================================================================
+As a DevOps professional , We should be familiar with the various package management systems associated with different programming languages . These are needed for building,deploying and automations.. Here’s the list of popular languages and their packages
+
+1️⃣ Java - JAR (Java Archive): 
+ - Use Case: JAR files bundle Java class files, resources, and metadata into a single archive. This simplifies deployment, making it easier to manage Java applications and libraries across environments.
+
+2️⃣ .NET - NuGet: 
+ - Use Case: NuGet acts as the package manager for .NET applications. Nuget packages are used for dependency management and used while building.NET apps.
+
+3️⃣ Python - PyPI (Python Package Index): 
+ - Use Case: PyPI, accessed via the `pip` command, allows to manage Python dependencies . This is crucial for automating deployment pipelines, where consistent library versions are necessary for reliability.
+
+4️⃣ JavaScript - npm (Node Package Manager): 
+ - Use Case: npm is used for managing JavaScript dependencies in web applications and microservices. DevOps teams leverage npm in CI/CD pipelines to ensure all necessary libraries are installed and updated during the build process.
+
+5️⃣ Ruby - RubyGems: 
+ - Use Case: RubyGems facilitates the packaging and distribution of Ruby libraries. 
+
+6️⃣ Go - Go Modules: 
+ - Use Case: Go Modules help manage dependencies in Go applications. They provide a structured way to define and control library versions and code reusability .
+
+7️⃣ PHP - Composer: 
+ - Use Case: Composer is essential for managing PHP libraries, allowing DevOps teams to automate dependency installation and updates.
+
+===========================================================================================
+Being a .#Cloud and .#Devops Engineer we mostly encounter connectivity issues or service downtime. Knowing a few basic network and DNS troubleshooting techniques can help you identify and resolve the problem quickly! Here are some basics.
+
+1️⃣ Ping Test: 
+Start with the `ping` command to check connectivity to a website or IP address. It helps determine whether your device can communicate with the server.
+
+.#Command
+ping google.com
+
+- Success: You're connected to the network.
+- Failure: There may be a network issue or the destination is unreachable.
+
+2️⃣ DNS Lookup:
+If you can ping an IP but not a domain, there may be a DNS issue. Use `nslookup` or `dig` to test if DNS is resolving correctly.
+
+.#Command
+nslookup example.com
+
+This will show the IP address your DNS server resolves for the domain.
+
+3️⃣ Check Network Configuration:
+Check your network configuration using `ifconfig` (Linux/macOS) or `ipconfig` (Windows) to make sure your device has a proper IP address, gateway, and DNS settings.
+
+.#Command
+ipconfig 
+
+4️⃣ Telnet to Check Open Ports: 
+If you're trying to access a service but it's not responding, use `telnet` to check if a specific port is open and accessible.
+
+.#Command
+telnet example.com 80
+
+If the connection fails, the service might be down or blocked by a firewall.
+
+5️⃣Netstat for Active Connections:
+Run netstat to view active network connections and see which ports are being used by applications. This is useful for checking open ports and connections on your device.
+
+.#Command
+netstat -an
+
+It will display all active network connections, which can help identify potential issues.
+
+“By default, kubeconfig is stored in ~/.kube/config.
+In projects with multiple clusters, I keep separate kubeconfig files in the ~/.kube/ directory (like dev/stage/prod) and merge them using the KUBECONFIG environment variable.
+In CI/CD pipelines, I store kubeconfigs securely in tools like Jenkins Credentials or AWS SSM and load them temporarily during the job.”
+
+6️⃣ Traceroute:
+Use traceroute to map the path data packets take to reach a destination, which helps diagnose where delays or blockages occur in the network.
+
+.#Command
+traceroute google.com
+
+With these tools, you'll be well-equipped to handle basic network and DNS issues!
+
+======================================================================================================
+Here are the tools I have come to rely on for my day-to-day .#Cloud and .#Devops tasks (Not sure if there are any missing ones 😀), with a few additional web-based ones as well which are not mentioned here.
+
+.#Zsh: A powerful shell for efficient command-line operations, love this for ease of terminal use.
+.#IntelliJ IDEA: An IDE , I mostly use this for terraform stuffs.
+.#VSCode: No need of intro for well known IDE, i prefer this for docker, yaml , app codes etc.
+.#kubectl: CLI tool for interacting with Kubernetes clusters.
+.#Helm: Kubernetes package manager for managing and deploying apps.
+.#Terraform: Infrastructure as Code tool to manage cloud resources declaratively.
+.#Python: For automation, scripting, and more.
+.#Homebrew: A package manager for macOS, helps me with additional tools and software installation.
+.#AWS CLI: Command-line tool for managing AWS services.
+.#eksctl: CLI for managing Kubernetes clusters on AWS EKS.
+.#Docker Desktop: Local containerization tool for building, testing, and running apps.
+.#Go: For automation, scripts.
+.#Git: For interacting, collaborating with Github for code related stuff.
+.#tfenv: Terraform version manager to switch between Terraform versions easily.
+.#Conda: A package manager and environment manager for Python and other languages.
+
+===================================================================================================
+Helm Upgrade with Multiple Values Files. How It Works ?
+
+hashtag#Example command 
+helm upgrade <release-name> <chart-name> -f values1.yaml -f values2.yaml
+
+When using hashtag#Helm to manage hashtag#Kubernetes applications, handling configurations with multiple `values.yaml` files is a common practice.
+
+When you run the `helm upgrade` command with multiple `values.yaml` files, Helm merges these values in a left-to-right order. This means:
+
+1. Last file wins: If the same key is defined in multiple files, the value from the file specified last will override earlier ones.
+
+In our example , `values2.yaml` will override any overlapping keys in `values1.yaml`.
+
+2. Merging objects : Helm can merge nested YAML structures, so if two files contain different keys within a nested object, Helm will combine them without overriding the entire object.
+
+This approach gives you the flexibility to maintain base configurations (e.g., defaults) in one file and environment-specific overrides in others, making your deployment configurations scalable and manageable.
+
+======================================================================================
+Let's take a journey through time to understand the evolution of Tech and how hashtag#Kubernetes became the legend.
+
+hashtag#Traditional Deployment 
+In the early days, applications ran directly on physical servers. This led to resource allocation issues, where one application could hog resources, causing others to underperform. To resolve this, organizations would place each application on a separate physical server which is an inefficient and costly solution.
+
+hashtag#Virtualized Deployment
+With the use of virtualization, organizations could run multiple Virtual Machines (VMs) on a single physical server. Each VM operated in isolation, offering enhanced resource utilization and scalability, but still required its own operating system. This was a step forward in reducing costs and improving flexibility.
+
+hashtag#Container Deployment 
+Containers brought a revolution! Unlike VMs, containers share the host OS while maintaining isolation. They are lightweight, portable across environments, and offer unmatched scalability and efficiency. 
+
+Entry of hashtag#Kubernetes
+But there is a need to manage containers that run the apps for example scheduling, restarting etc. So won’t it be easy if someone does this for us automatically. Here Kubernetes took the opportunity to 
+do container management.
+
+==================================================================================================================
+Do You Know? Windows Container Logging is Different from Linux Containers🐳
+Here is the key difference between Linux and Windows containers.
+🐧 𝐋𝐢𝐧𝐮𝐱 𝐂𝐨𝐧𝐭𝐚𝐢𝐧𝐞𝐫𝐬
+By default, applications running in Linux containers output logs to STDOUT/STDERR. This allows for easily view logs using commands like 'docker logs <container_id>'.
+
+🪟 𝐖𝐢𝐧𝐝𝐨𝐰𝐬 𝐂𝐨𝐧𝐭𝐚𝐢𝐧𝐞𝐫𝐬
+Windows containers keep things interesting by not exposing logs to STDOUT/STDERR by default. Instead, Windows applications typically log to Event Tracing for Windows (ETW), Event Logs, Log Files . 
+
+This means developers and hashtag#DevOps teams often have to find some solution or else troubleshooting or monitoring windows containers will be a painful task.
+
+hashtag#Solution
+Here's a solution! There is this open-source tool called 𝐋𝐨𝐠 𝐌𝐨𝐧𝐢𝐭𝐨𝐫. This powerful tool bridges the gap by routing Windows application logs to STDOUT/STDERR. By integrating Log Monitor you can easily access logs similar to Linux Containers.
+
+================================================================================================================
+#Scenario:
+Lets imagine there is a new CI/CD pipeline for building Docker images of microservices, pushing them to Artifactory, and deploying them via Helm on Kubernetes .
+ The images are tagged with branch name.
+
+For example, if the branch is `feature-X`, the image tags would be:
+- `feature-X’
+
+A developer creates a new feature branch called `feature-X` and successfully deploys it. 
+During testing, the developer discovers that the new feature is incomplete.
+They push additional changes to the same branch, and the pipeline runs successfully.
+However, after the deployment, the developer notices that the updated feature is not reflected in the microservice.
+
+hashtag#Challenge:
+As a DevOps engineer, you are tasked with troubleshooting the issue.
+ Despite the pipeline showing a successful build and deployment, the service still runs the old version of the code. 
+
+hashtag#Troubleshooting Steps:
+- You started by checking the CI/CD pipeline logs and verified that the image is build and pushed and also Helm is reporting a successful deployment.
+
+- Next, you reviewed the Helm chart configuration and found that the hashtag#imagePullPolicy is set to hashtag#IfNotPresent. This policy caused Kubernetes to skip pulling the latest image.
+
+hashtag#Solutions
+Two Possible Solutions to choose from. 
+1. Change the Image Pull Policy: 
+ Update the Helm chart to set the hashtag#imagePullPolicy to hashtag#Always. This ensures that Kubernetes always pulls the latest image from the Artifactory during deployments.
+ ```yaml
+ image:
+ pullPolicy: Always
+ ```
+2. Update the CICD pipeline to tag the images for every pipeline run, for example you can add pipeline ID to the tag. This will force Kubernetes to pull the updated image every time deployment is made via pipeline.
+
+===============================================================================================================
+#Scenario
+As a DevOps engineer you and your team are setting up a DR kubernetes cluster and deploying multiple microservices in parallel . The team noticed that deployments are slowing down as it is taking delays in getting pods ready, inspite of having a large bandwidth and system capacity.
+
+hashtag#Challenge
+You need to speed up the process so that the deployments get ready quickly without overwhelming the container runtime or affecting the stability of the cluster and only if the runtime supports.
+
+hashtag#Solution
+You resolve this challenge by updating the kubelet configuration by setting hashtag#serializeImagePulls to false. This enables parallel image pulls, allowing multiple images to be fetched simultaneously, significantly speeding up deployments across the cluster. And additionally setting the hashtag#maxParallelImagePulls to a value comes handy while controlling the parallel image pulls.
+
+hashtag#GoodtoKnow : The kubelet never pulls multiple images in parallel on behalf of one Pod. For example an init container and the main container won’t be pulled in parallel. It works only for multiple pods in a single node.
+
+========================================================================================================================
+#Scenario:
+Imagine you are managing infrastructure across multiple AWS accounts with VPC hashtag#peering. Everything works fine, but now you’re ready to scale. Migrating to AWS Transit Gateway seems like the best option to streamline connections across your VPCs. But you have many cross VPC Security Group referencing which you are worried about.
+
+hashtag#Challenge:
+Managing security groups across accounts and VPCs seems like a major challenge, especially when it comes to referencing security rules between them. You don’t want to manually update the IP’s and CIDR ranges for the referencing across VPC security groups.
+
+hashtag#Solution:
+AWS has introduced a new Security Group Referencing feature in hashtag#TransitGateway! 🎉 Now, instead of manually configuring IPs or CIDRs for every VPC, you can hashtag#reference security groups across VPCs attached to the same Transit Gateway in the same region. This simplifies security management and makes your migration to Transit Gateway seamless. 
+
+=========================================================================
+
+

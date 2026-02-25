@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-ingress-service
+  namespace: my-ingress  # Namespace where the ingress controller is installed
+spec:
+  selector:
+    app: nginx-ingress  # Selector should match the ingress controller pods
+  ports:
+    - protocol: TCP
+      port: 80        # HTTP traffic
+      targetPort: 80   # Target port on the Ingress controller
+    - protocol: TCP
+      port: 443       # HTTPS traffic
+      targetPort: 443  # Target port on the Ingress controller
+  type: LoadBalancer   # This will provision an external IP in the cloud provider
+
+
+
+# Deploy Ingress Controller
+# $$ helm install nginx-ingress ingress-nginx/ingress-nginx --namespace ingress-nginx --create-namespace
+
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: my-ingress
+#   namespace: default
+#   annotations:
+#     nginx.ingress.kubernetes.io/rewrite-target: /
+# spec:
+#   rules:
+#   - host: myapp.example.com        # The domain to route traffic to
+#     http:
+#       paths:
+#       - path: /app1                 # Path for the first app
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: app1-service     # Service that handles the /app1 path
+#             port:
+#               number: 80
+#       - path: /app2                 # Path for the second app
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: app2-service     # Service that handles the /app2 path
+#             port:
+#               number: 80
+

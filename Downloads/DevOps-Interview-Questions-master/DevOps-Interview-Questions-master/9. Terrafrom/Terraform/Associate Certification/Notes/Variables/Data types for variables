@@ -1,0 +1,53 @@
+Data types helps terraform to prevent wrong value assignment to varible 
+example:
+
+variable "instance_name" {
+    type = number
+}
+
+in the above case instance_name is of type number and in terraform.tfvars, if you define instance_type="shyam-123", it will throw an error
+so, if you define a type for a variable, it wont allow you to assign wrong values (ie data types)
+
+
+
+<--------------------------->
+String
+
+variable "instance_type"{
+    type = String
+    default ="t2.micro"
+}
+<--------------------------->
+
+Number
+
+variable "instance_name" {
+    type = number
+}
+<--------------------------->
+
+List -> sequential list of values identified by their position. starts from 0
+
+variable "example_list" {
+  description = "An example list in Terraform"
+  type        = list
+  default     = ["item1", "item2", "item3"]
+}
+<--------------------------->
+
+Map --> group of values identinfied named labels
+
+        example: {type = "t2.micro", ami = "ami001223"}
+
+variable "example_map" {
+  description = "An example map in Terraform"
+  type        = map
+  default = {
+    key1 = "value1"
+    key2 = "value2"
+    key3 = "value3"
+  }
+}
+
+<--------------------------->
+

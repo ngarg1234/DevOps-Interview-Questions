@@ -1,0 +1,66 @@
+✅ Advanced Strategies (via other tools like ArgoCD/Flux/CD tools)
+-> Although Kubernetes natively supports RollingUpdate and Recreate, advanced strategies like Blue-Green Deployments and Canary Deployments can be achieved using:
+1. Argo Rollouts
+2. Flagger
+3. Service Mesh (e.g., Istio)
+
+✅ Istio/Service Mesh: (managing microservices)
+-----------------------------------------------
+💡 Istio is an open-source service mesh that provides a "Dedicated infrastructure layer for managing service-to-service communication" within a Kubernetes cluster (or across multiple clusters).
+-> It provides a set of features for managing and securing microservices applications. 
+-> It is built on top of the Kubernetes platform and is designed to work seamlessly with it.
+-> It is a mesh of proxy components that run alongside your application (most likely as a sidecar in Kubernetes) that offloads a lot of the networking responsibilities to the proxy. 
+
+
+✅ Key Responsibilities of Istio:
+1. Traffic Management — Fine-grained control of traffic routing (e.g., canary deployments, blue-green, A/B testing), Routing rules (path, headers, version-based), Retries, timeouts, fault injection, Load balancing, mirroring (traffic shadowing).
+2. Observability — Telemetry, tracing, and monitoring of service communication.
+-- Metrics via Prometheus, dashboards in Grafana
+-- Distributed tracing via Jaeger or Zipkin, Access logs.
+3. Security — Automatic, mTLS (Mutual TLS), RBAC  [authentication, authorization], and traffic encryption, Identity and credential management.
+4. Policy Enforcement — Rate limiting, quotas, and access controls, External authorization integrations.
+5. Resiliency — Fault injection, retries, circuit breaking, timeouts.
+
+✅ How Does Istio Work?
+-> Istio uses a sidecar proxy pattern to manage communication between microservices. 
+-> It automatically injects a sidecar proxy (Envoy) alongside each application Pod.
+
+⚙️ Architecture Overview:
+1. Control Plane (Istiod):
+-> Handles configuration and management of the proxies.
+-> Manages certificates for mTLS.
+-> Distributes policies and traffic management rules.
+
+2. Data Plane (Envoy Proxies):
+-> Sidecar proxies injected into each Pod.
+-> Intercept and manage all inbound and outbound traffic.
+-> Enforce security, collect telemetry, and apply traffic rules.
+
+✅ Visual Diagram:
++------------------+       +------------------+
+|  Service A Pod   | <---> |  Service B Pod   |
+| +--------------+ |       | +--------------+ |
+| | App Container| |       | | App Container| |
+| +--------------+ |       | +--------------+ |
+| | Envoy Proxy  | | <----> | Envoy Proxy  | |
+| +--------------+ |       | +--------------+ |
++------------------+       +------------------+
+          |
+          v
+
+       Istiod (Control Plane)
+
+✅ Core Istio Components:
+Component				Purpose
+Istiod			Control plane — configuration, policy distribution, certificate authority.
+Envoy Proxy		Sidecar data plane proxy for traffic interception and control.
+Ingress Gateway		Manage inbound traffic to services.
+Egress Gateway		Manage outbound traffic to external services.
+Mixer (deprecated)	Policy and telemetry (older Istio versions).
+
+
+Q. If Kubernetes already provides automatic service discovery and routing via kube-proxy, you may be wondering why a service mesh is needed.?
+-> As you add in more services, managing how those services talk to one another seamlessly starts to become challenging. In fact, there’s a lot of “stuff” that needs to happen to make sure everything “works”. These things include:
+1. Security: encrypting messages in transit (e.g., mTLS), access control (i.e. service-to-service authorization)
+2. Traffic Management: load balancing, routing, retries, timeouts, traffic splitting, etc
+3. Observability: tracking latencies/errors/saturation, visualizing service topology, etc

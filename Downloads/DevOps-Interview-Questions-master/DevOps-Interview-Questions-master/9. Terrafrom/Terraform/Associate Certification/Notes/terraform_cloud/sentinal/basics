@@ -1,0 +1,46 @@
+
+Sentinal allows you to set polices
+
+example policy:- make sure that all the ec2_instance have a certain tags 
+
+                disallow 0.0.0.0/0 in a security group
+
+
+NOTE: Sentinal is a paid feature 
+
+policy -> policySet > workspace
+
+you have to attach a policy to policyset and policyset to workspace
+
+for using sentinal, you have to upgrade to a paid plan
+
+create a policy set and connect it to the workspace
+
+create apolicy and connect it to the policy set
+
+policy Enforcement behaviour
+
+Advisory
+Failed policies produce a warning.
+
+Soft mandatory
+Failed policies can be overridden.
+You have 1 soft mandatory policy left.
+
+Hard mandatory
+Failed policies stop the run.
+You have 1 hard mandatory policy left.
+
+
+
+policy example 
+
+import "tfplan"
+
+main = rule {
+  all tfplan.resources.aws_instance as _, instances {
+    all instances as _, r {
+      (length(r.applied.tags) else 0) > 0
+    }
+  }
+}

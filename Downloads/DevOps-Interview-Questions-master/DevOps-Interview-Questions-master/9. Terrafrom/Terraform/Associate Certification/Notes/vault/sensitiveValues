@@ -1,0 +1,5 @@
+
+
+sensitive = true 
+above flag will allow you to hide sensitie values from getting displayed on terminal
+

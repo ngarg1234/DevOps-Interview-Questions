@@ -1,0 +1,14 @@
+
+
+here index_key is refered as the elemet of the list (you can also check the statfile present in this folder)
+
+example
+
+"index_key": "t2.micro",
+
+but in case of count - "index_key": 0,
+
+"index_key": 2, etc...
+
+
+so in case of count, if index value chnages, all the resources will be sometimes recreated or updated depends on the scenario

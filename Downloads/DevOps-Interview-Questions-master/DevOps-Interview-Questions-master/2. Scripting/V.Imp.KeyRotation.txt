@@ -1,0 +1,151 @@
+Great question! If you're storing **JFrog (Artifactory) credentials** such as API keys or user tokens in AWS Secrets
+Manager, you can apply **the same pattern** of key rotation using Lambda.
+
+Let me show you exactly how you'd do this — including a **JFrog-specific use case**, theory, and code.
+
+---
+
+## 🔐 **JFrog Credentials Rotation via AWS Lambda**
+
+### ✅ **Why Rotate JFrog API Keys or Access Tokens?**
+- Tokens might expire (e.g., 90-day default).
+- To follow security best practices.
+- To reduce the risk of leaked or stale credentials.
+- For **automated CI/CD access** (e.g., Jenkins, GitHub Actions using JFrog CLI).
+
+---
+
+## 🧠 **Use Case**
+You have a user account in JFrog with API Key or Access Token.
+- This is stored in AWS Secrets Manager (`jfrog-creds`).
+- Every 30 days, you want to:
+  1. Generate a new token via JFrog REST API.
+  2. Store the new token securely in AWS Secrets Manager.
+
+---
+
+### 📌 **Secret Format in Secrets Manager**
+```json
+{
+  "username": "ci-bot",
+  "api_key": "old-key-123456"
+}
+```
+
+---
+
+## 🔄 **JFrog Token Rotation Lambda (Python)**
+
+### ⚙️ Prerequisites
+- JFrog account with `admin` or `access-admin` rights.
+- Use JFrog’s REST API to regenerate tokens:
+  - [API Doc](https://www.jfrog.com/confluence/display/JFROG/Access+Tokens#AccessTokens-CreatinganAccessToken)
+
+---
+
+### ✅ Lambda Code to Rotate JFrog Token
+
+```python
+import boto3
+import json
+import requests
+import os
+
+SECRET_NAME = os.environ['SECRET_NAME']  # e.g., 'jfrog-creds'
+REGION_NAME = os.environ['AWS_REGION']
+JFROG_URL = os.environ['JFROG_URL']  # e.g., 'https://yourcompany.jfrog.io'
+ADMIN_USER = os.environ['JFROG_ADMIN_USER']
+ADMIN_PASSWORD = os.environ['JFROG_ADMIN_PASSWORD']
+
+def lambda_handler(event, context):
+    secrets_client = boto3.client('secretsmanager', region_name=REGION_NAME)
+
+    # Step 1: Get old secret (optional, if needed)
+    old_secret = secrets_client.get_secret_value(SecretId=SECRET_NAME)
+    secret_data = json.loads(old_secret['SecretString'])
+
+    # Step 2: Generate new token via JFrog API
+    token_url = f"{JFROG_URL}/access/api/v1/tokens"
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+    data = {
+        "username": secret_data["username"],
+        "scope": "member-of-groups:readers",  # adjust group if needed
+        "expires_in": "2592000"  # 30 days
+    }
+
+    response = requests.post(
+        token_url,
+        headers=headers,
+        data=data,
+        auth=(ADMIN_USER, ADMIN_PASSWORD)
+    )
+
+    if response.status_code != 200:
+        raise Exception(f"Failed to get token: {response.text}")
+
+    new_token = response.json()['access_token']
+
+    # Step 3: Update secret in Secrets Manager
+    updated_secret = {
+        "username": secret_data["username"],
+        "api_key": new_token
+    }
+
+    secrets_client.put_secret_value(
+        SecretId=SECRET_NAME,
+        SecretString=json.dumps(updated_secret)
+    )
+
+    print(f"[✅] JFrog token updated successfully.")
+    return {"status": "success"}
+```
+
+---
+
+## 🔐 Environment Variables in Lambda
+Set these:
+- `SECRET_NAME = jfrog-creds`
+- `AWS_REGION = us-east-1`
+- `JFROG_URL = https://yourcompany.jfrog.io`
+- `JFROG_ADMIN_USER = admin`
+- `JFROG_ADMIN_PASSWORD = your_password_or_secret`
+
+For security, the admin password can also come from another Secrets Manager entry.
+
+---
+
+## ⏰ Scheduled Rotation (Cron)
+
+Create a CloudWatch Rule to trigger this Lambda every 30 days:
+```bash
+cron(0 0 1 * ? *)  # 1st of every month
+```
+
+---
+
+## ✅ Best Practices for Production
+
+| Practice                       | Why Important                                           |
+|-------------------------------|----------------------------------------------------------|
+| Use short-lived tokens        | Reduces blast radius in case of compromise              |
+| Store secrets in Secrets Manager | Centralized and encrypted store                     |
+| Rotate automatically via Lambda | Removes manual ops                                     |
+| Scope token permissions       | Limit token to only what CI/CD pipeline needs           |
+| Alert on failure              | Hook Lambda failure to SNS or CloudWatch Alarm          |
+
+---
+
+## 💬 **Sample Interview Answer**
+
+> “In our project, we use JFrog Artifactory for artifact storage. To automate key rotation, we have a Lambda that’s triggered monthly using CloudWatc
+h. It uses JFrog’s REST API to generate a new access token for our CI bot user, and updates AWS Secrets Manager with the new token. Our pipeline
+s (like Jenkins or GitHub Actions) pull the latest token dynamically. This approach ensures security a
+nd compliance.”
+
+---
+
+Would you like the Terraform/CDK version of this setup? Or want to integrate with GitHub Actions/CodeBuild?
+
+Let me know and I’ll build it for you 🚀

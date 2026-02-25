@@ -1,0 +1,11 @@
+
+
+
+
+ln -sf ../global12.tf global.tf
+
+Make the file global12.tf 
+
+Go to the folder of configuration
+
+Execute - ln -sf ../global12.tf global.tf

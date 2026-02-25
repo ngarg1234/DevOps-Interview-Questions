@@ -1,0 +1,16 @@
+apiVersion: audit.k8s.io/v1
+kind: Policy
+rules:
+  # Log all requests at the metadata level
+  - level: Metadata
+    resources:
+    - group: ""
+      resources: ["pods", "secrets", "configmaps"]
+  # Log all write (create, update, delete) at the request/response level
+  - level: RequestResponse
+    verbs: ["create", "update", "patch", "delete"]
+  # Log "get", "list", "watch" as metadata
+  - level: Metadata
+    verbs: ["get", "list", "watch"]
+  # Catch-all rule to log other requests at metadata level
+  - level: Metadata

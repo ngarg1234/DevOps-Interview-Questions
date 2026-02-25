@@ -1,0 +1,6 @@
+
+terraform graph command will produce a graphical representation of the resource dependencies 
+
+you can also store the output to a file
+
+terraform graph >> test

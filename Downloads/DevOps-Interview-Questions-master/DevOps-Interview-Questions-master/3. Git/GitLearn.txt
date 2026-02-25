@@ -1,0 +1,102 @@
+Here are **clean, interview-ready comparison tables** in **easy language**, exactly how interviewers expect 👍
+
+---
+
+## 🔹 Git Reset vs Git Revert
+
+| Feature                | **git reset**             | **git revert**           |
+| ---------------------- | ------------------------- | ------------------------ |
+| Purpose                | Remove commits            | Undo commit safely       |
+| How it works           | Moves HEAD backward       | Creates a **new commit** |
+| Commit history         | **Changes history**       | **Keeps history**        |
+| Safe for shared branch | ❌ No                      | ✅ Yes                    |
+| Use case               | Local / private work      | Production / main branch |
+| New commit created     | ❌ No                      | ✅ Yes                    |
+| Risk                   | High (can lose work)      | Low                      |
+| Common command         | `git reset --hard HEAD~1` | `git revert <commit-id>` |
+
+### 🔑 Simple rule
+
+👉 **Reset = rewrite history**
+👉 **Revert = add opposite commit**
+
+---
+
+## 🔹 Types of git reset (Interview bonus)
+
+| Type                | What happens                        |
+| ------------------- | ----------------------------------- |
+| `--soft`            | Commit removed, changes kept staged |
+| `--mixed` (default) | Commit removed, changes unstaged    |
+| `--hard`            | Commit removed, changes deleted     |
+
+---
+
+## 🔹 Git Rebase vs Git Merge
+
+| Feature                | **git rebase**       | **git merge**             |
+| ---------------------- | -------------------- | ------------------------- |
+| Purpose                | Make history linear  | Combine branches          |
+| Commit history         | **Rewrites history** | **Keeps history**         |
+| Merge commit           | ❌ No                 | ✅ Yes                     |
+| Safe for shared branch | ❌ No                 | ✅ Yes                     |
+| Readability            | Clean, straight line | Shows real branch history |
+| Use case               | Feature branches     | Main / develop branch     |
+| Conflict handling      | One by one commit    | All at once               |
+
+---
+
+## 🔹 Example (Easy)
+
+### Rebase
+
+```bash
+git checkout feature
+git rebase main
+```
+
+📌 Feature commits replayed on top of main
+
+---
+
+### Merge
+
+```bash
+git checkout main
+git merge feature
+```
+
+📌 New merge commit created
+
+---
+
+## 🔑 Interview One-Liners
+
+* **Reset vs Revert**
+
+  > Reset rewrites history, Revert preserves history
+
+* **Rebase vs Merge**
+
+  > Rebase cleans history, Merge keeps history
+
+---
+
+## 🔹 When to use what? (Very common question)
+
+| Situation                 | Best choice  |
+| ------------------------- | ------------ |
+| Undo commit in production | `git revert` |
+| Clean local commits       | `git reset`  |
+| Sync feature branch       | `git rebase` |
+| Release to main           | `git merge`  |
+
+---
+
+If you want, I can also give:
+
+* 🔥 **Git commands interview cheat sheet**
+* 🔥 **Real interview scenarios + answers**
+* 🔥 **Git rebase conflict explanation (easy)**
+
+Just say 👍

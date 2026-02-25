@@ -1,0 +1,488 @@
+https://interviewprep.org/boto3-interview-questions/
+https://climbtheladder.com/boto3-interview-questions/
+
+Great! Here's a categorized breakdown of **Boto3 interview questions with answers and Python code examples** by AWS service. Each section includes essential real-world tasks.
+
+---
+
+## 🪣 **S3 (Simple Storage Service)**
+
+### 1. **List all buckets**
+
+```python
+import boto3
+
+s3 = boto3.client('s3')
+response = s3.list_buckets()
+for bucket in response['Buckets']:
+    print(bucket['Name'])
+```
+
+### 2. **List objects in a bucket**
+
+```python
+response = s3.list_objects_v2(Bucket='my-bucket')
+for obj in response.get('Contents', []):
+    print(obj['Key'])
+```
+
+### 3. **Upload a file**
+
+```python
+s3.upload_file('local.txt', 'my-bucket', 'uploaded.txt')
+```
+
+### 4. **Download a file**
+
+```python
+s3.download_file('my-bucket', 'uploaded.txt', 'downloaded.txt')
+```
+
+### 5. **Generate a presigned URL**
+
+```python
+url = s3.generate_presigned_url('get_object', Params={
+    'Bucket': 'my-bucket', 'Key': 'uploaded.txt'
+}, ExpiresIn=3600)
+print(url)
+```
+
+### 6. **Multipart upload (advanced)**
+
+```python
+mpu = s3.create_multipart_upload(Bucket='my-bucket', Key='largefile.zip')
+# Upload parts...
+```
+
+---
+
+## 🖥️ **EC2 (Elastic Compute Cloud)**
+
+### 7. **Start an instance**
+
+```python
+ec2 = boto3.client('ec2')
+ec2.start_instances(InstanceIds=['i-1234567890abcdef0'])
+```
+
+### 8. **Stop an instance**
+
+```python
+ec2.stop_instances(InstanceIds=['i-1234567890abcdef0'])
+```
+
+### 9. **List instances with filters**
+
+```python
+response = ec2.describe_instances(Filters=[{
+    'Name': 'instance-state-name', 'Values': ['running']
+}])
+```
+
+---
+
+## 📊 **DynamoDB**
+
+### 10. **Create a table**
+
+```python
+ddb = boto3.client('dynamodb')
+ddb.create_table(
+    TableName='MyTable',
+    KeySchema=[{'AttributeName': 'id', 'KeyType': 'HASH'}],
+    AttributeDefinitions=[{'AttributeName': 'id', 'AttributeType': 'S'}],
+    ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
+)
+```
+
+### 11. **Insert an item**
+
+```python
+ddb.put_item(
+    TableName='MyTable',
+    Item={'id': {'S': '123'}, 'name': {'S': 'Alice'}}
+)
+```
+
+### 12. **Query items**
+
+```python
+ddb.query(
+    TableName='MyTable',
+    KeyConditionExpression='id = :id',
+    ExpressionAttributeValues={':id': {'S': '123'}}
+)
+```
+
+---
+
+## 🛡️ **IAM (Identity and Access Management)**
+
+### 13. **List IAM users**
+
+```python
+iam = boto3.client('iam')
+for user in iam.list_users()['Users']:
+    print(user['UserName'])
+```
+
+### 14. **Attach a policy to a user**
+
+```python
+iam.attach_user_policy(
+    UserName='my-user',
+    PolicyArn='arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess'
+)
+```
+
+---
+
+## 🔄 **General Concepts**
+
+### 15. **Handle errors with botocore**
+
+```python
+from botocore.exceptions import NoCredentialsError
+
+try:
+    s3.list_buckets()
+except NoCredentialsError:
+    print("Credentials not found")
+```
+
+### 16. **Paginate responses**
+
+```python
+paginator = s3.get_paginator('list_objects_v2')
+for page in paginator.paginate(Bucket='my-bucket'):
+    for obj in page.get('Contents', []):
+        print(obj['Key'])
+```
+
+### 17. **Use Session for multiple accounts**
+
+```python
+session = boto3.Session(
+    aws_access_key_id='KEY',
+    aws_secret_access_key='SECRET',
+    region_name='us-west-1'
+)
+s3 = session.client('s3')
+```
+
+---
+
+Would you like this code in a downloadable `.py` file or split into separate files by service?
+
+
+Yes, if you're working with **multiple AWS accounts** in the same source code using Boto3, you can create multiple `boto3.Session` objects, each with different credentials.
+
+### ✅ Example: Using multiple sessions for different AWS accounts
+
+```python
+import boto3
+
+# Session for Account A
+session_a = boto3.Session(
+    aws_access_key_id='ACCESS_KEY_A',
+    aws_secret_access_key='SECRET_KEY_A',
+    region_name='us-west-1'
+)
+s3_a = session_a.client('s3')
+buckets_a = s3_a.list_buckets()
+
+# Session for Account B
+session_b = boto3.Session(
+    aws_access_key_id='ACCESS_KEY_B',
+    aws_secret_access_key='SECRET_KEY_B',
+    region_name='us-east-1'
+)
+s3_b = session_b.client('s3')
+buckets_b = s3_b.list_buckets()
+```
+
+You can then manage resources across different accounts programmatically.
+
+Would you like an extended version that also assumes roles via STS for better security?
+
+
+Sure! Here's a clean interview-ready **description + code** bundle you can confidently present when asked about **EC2 automation for cost optimization**.
+
+---
+
+## 🧠 **Interview Answer: EC2 Cost Optimization with boto3 Automation**
+
+> _"To reduce unnecessary AWS costs, I wrote a Python script using `boto3.client('ec2')` that automatically starts EC2 instances during business hours and stops them outside of those hours. This was especially useful for non-production environments like development and testing, which don’t require 24/7 uptime. The script uses local time checks to decide whether to start or stop the instance, and was scheduled to run every hour via AWS Lambda + CloudWatch Events. This helped cut compute costs by up to 70% for idle resources."_  
+
+---
+
+## 💡 **Real-World Use Case**
+
+- **Problem**: Dev/test EC2 instances were left running 24/7.
+- **Solution**: Automatically stop instances during nights and weekends.
+- **Result**: Saved **~70% monthly cost per instance**.
+
+Example:
+- `t2.medium` @ $0.0416/hour  
+- 24x7 = $30/month  
+- 9am–6pm weekdays only = ~$8/month  
+- **Savings: ~$22/month/instance**
+
+---
+
+## 💻 **Python Script (with `boto3.client`)**
+
+```python
+import boto3
+from datetime import datetime
+
+# === CONFIGURATION ===
+INSTANCE_IDS = ['i-0123456789abcdef0']  # Replace with your instance IDs
+REGION = 'us-east-1'                    # AWS region
+TIMEZONE = 'Asia/Kolkata'              # Your business timezone
+
+WORK_START_HOUR = 9    # 9 AM
+WORK_END_HOUR = 18     # 6 PM
+
+# === AWS EC2 CLIENT ===
+ec2_client = boto3.client('ec2', region_name=REGION)
+
+def is_within_working_hours():
+    hour = datetime.now().hour()
+    return WORK_START_HOUR <= hour < WORK_END_HOUR
+
+def start_instances():
+    print("🟢 Starting instances:", INSTANCE_IDS)
+    ec2_client.start_instances(InstanceIds=INSTANCE_IDS)
+
+def stop_instances():
+    print("🔴 Stopping instances:", INSTANCE_IDS)
+    ec2_client.stop_instances(InstanceIds=INSTANCE_IDS)
+
+def main():
+    if is_within_working_hours():
+        print("⌛ Inside working hours.")
+        start_instances()
+    else:
+        print("🌙 Outside working hours.")
+        stop_instances()
+
+if __name__ == "__main__":
+    main()
+```
+“The if __name__ == '__main__' block ensures that the main logic is only executed when the script is run directly, and not when it’s imported elsewhere. This is a common Python best practice to make code reusable and modular.”
+---
+
+Yes, **absolutely!** 👇
+
+If your only goal is to **start and stop EC2 instances at specific times**, then **you don’t even need a Python script**. You can:
+
+---
+
+## ✅ **Use AWS CloudWatch Events (EventBridge) + AWS Lambda (No script needed on your local)**
+
+### 🔄 Instead of:
+- Writing a time check in Python
+- Running your script every hour (via Task Scheduler or cron)
+
+You can do this **entirely within AWS**, using a **scheduled rule**.
+
+---
+
+### 🚀 Recommended Architecture (Simplest Way)
+
+| Task              | Tool               |
+|------------------|--------------------|
+| Define start time | EventBridge (cron) |
+| Define stop time  | EventBridge (cron) |
+| Trigger action    | AWS Lambda         |
+| Perform action    | Lambda function (using boto3) |
+
+---
+
+### ✅ Example: Schedule Instance Start/Stop
+
+1. **Create an EventBridge rule**
+   - **Cron** for start: `cron(30 3 * * ? *)` → 9:30 AM IST (03:30 UTC)
+   - **Cron** for stop: `cron(30 12 * * ? *)` → 6:00 PM IST (12:30 UTC)
+
+2. **Create a small Lambda function** to start/stop the instance:
+   ```python
+   import boto3
+
+   def lambda_handler(event, context):
+       ec2 = boto3.client('ec2', region_name='us-east-1')
+       instance_id = 'i-0e278b64e1cf136de'
+
+       action = event.get('action')
+
+       if action == 'start':
+           ec2.start_instances(InstanceIds=[instance_id])
+           return 'Started'
+       elif action == 'stop':
+           ec2.stop_instances(InstanceIds=[instance_id])
+           return 'Stopped'
+       else:
+           return 'No valid action'
+   ```
+
+3. **Pass `action` as input** in EventBridge rule:
+   - For start rule: `{ "action": "start" }`
+   - For stop rule: `{ "action": "stop" }`
+
+---
+
+### 🧠 So, Why Write a Script Then?
+
+> Writing a script with time logic is useful when:
+- You want to **manually run it**
+- You’re doing **extra logic**, like skipping holidays or checking usage
+- You’re just learning how Python interacts with AWS (which is a great learning step!)
+
+---
+
+Let me know if you want help generating the **cron expressions**, or want me to create the full **Terraform/CloudFormation or Python script** to deploy this with Lambda.
+
+## ⏰ **How to Schedule It**
+
+### ✅ Option 1: AWS Lambda + CloudWatch (serverless & reliable)
+- Upload script to Lambda
+- Set up a **CloudWatch Event rule** to trigger it every hour
+
+### ✅ Option 2: On-prem or EC2-based scheduler
+- Use **cron** (Linux) or **Task Scheduler** (Windows)
+- Run script hourly or every 30 mins
+
+---
+
+If you'd like, I can also help you format this as a **PDF portfolio piece** or provide a **Lambda-compatible version** of the code. Want that?
+
+Excellent question to anticipate! If an interviewer asks:
+
+> **"Why not just use AWS Instance Scheduler or an Auto Scaling policy instead of writing this script?"**
+
+You can answer strategically like this 👇
+
+---
+
+## 🎯 **Interview Answer: Why a Custom Script Over AWS Instance Scheduler**
+
+> _"That's a great point. AWS does offer a managed **Instance Scheduler** solution, which is ideal for larger, multi-account environments and standardized schedules. However, in our use case, we chose a lightweight Python script for a few reasons:"_
+
+1. **Simplicity**  
+   > _We had a small set of EC2 instances (less than 10), and spinning up the full AWS Instance Scheduler with CloudFormation, DynamoDB, and tagging was overkill._
+
+2. **Full Control & Custom Logic**  
+   > _The script gave us precise control over timezones, edge cases, and custom schedules (e.g., skipping holidays, staggered stop/start times, logic based on external APIs)._
+
+3. **Faster Setup**  
+   > _We could get the script running with `boto3` and CloudWatch/Lambda in under 30 minutes without provisioning extra AWS services._
+
+4. **No Cost or Overhead**  
+   > _Using the script with Lambda (or even cron) meant zero additional AWS resources like DynamoDB tables, which the Instance Scheduler depends on._
+
+5. **Easy to Extend**  
+   > _We later added Slack alerts and logging to S3 — much easier in a custom script than modifying the managed solution._
+
+For your case (single EC2 start/stop at fixed times):
+
+💡 Use Lambda + EventBridge — it's simpler, cheaper, and easier to control.
+
+🧰 2. AWS Instance Scheduler (Solution from AWS Solutions Library)
+💵 Costs
+Runs on a CloudFormation stack with:
+
+Lambda
+
+DynamoDB
+
+SNS
+
+EventBridge
+
+So What Is It Then?
+It's an AWS-maintained open-source solution built using AWS services (like Lambda, DynamoDB, CloudWatch, etc.) and deployed via CloudFormation.
+
+Think of it as a packaged tool you deploy yourself, not something you just turn on like EC2 or RDS.
+
+✅ Summary
+Feature	Instance Scheduler
+AWS-native service	❌ No
+AWS-supported solution	✅ Yes
+Deploy via	CloudFormation (or CDK/Terraform)
+Cost	Only for the services it uses (Lambda, DynamoDB, etc.)
+Maintenance	You manage updates & config
+
+---
+
+## 🔄 When to Use AWS Instance Scheduler Instead
+
+> _Of course, if you're managing **dozens or hundreds** of instances across environments, AWS Instance Scheduler is a great choice — especially when you need role-based access, multi-account scheduling, and tagging-based logic._
+
+---
+
+💡 **Bonus Tip**: If you're interviewing for a DevOps or SRE role, this kind of thoughtful tradeoff explanation shows **pragmatism and architectural thinking**, not just coding.
+
+Want me to help you tailor this into a spoken answer or include pros/cons in a slide if you're presenting?
+
+import boto3
+from datetime import datetime
+
+REGION = 'us-east-1'
+
+WORK_START_HOUR = 9    # 9 AM
+WORK_END_HOUR = 18     # 6 PM
+
+ec2_client = boto3.client('ec2', region_name=REGION)
+
+def is_within_working_hours():
+    return WORK_START_HOUR <= datetime.now().hour < WORK_END_HOUR
+
+def get_instance_ids_by_tag():
+    response = ec2_client.describe_instances(
+        Filters=[
+            {
+                'Name': 'tag:AutoSchedule',
+                'Values': ['Yes']
+            },
+            {
+                'Name': 'instance-state-name',
+                'Values': ['running', 'stopped']
+            }
+        ]
+    )
+
+    instance_ids = []
+    for reservation in response['Reservations']:
+        for instance in reservation['Instances']:
+            instance_ids.append(instance['InstanceId'])
+
+    return instance_ids
+
+def start_instances(instance_ids):
+    if instance_ids:
+        print("🟢 Starting instances:", instance_ids)
+        ec2_client.start_instances(InstanceIds=instance_ids)
+    else:
+        print("⚠️ No instances found to start")
+
+def stop_instances(instance_ids):
+    if instance_ids:
+        print("🔴 Stopping instances:", instance_ids)
+        ec2_client.stop_instances(InstanceIds=instance_ids)
+    else:
+        print("⚠️ No instances found to stop")
+
+def main():
+    instance_ids = get_instance_ids_by_tag()
+
+    if is_within_working_hours():
+        print("⌛ Inside working hours")
+        start_instances(instance_ids)
+    else:
+        print("🌙 Outside working hours")
+        stop_instances(instance_ids)
+
+if __name__ == "__main__":
+    main()
+

@@ -1,0 +1,20 @@
+
+case 1: If a resouce configuration is available in terraform file and but it's state is not available as well as resource is not present
+        on the actuall environment - terraform apply will create the resource 
+
+case 2: If the state is present in the statefile and resource also present on the environement but resource configuration is removed from 
+        terraform file -> terraform apply will destroy the resource 
+
+
+case 3: if there is any change in attributes of the resource configuration -> terraform apply will update the resource 
+
+
+IMP CAses
+
+case 4: if an attribute chnages but it cannot be updated due to api limitation ->resource will be destroyed and recreated 
+
+        example : if you create an ec2 with linux ami and later you change it to windows ami -> terraform will destroy the instance and recreate 
+
+case 5: if the configuration is present on terraform file and resource also available but state is not present on statefile 
+
+            terraform apply will throw an error stating that resource is already present 

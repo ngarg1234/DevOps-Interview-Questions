@@ -1,0 +1,58 @@
+
+
+Regarding state file --- https://github.com/hashicorp/terraform/issues/8099
+
+
+https://www.terraform.io/docs/cli/commands/state/mv.html
+
+
+6️⃣ Lifecycle difference (VERY IMPORTANT)
+Import block
+
+One-time instruction
+
+Must be removed after success
+
+Becomes part of infra history
+
+Import command
+
+Fire-and-forget
+
+No history
+
+Easy to misuse
+
+7️⃣ When should you STILL use terraform import?
+
+Only in rare cases:
+
+Case	OK?
+Emergency fix	⚠️ Maybe
+Legacy Terraform (<1.5)	✅ Yes
+Quick local experiment	⚠️ Maybe
+Team / prod	❌ No
+8️⃣ Summary table (final)
+Topic	Import Block	Import Command
+Writes config	❌	❌
+Updates state	✅	✅
+Visible in Git	✅	❌
+Safe for teams	✅	❌
+CI/CD compatible	✅	❌
+Future-proof	✅	❌
+🏁 Final truth (remember this)
+
+Import blocks don’t do more — they do it SAFER.
+Terraform import command is not wrong — just outdated.
+
+If you want, I can:
+
+Show bad real-world import incident
+
+Share import block checklist
+
+Explain importing modules cleanly
+
+Provide CI/CD import example
+
+Just say 👍

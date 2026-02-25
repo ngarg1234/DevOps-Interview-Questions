@@ -1,0 +1,11 @@
+What is the use of a provider block
+what does terraform init do
+where does the provider plugin get downloaded(location)
+what are the 3 tiers of providers
+what is a provider namespace
+how to use a thirdpary provider plugin inside terraform script(sytax)
+.terraform.lock.hcl  => use of this file 
+.terraform.tfstate.lock.info    => use of this file  -> this folder get created when you run terraform apply or destroy command, once the command is excuted succesfully, this file disappears 
+Try to create resources on 2 providers from same folder
+
+--auto approve 

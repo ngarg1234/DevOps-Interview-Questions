@@ -1,0 +1,670 @@
+NOW
+|----------------|----------------|----------------|
+0–24h ago     24–48h ago       >48h ago
+
+-mtime -1     -mtime 1         -mtime +1( 1 day ago)
+-mtime 0 👉 today since midnight
+| Syntax      | Meaning                                 |
+| ----------- | --------------------------------------- |
+| `-mtime -N` | Modified **less than N+1 days ago**     |
+| `-mtime N`  | Modified **between N and N+1 days ago** |
+| `-mtime +N` | Modified **more than N+1 days ago**     |
+
+
+agar day bole.. to +1 , +2
+
+hours.. -1 =24 
+
+1. Automated data backups to S3: files modified in last 24 hrs
+   
+#!/bin/bash
+
+BACKUP_FROM="/home/ubuntu/Ram/csi-demo"
+BACKUP_TO="s3://demo123ramesh/demo/"
+DATE=$(date +%Y-%m-%d)
+
+# put percent every word, m and  d are small and Y capital.. separated by -
+
+# Create a tar archive of only modified files
+find "$BACKUP_FROM" -type f -mtime -1 -print | tar -cvf demo-$DATE.tar -T -
+
+
+# Upload the tar file to S3
+aws s3 cp demo-$DATE.tar "$BACKUP_TO/demo-$DATE.tar"
+
+
+
+In your command:
+
+```bash
+find "$BACKUP_FROM" -type f -mtime -1 -print | tar -cvf demo-$DATE.tar -T -
+```
+
+### Explanation of `-print`:
+
+The `-print` action in `find` **outputs the path of each file that matches the criteria** — in this case:
+
+* `"$BACKUP_FROM"`: directory to search.
+* `-type f`: look for files.
+* `-mtime -1`: files modified in the **last 1 day** (i.e., in the past 24 hours).
+* `-print`: outputs each matching file path, one per line, to **standard output**.
+
+This output is then **piped** (`|`) to `tar` using `-T -`, which tells `tar` to **read the list of files from stdin**.
+
+### Why `-print` is needed:
+
+* Without `-print`, `find` may not output anything to the pipe, especially in older versions of `find` (though in modern GNU `find`, `-print` is implicit if no other output action is given).
+* Using `-print` ensures compatibility and clarity — explicitly telling `find` to output the paths.
+
+### Example simplified:
+
+```bash
+find . -type f -mtime -1 -print
+```
+
+Prints:
+
+```
+./file1.txt
+./subdir/file2.log
+```
+
+Then `tar -T -` takes those paths and archives them.
+
+Would you like a version that compresses the tarball too (e.g., `tar.gz`)?
+
+==
+
+
+2.Write a shell script to retain files recent 7 days and delete other files. 
+-------------------------------------
+#!/bin/bash
+
+TARGET_DIR="/path/to/your/directory"
+
+# Delete files older than 7 days
+find "$TARGET_DIR" -type f -mtime +7 -exec rm -f {} \;
+or
+find $source_dir -type f -mtime +7 -delete
+
+
+echo "Deleted files older than 7 days."
+
+Here’s a Bash script that checks:
+
+CPU usage
+
+Memory usage
+
+Disk space usage
+
+And takes action (e.g., sends a warning or deletes temp files) if any usage exceeds defined limits.
+
+✅ Script: resource_monitor.sh
+bash
+Copy
+Edit
+#!/bin/bash
+
+# Thresholds (percentages)
+CPU_THRESHOLD=80
+MEMORY_THRESHOLD=80
+DISK_THRESHOLD=80
+
+# Action on high usage
+take_action() {
+    echo "[!] High $1 usage detected: $2%. Taking action..."
+    # Example actions (customize as needed):
+    case "$1" in
+        CPU)
+            echo "Top 5 CPU-consuming processes:"
+            ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%cpu | head -n 6
+            ;;
+        Memory)
+            echo "Clearing page cache..."
+            sudo sync; sudo echo 3 > /proc/sys/vm/drop_caches
+            ;;
+        Disk)
+            echo "Deleting files in /tmp older than 7 days..."
+            find /tmp -type f -mtime +7 -exec rm -f {} \;
+            ;;
+    esac
+    echo ""
+}
+
+# CPU usage
+CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | awk '{print 100 - $8}')
+CPU_USAGE=${CPU_USAGE%.*}  # remove decimal
+
+# Memory usage
+MEMORY_USAGE=$(free | awk '/Mem/ {printf("%.0f"), $3/$2 * 100}')
+
+# Disk usage (root partition)
+DISK_USAGE=$(df / | awk 'NR==2 {print $5}' | tr -d '%')
+
+# Check CPU
+if [ "$CPU_USAGE" -gt "$CPU_THRESHOLD" ]; then
+    take_action "CPU" "$CPU_USAGE"
+fi
+
+# Check Memory
+if [ "$MEMORY_USAGE" -gt "$MEMORY_THRESHOLD" ]; then
+    take_action "Memory" "$MEMORY_USAGE"
+fi
+
+# Check Disk
+if [ "$DISK_USAGE" -gt "$DISK_THRESHOLD" ]; then
+    take_action "Disk" "$DISK_USAGE"
+fi
+
+Solution:
+ ✅ Challenge 1: Write a simple Bash script that prints “Hello DevOps” along with the current date and time.
+
+Answer:
+
+Step 1: Create hello_devops.sh & Copy hello_devops.sh file code there
+
+nano hello_devops.sh
+hello_devops.sh file code:
+
+#!/bin/bash
+
+echo "Hello DevOps! Today's date and time is: $(date)"
+Step 2: Make it executable:
+
+chmod +x hello_devops.sh
+Step 3: Run the script:
+
+./hello_devops.sh
+
+Explanation:
+
+#!/bin/bash → Shebang to specify Bash as the interpreter.
+
+echo "Hello DevOps! Today's date and time is: $(date)"
+
+echo prints the message.
+
+$(date) fetches the current date and time.
+
+✅ Challenge 2: Create a script that checks if a website (e.g., https://www.learnxops.com) is reachable using curl or ping. Print a success or failure message.
+
+Answer:
+
+nano check_website .sh
+File name: check_website.sh
+#!/bin/bash
+
+# Define the website to check
+WEBSITE="https://www.learnxops.com"
+DOMAIN="learnxops.com"
+
+# Check website availability using curl
+if curl -Is "$WEBSITE" --max-time 5 | head -n 1 | grep -q "200\|301\|302"; then
+    echo "✅ Success: $WEBSITE is reachable via curl!"
+else
+    echo "⚠️ Curl check failed, trying ping..."
+    
+    # Check website availability using ping
+    if ping -c 2 -W 2 "$DOMAIN" > /dev/null 2>&1; then
+        echo "✅ Success: $DOMAIN is reachable via ping!"
+    else
+        echo "❌ Failure: $WEBSITE is not reachable via curl or ping."
+    fi
+fi
+Make it executable:
+
+chmod +x check_website.sh
+Run the script:
+
+./check_website.sh
+If Success:
+
+
+If Failure:
+
+
+Explanation:
+WEBSITE="https://www.learnxops.com" → Defines the website to check.
+
+curl -Is "$WEBSITE" --max-time 5 | head -n 1 | grep -q "200\|301\|302"
+
+curl -Is → Sends a HEAD request (faster than full request).
+
+--max-time 5 → Times out if no response within 5 seconds.
+
+grep -q "200\|301\|302" → Checks for HTTP status codes 200 (OK), 301 (Redirect), or 302 (Temporary Redirect).
+
+If the site is reachable, it prints "✅ Success", otherwise "❌ Failure".
+
+Ping Method :
+
+ping -c 2 -W 2 learnxops.com → Sends 2 packets with a 2-second timeout.
+
+If the ping succeeds, it prints Success, otherwise Failure.
+
+✅ Challenge 3: Write a script that takes a filename as an argument, checks if it exists, and prints the content of the file accordingly.
+
+File name: check_file.sh
+#!/bin/bash
+
+# Check if a filename argument is provided
+if [ $# -eq 0 ]; then
+    echo "❌ Error: No filename provided."
+    echo "Usage: ./check_file.sh <filename>"
+    exit 1
+fi
+
+FILENAME="$1"
+
+# Check if the file exists
+if [ -f "$FILENAME" ]; then
+    echo "✅ File '$FILENAME' found. Displaying content:"
+    cat "$FILENAME"
+else
+    echo "❌ Error: File '$FILENAME' does not exist."
+fi
+Explanation:
+
+if [ $# -eq 0 ]; then ... fi
+
+Checks if the user provided a filename as an argument.
+
+If not, it prints an error and exits.
+
+FILENAME="$1" → Stores the first argument as the filename.
+
+if [ -f "$FILENAME" ]; then ... fi
+
+Checks if the file exists (-f flag for files).
+
+If the file exists, it prints "File found" and displays its content using cat.
+
+Otherwise, it prints "File does not exist".
+
+✅ Challenge 4: Create a script that lists all running processes and writes the output to a file named process_list.txt.
+
+Answer:
+
+File name: list_processes.sh
+#!/bin/bash
+
+# Define output file
+OUTPUT_FILE="process_list.txt"
+
+# List all running processes and write to file
+ps aux > "$OUTPUT_FILE"
+
+# Print success message
+echo "✅ Process list saved to $OUTPUT_FILE"
+Explanation:
+
+OUTPUT_FILE="process_list.txt" → Defines the output file.
+
+ps aux > "$OUTPUT_FILE"
+
+ps aux → Lists all running processes.
+
+> → Redirects the output to process_list.txt.
+
+echo "✅ Process list saved to $OUTPUT_FILE"
+
+Prints a confirmation message.
+
+
+✅Challenge 5: Write a script that installs multiple packages at once (e.g., git, vim, curl). The script should check if each package is already installed before attempting installation.
+
+Answer:
+
+File name: install_packages.sh
+#!/bin/bash
+
+# Define the list of packages to install
+PACKAGES=("git" "vim" "curl")
+
+# Loop through each package and check if it's installed
+for PACKAGE in "${PACKAGES[@]}"; do
+    if dpkg -l | grep -qw "$PACKAGE"; then
+        echo "✅ $PACKAGE is already installed."
+    else
+        echo "⏳ Installing $PACKAGE..."
+        sudo apt-get install -y "$PACKAGE" && echo "✅ $PACKAGE installed successfully." || echo "❌ Failed to install $PACKAGE."
+    fi
+done
+Explanation :
+
+Define the list of packages in the PACKAGES array.
+
+Loop through each package:
+
+dpkg -l | grep -qw "$PACKAdZGE" → Checks if the package is already installed.
+
+If installed, it prints "✅ Already installed."
+
+Otherwise, it installs the package using:
+
+sudo apt-get install -y "$PACKAGE"
+
+If the installation succeeds, it prints "✅ Installed successfully.", otherwise "❌ Failed to install."
+
+Steps to run the script:
+
+Create the script file and copy above script:
+
+nano install_packages.sh
+
+Make it executable:
+
+chmod +x install_packages.sh
+
+Run the Script:
+
+./install_packages.sh
+
+
+✅ Challenge 6: Create a script that monitors CPU and memory usage every 5 seconds and logs the results to a file.
+
+#monitor_resources.sh
+#!/bin/bash
+
+# Define the log file
+LOG_FILE="resource_usage.log"
+
+echo "Monitoring CPU and Memory usage... Logs will be saved in $LOG_FILE"
+echo "Timestamp          | CPU (%) | Memory (%)" > "$LOG_FILE"
+
+# Infinite loop to log system usage every 5 seconds
+while true; do
+    TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
+    
+    # Get CPU usage
+    CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}')
+    
+    # Get Memory usage
+    MEM_USAGE=$(free | awk '/Mem/ {printf "%.2f", $3/$2 * 100}')
+    
+    # Write data to the log file
+    echo "$TIMESTAMP |  $CPU_USAGE  |  $MEM_USAGE" >> "$LOG_FILE"
+    
+    # Wait for 5 seconds
+    sleep 5
+done
+
+Explanation:
+
+Defines the log file (resource_usage.log).
+
+Logs column headers (Timestamp | CPU (%) | Memory (%)).
+
+Infinite loop (while true):
+
+Fetches current timestamp (date command).
+
+Fetches CPU usage using top and awk.
+
+Fetches Memory usage using free and awk.
+
+Appends the data to resource_usage.log.
+
+Waits for 5 seconds before repeating.
+
+Steps to Run the Script:
+Create a script and copy the above script there:
+
+nano monitor_resources.sh
+
+Make it executable:
+
+chmod +x monitor_resources.sh
+
+Run the script in the background:
+
+nohup ./monitor_resources.sh &
+
+nohup → Keeps the script running even if you log out.
+
+& → Runs it in the background.
+
+✅ Challenge 7: Write a script that automatically deletes log files older than 7 days from /var/log.
+
+Answer:
+
+#clean_old_logs.sh
+#!/bin/bash
+
+# Define log directory
+LOG_DIR="/var/log"
+
+# Define file age threshold (in days)
+DAYS=7
+
+# Find and delete log files older than 7 days
+find "$LOG_DIR" -type f -name "*.log" -mtime +$DAYS -exec rm -f {} \;
+
+# Print success message
+echo "✅ Deleted log files older than $DAYS days from $LOG_DIR."
+
+Explanation:
+
+Defines the log directory (/var/log).
+
+Defines the threshold (DAYS=7) for old logs.
+
+Finds and deletes old logs using find:
+
+-type f → Selects only files.
+
+-name "*.log" → Matches only .log files.
+
+-mtime +7 → Files older than 7 days.
+
+-exec rm -f {} \; → Deletes the found files.
+
+Steps to run:
+
+create file:
+
+nano clean_old_logs.sh
+
+Make it executable:
+
+chmod +x clean_old_logs.sh
+
+Run the script:
+
+sudo ./clean_old_logs.sh
+
+✅ Challenge 8: Automate user account creation – Write a script that takes the username as an argument, checks, if the user exists, gives the message “user already exists“ else creates a new user, adds it to a “devops“ group, and sets up a default home directory.
+
+Answer:
+
+#create_user.sh
+#!/bin/bash
+
+# Check if a username is provided
+if [ $# -eq 0 ]; then
+    echo "❌ Error: No username provided."
+    echo "Usage: sudo ./create_user.sh <username>"
+    exit 1
+fi
+
+USERNAME="$1"
+GROUP="devops"
+
+# Check if user already exists
+if id "$USERNAME" &>/dev/null; then
+    echo "✅ User '$USERNAME' already exists."
+else
+    # Create the group if it doesn't exist
+    if ! getent group "$GROUP" > /dev/null; then
+        echo "⏳ Creating group '$GROUP'..."
+        sudo groupadd "$GROUP"
+    fi
+
+    # Create user with home directory and add to group
+    echo "⏳ Creating user '$USERNAME'..."
+    sudo useradd -m -s /bin/bash -G "$GROUP" "$USERNAME"
+
+    # Set a default password (optional, force change on first login)
+    echo "$USERNAME:ChangeMe123" | sudo chpasswd
+    sudo passwd --expire "$USERNAME"
+
+    echo "✅ User '$USERNAME' created successfully and added to group '$GROUP'."
+    echo "ℹ️ Default password: ChangeMe123 (User must change it on first login)"
+fi
+
+Explanation:
+
+Checks if a username is provided ($# -eq 0).
+
+Stores username and group (devops).
+
+Checks if the user already exists using id "$USERNAME" &>/dev/null.
+
+If yes, prints "User already exists".
+
+Creates the devops group if it doesn't exist.
+
+Creates the user with:
+
+-m → Creates a home directory.
+
+-s /bin/bash → Sets Bash as the default shell.
+
+-G devops → Adds the user to the devops group.
+
+Sets a default password (ChangeMe123) and forces a password change on first login.
+
+Steps to run the script:
+
+Create the script file & copy the above code there:
+
+nano create_user.sh
+
+Make it executable:
+
+chmod +x create_user.sh
+
+Run the script with a username:
+
+sudo ./create_user.sh devops_user
+
+✅ Challenge 9: Use awk or sed in a script to process a log file and extract only error messages.
+
+Answer:
+
+#extract_errors.sh
+#!/bin/bash
+
+# Define log file path
+LOG_FILE="/var/log/syslog"  # Change this to your log file
+OUTPUT_FILE="error_messages.log"
+
+# Check if log file exists
+if [ ! -f "$LOG_FILE" ]; then
+    echo "❌ Error: Log file '$LOG_FILE' not found!"
+    exit 1
+fi
+
+# Extract error messages using awk
+awk '/error|ERROR|Error/ {print}' "$LOG_FILE" > "$OUTPUT_FILE"
+
+# Alternatively, use sed:
+# sed -n '/error\|ERROR\|Error/p' "$LOG_FILE" > "$OUTPUT_FILE"
+
+echo "✅ Extracted error messages saved to '$OUTPUT_FILE'."
+Explanation:
+
+Defines the log file (LOG_FILE) and output file (OUTPUT_FILE).
+
+Checks if the log file exists before processing.
+
+Extracts error messages & saves extracted errors to error_messages.log:
+
+awk '/error|ERROR|Error/ {print}' "$LOG_FILE" → Searches for "error" in any case and prints matching lines.
+
+Alternative using sed:
+
+sed -n '/error\|ERROR\|Error/p' "$LOG_FILE" > "$OUTPUT_FILE"
+
+To run the script:
+
+Create the script file & copy-paste the script above and save it.:
+
+nano extract_errors.sh
+
+Make it executable:
+
+chmod +x extract_errors.sh
+
+Run the script:
+
+./extract_errors.sh
+
+✅ Challenge 10: Set up a cron job that runs a script to back up (zip/tar) a directory daily.
+
+Answer:
+
+#backup.sh
+#!/bin/bash
+
+# Define backup directory and destination
+SOURCE_DIR="/path/to/directory"  # Change this to the directory you want to back up
+BACKUP_DIR="/path/to/backup"
+TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
+BACKUP_FILE="$BACKUP_DIR/backup_$TIMESTAMP.tar.gz"
+
+# Create backup directory if it doesn't exist
+mkdir -p "$BACKUP_DIR"
+
+# Create the backup archive
+tar -czf "$BACKUP_FILE" "$SOURCE_DIR"
+
+# Print success message
+echo "✅ Backup created: $BACKUP_FILE"
+Steps:
+
+Create the “backup.sh“ file and copy the above code there:
+
+nano backup.sh
+
+Make the Script Executable:
+
+chmod +x backup.sh
+
+Schedule a Daily Cron Job:
+
+Open the cron editor:
+
+crontab -e
+
+Add the following line to run the script daily at 2 AM:
+
+0 2 * * * /path/to/backup.sh >> /var/log/backup.log 2>&1
+
+Verify the Cron Job:
+
+crontab -l
+
+💡 Bonus Challenge: Customize your Bash prompt to display the current user and working directory. (Hint: export PS1="\u@\h:\w\$ "), try to make it permanent, so terminal closing and opening don’t default!
+
+Answer:
+
+echo 'export PS1="\u@\h:\w\$ "' >> ~/.bashrc
+source ~/.bashrc
+Explanation:
+
+\u → Displays the current user.
+
+\h → Displays the hostname.
+
+\w → Displays the current working directory.
+
+\$ → Displays $ for normal users and # for root.
+
+To persist the prompt customization, add the line to ~/.bashrc 
+
+🧠 Since you read till the end, here’s extra bonus: to make the prompt colorful, try:
+
+echo 'export PS1="\[\e[1;32m\]\u@\h:\w\$ \[\e[0m\]"' >> ~/.bashrc
+source ~/.bashrc

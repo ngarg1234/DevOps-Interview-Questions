@@ -1,0 +1,36 @@
+# 3️⃣ Enforce Read-Only Root Filesystem
+# 🚫 Prevent containers from modifying the filesystem inside the Pod.
+
+# 🔹 ConstraintTemplate
+
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sreadonlyrootfs
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sReadOnlyRootFS
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sreadonlyrootfs
+
+        violation[{"msg": "Containers must have a read-only root filesystem"}] {
+          input.review.object.spec.containers[_].securityContext.readOnlyRootFilesystem != true
+        }
+
+---
+# 🔹 Constraint
+# ✅ What it does: Ensures all containers have readOnlyRootFilesystem: true.
+
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sReadOnlyRootFS
+metadata:
+  name: enforce-readonly-rootfs
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ambassador-pattern-pod
+spec:
+  containers:
+    - name: web-server
+      image: nginx
+    - name: proxy
+      image: envoy

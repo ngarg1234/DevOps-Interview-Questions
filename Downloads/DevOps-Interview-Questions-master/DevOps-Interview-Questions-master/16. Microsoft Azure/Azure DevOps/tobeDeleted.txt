@@ -1,0 +1,30 @@
+az deployment group create/Validate/what-if --template-file <....template.json..> --resource-group <resource-group>
+
+az bicep build/decompile --template-file main.bicep
+
+-------------------bicep file-------------------------------
+
+resource 'sa' 'Microsoft.Storage/<microsoft version>' = [for var in list {
+
+
+}]
+
+trigger:
+  branches:
+    include:
+      - dev
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+parameters:
+  - name: 
+    type:
+    default:  
+
+jobs-
+  job: 
+    steps:
+      task:
+
+      task:

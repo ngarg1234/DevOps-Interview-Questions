@@ -1,0 +1,549 @@
+Below are **three full, interview-ready Jenkinsfiles** with **end-to-end CI/CD stages** including:
+✔ build
+✔ unit tests
+✔ SonarQube scan
+✔ Checkmarx scan
+✔ JFrog Artifactory upload
+✔ Docker build & push
+✔ EKS deployment
+✔ ArgoCD deployment
+
+All pipelines follow **best practices**, **proper structure**, and **real-world CI/CD patterns**.
+
+---
+
+# ✅ **JENKINSFILE–1 (Classic CI Pipeline: Build → Test → Sonar → Checkmarx → Artifactory)**
+
+This is the most common CI pipeline used in interviews.
+
+### **Purpose:**
+
+✔ Pull code → build → tests → Sonar → Checkmarx → Package → Upload Artifact (Jfrog)
+
+---
+
+### **Jenkinsfile — CI Pipeline**
+
+```
+pipeline {
+    agent any
+
+    environment {
+        SONARQUBE_SERVER = "sonarqube-server"
+        ARTIFACTORY = "artifactory-server"
+        CHECKMARX_CREDENTIALS = credentials('checkmarx-cred')
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build Project') {
+            steps {
+                sh """
+                    mvn clean install -DskipTests=false
+                """
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                sh """
+                    mvn test
+                """
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('SonarQube Scan') {
+            steps {
+                withSonarQubeEnv(SONARQUBE_SERVER) {
+                    sh """
+                        mvn sonar:sonar \
+                        -Dsonar.projectKey=my-app \
+                        -Dsonar.projectName=my-app \
+                        -Dsonar.host.url=$SONAR_HOST_URL
+                    """
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Checkmarx Scan') {
+            steps {
+                sh """
+                    cx scan --project-name my-app \
+                    --username ${CHECKMARX_CREDENTIALS_USR} \
+                    --password ${CHECKMARX_CREDENTIALS_PSW}
+                """
+            }
+        }
+
+        stage('Package Artifact') {
+            steps {
+                sh "mvn package -DskipTests"
+            }
+        }
+
+        stage('Upload to JFrog Artifactory') {
+            steps {
+                script {
+                    def server = Artifactory.server(ARTIFACTORY)
+                    def uploadSpec = """{
+                        "files": [
+                            {
+                                "pattern": "target/*.jar",
+                                "target": "libs-release-local/my-app/"
+                            }
+                        ]
+                    }"""
+                    server.upload spec: uploadSpec
+                }
+            }
+        }
+    }
+
+    post {
+        success { echo "CI Pipeline Completed Successfully ✔" }
+        failure { echo "CI Pipeline Failed ❌" }
+    }
+}
+```
+
+---
+
+# ✅ **JENKINSFILE–2 (CI + Container Build + Push to ECR + Deploy to EKS via kubectl)**
+
+### **Purpose:**
+
+✔ Build & Test
+✔ Sonar + Checkmarx
+✔ Docker Image Build
+✔ Push to AWS ECR
+✔ Deploy to EKS using kubectl
+
+---
+
+### **Jenkinsfile — CI + Docker + EKS**
+
+```
+pipeline {
+    agent any
+
+    environment {
+        AWS_REGION = "ap-south-1"
+        ECR_REPO = "123456789012.dkr.ecr.ap-south-1.amazonaws.com/my-app"
+        IMAGE_TAG = "${env.BUILD_NUMBER}"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh "mvn clean install -DskipTests=false"
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                sh "mvn test"
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('SonarQube Scan') {
+            steps {
+                withSonarQubeEnv("sonarqube-server") {
+                    sh """
+                        mvn sonar:sonar \
+                        -Dsonar.projectKey=my-app \
+                        -Dsonar.projectName=my-app
+                    """
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh """
+                    docker build -t my-app:${IMAGE_TAG} .
+                """
+            }
+        }
+
+        stage('Login to AWS ECR') {
+            steps {
+                sh """
+                    aws ecr get-login-password --region $AWS_REGION \
+                    | docker login --username AWS --password-stdin $ECR_REPO
+                """
+            }
+        }
+
+        stage('Push Image to ECR') {
+            steps {
+                sh """
+                    docker tag my-app:${IMAGE_TAG} ${ECR_REPO}:${IMAGE_TAG}
+                    docker push ${ECR_REPO}:${IMAGE_TAG}
+                """
+            }
+        }
+
+        stage('Deploy to EKS') {
+            steps {
+                sh """
+                    aws eks update-kubeconfig --region $AWS_REGION --name my-eks-cluster
+
+                    kubectl set image deployment/my-app my-app=${ECR_REPO}:${IMAGE_TAG}
+                    kubectl rollout status deployment/my-app
+                """
+            }
+        }
+    }
+
+    post {
+        success { echo "Build, Docker Push & EKS Deployment Successful ✔" }
+        failure { echo "Pipeline Failed ❌" }
+    }
+}
+```
+
+---
+
+# ✅ **JENKINSFILE–3 (CI → Docker Build → Push → ArgoCD Sync Deployment)**
+
+### **Purpose:**
+
+✔ Build & Test
+✔ Docker Build
+✔ Push to Registry (ECR/JFrog/DockerHub)
+✔ Update values.yaml OR kustomize
+✔ Trigger ArgoCD for GitOps deployment
+
+---
+
+### **Jenkinsfile — CI + Docker + GitOps + ArgoCD**
+
+```
+pipeline {
+    agent any
+
+    environment {
+        ARGOCD_SERVER = "argocd.company.com"
+        ARGOCD_APP = "my-app"
+        IMAGE_TAG = "${env.BUILD_NUMBER}"
+        GIT_REPO = "git@github.com:org/app-deployment.git"
+    }
+
+    stages {
+
+        stage('Checkout App Code') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                sh """
+                    mvn clean install -DskipTests=false
+                    mvn test
+                """
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh """
+                    docker build -t my-app:${IMAGE_TAG} .
+                """
+            }
+        }
+
+        stage('Push to Registry') {
+            steps {
+                sh """
+                    docker tag my-app:${IMAGE_TAG} myrepo/my-app:${IMAGE_TAG}
+                    docker push myrepo/my-app:${IMAGE_TAG}
+                """
+            }
+        }
+
+        stage('Update GitOps Repo With New Image Tag') {
+            steps {
+                sh """
+                    git clone $GIT_REPO deploy-repo
+                    cd deploy-repo
+
+                    sed -i 's|tag: .*|tag: ${IMAGE_TAG}|g' helm/values.yaml
+
+                    git config user.email "jenkins@company.com"
+                    git config user.name "jenkins"
+                    git commit -am "Updated image tag to ${IMAGE_TAG}"
+                    git push origin main
+                """
+            }
+        }
+
+        stage('ArgoCD Deployment') {
+            steps {
+                sh """
+                    argocd login $ARGOCD_SERVER --username admin --password admin --insecure
+                    argocd app sync $ARGOCD_APP
+                    argocd app wait $ARGOCD_APP
+                """
+            }
+        }
+    }
+
+    post {
+        success { echo 'GitOps Deployment via ArgoCD Successful ✔' }
+        failure { echo 'Pipeline Failed ❌' }
+    }
+}
+```
+
+---
+
+# 🔥 **If you want, I can also include:**
+
+✔ Jenkins Shared Library version of these pipelines
+✔ A combined monolithic CI/CD Jenkinsfile
+✔ Blue/Green + Canary deployment versions
+✔ Multi-branch Jenkinsfile
+✔ Parameterized Jenkins pipelines
+✔ Full interview notes around each Jenkinsfile
+
+Just tell me **“yes share more”** or specify what you need!
+
+Below is the **CD (Continuous Deployment) pipeline** that perfectly matches your **FIRST Jenkinsfile** (CI-only pipeline).
+This CD pipeline assumes that the **artifact (.jar) uploaded to JFrog Artifactory** will be deployed to:
+
+✔ **EC2** (common setup)
+OR
+✔ **Tomcat / WebLogic / WildFly**
+OR
+✔ **Kubernetes cluster**
+
+I will give you **the best interview-ready version** which deploys the artifact from **JFrog → EC2 or VM** and also a version for **Kubernetes**, so you can answer any interviewer.
+
+---
+
+# ✅ **CD Pipeline for Jenkinsfile–1 (Using JFrog → EC2 Deployment)**
+
+**This continues the CI pipeline where artifact is uploaded to JFrog Artifactory.**
+
+---
+
+# 🚀 **Jenkinsfile — CD Pipeline (Fetch JAR From JFrog → Deploy on EC2)**
+
+```
+pipeline {
+    agent any
+
+    environment {
+        ARTIFACTORY = "artifactory-server"
+        ARTIFACT_PATH = "libs-release-local/my-app/my-app.jar"
+        TARGET_SERVER = "ec2-user@10.10.1.25"
+        APP_SERVICE = "myapp.service"      // systemd service name
+    }
+
+    stages {
+
+        stage('Download Artifact From JFrog') {
+            steps {
+                script {
+                    def server = Artifactory.server(ARTIFACTORY)
+                    def downloadSpec = """{
+                        "files": [
+                            {
+                                "pattern": "${ARTIFACT_PATH}",
+                                "target": "artifact/"
+                            }
+                        ]
+                    }"""
+                    server.download spec: downloadSpec
+                }
+
+                sh "ls -l artifact/"
+            }
+        }
+
+        stage('Copy Artifact to EC2') {
+            steps {
+                sh """
+                    scp -o StrictHostKeyChecking=no artifact/my-app.jar ${TARGET_SERVER}:/opt/myapp/
+                """
+            }
+        }
+
+        stage('Restart Application') {
+            steps {
+                sh """
+                    ssh -o StrictHostKeyChecking=no ${TARGET_SERVER} "
+                    sudo systemctl stop ${APP_SERVICE};
+                    sudo systemctl start ${APP_SERVICE};
+                    sudo systemctl status ${APP_SERVICE} -l
+                    "
+                """
+            }
+        }
+
+        stage('Post Deployment Health Check') {
+            steps {
+                sh """
+                    curl -f http://${TARGET_SERVER}:8080/actuator/health
+                """
+            }
+        }
+    }
+
+    post {
+        success { echo "CD Deployment to EC2 Successful ✔" }
+        failure { echo "CD Pipeline Failed ❌" }
+    }
+}
+```
+
+---
+
+# 🧠 **How You Explain This in an Interview (Very Important)**
+
+**“Our CI pipeline generates artifacts and publishes them to JFrog.
+Our CD pipeline fetches that versioned artifact from JFrog Artifactory, copies it to the target EC2 server or VM, and restarts the application using systemd. We also perform a health check after deployment.”**
+
+This is **very strong interview material**.
+
+---
+
+# ✅ **Alternative CD Pipeline Version — Deploy to Kubernetes Cluster**
+
+If the interviewer prefers k8s instead of EC2, give this:
+
+---
+
+# 🚀 **CD Jenkinsfile (JFrog → K8s Deployment)**
+
+```
+pipeline {
+    agent any
+
+    environment {
+        ARTIFACTORY = "artifactory-server"
+        IMAGE_REPO = "123456789012.dkr.ecr.ap-south-1.amazonaws.com/my-app"
+        IMAGE_TAG = "latest"  // or from CI pipeline
+        KUBE_CONTEXT = "prod"
+    }
+
+    stages {
+
+        stage('Download Artifact From JFrog') {
+            steps {
+                script {
+                    def server = Artifactory.server(ARTIFACTORY)
+                    def downloadSpec = """{
+                        "files": [
+                            {
+                                "pattern": "libs-release-local/my-app/my-app.jar",
+                                "target": "artifact/"
+                            }
+                        ]
+                    }"""
+                    server.download spec: downloadSpec
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh """
+                    docker build -t ${IMAGE_REPO}:${IMAGE_TAG} .
+                """
+            }
+        }
+
+        stage('Push to ECR') {
+            steps {
+                sh """
+                    aws ecr get-login-password --region ap-south-1 \
+                    | docker login --username AWS --password-stdin ${IMAGE_REPO}
+
+                    docker push ${IMAGE_REPO}:${IMAGE_TAG}
+                """
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh """
+                    kubectl --context ${KUBE_CONTEXT} set image deployment/my-app \
+                    my-app=${IMAGE_REPO}:${IMAGE_TAG}
+
+                    kubectl --context ${KUBE_CONTEXT} rollout status deployment/my-app
+                """
+            }
+        }
+    }
+
+    post {
+        success { echo "CD Deployment to Kubernetes Successful ✔" }
+        failure { echo "CD Pipeline Failed ❌" }
+    }
+}
+```
+
+---
+
+# ⭐ **Which One Should You Use in Interviews?**
+
+Use this cheat sheet:
+
+| Deployment Method      | When to Use in Interviews                                                |
+| ---------------------- | ------------------------------------------------------------------------ |
+| **EC2/VM CD pipeline** | For traditional Java/Spring apps, monolithic apps                        |
+| **Kubernetes CD**      | Modern microservices, containerized deployments                          |
+| **ArgoCD (GitOps)**    | When they ask “do you use GitOps?” or “how do you deploy declaratively?” |
+
+---
+
+# Want the **ArgoCD CD pipeline** version too?
+
+You already have an ArgoCD Jenkinsfile, but I can create **a version that directly matches Jenkinsfile–1** if you want.
+
+Just say:
+➡️ **"Give ArgoCD CD pipeline for Jenkinsfile-1"**
+
+I will generate it.

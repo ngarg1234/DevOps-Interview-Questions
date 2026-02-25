@@ -1,0 +1,116 @@
+Below is a clear, interview-ready explanation of how to authenticate AWS Cloud inside a Jenkins server. I’ll give 3 main authentication approaches, best practices, pipeline examples, and common interview questions related to this topic.
+
+✅ How to Authenticate AWS Cloud in Jenkins Server
+
+Jenkins interacts with AWS using the AWS CLI / SDK using one of these authentication methods:
+
+🔹 Method 1: Using AWS Credentials Stored in Jenkins Credentials Store (Best Practice)
+
+This is the most secure and most common method.
+
+Steps
+1️⃣ Create IAM User/Role in AWS
+
+IAM User: “jenkins-deploy-user”
+
+Attach policies based on your need (example):
+
+AmazonEC2FullAccess
+
+AmazonS3FullAccess
+
+AmazonEKSClusterPolicy
+
+AmazonECRFullAccess
+
+or restrict with custom IAM policy
+
+Generate Access Key + Secret Key
+
+2️⃣ Add AWS Credentials to Jenkins
+
+Go to:
+
+Jenkins → Manage Jenkins → Credentials → Global → Add Credentials
+
+Kind → AWS Credentials
+
+ID → aws-creds
+
+Access Key → xxxx
+
+Secret Key → yyyy
+
+3️⃣ Use Credentials in Jenkinsfile
+
+Example:
+
+pipeline {
+    agent any
+    environment {
+        AWS_DEFAULT_REGION = "ap-south-1"
+    }
+
+    stages {
+        stage('Configure AWS Auth') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+                    sh """
+                        aws sts get-caller-identity
+                    """
+                }
+            }
+        }
+    }
+}
+
+
+✔ Jenkins uses AWS CLI with secure credentials
+✔ Credentials are masked in logs
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "S3Access",
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::my-ci-artifacts",
+        "arn:aws:s3:::my-ci-artifacts/*"
+      ]
+    },
+    {
+      "Sid": "STSAccess",
+      "Effect": "Allow",
+      "Action": [
+        "sts:GetCallerIdentity"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "EC2ReadOnly",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeInstances",
+        "ec2:DescribeTags",
+        "ec2:DescribeImages"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CloudWatchLogs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogStream",
+        "logs:CreateLogGroup",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cloned-pvc
+spec:
+  storageClassName: my-storage-class
+  dataSource:
+    name: existing-pvc
+    kind: PersistentVolumeClaim
+    apiGroup: ""
+
+# 2. Volume Cloning
+# Create new volumes that are exact copies of existing volumes.
+# Use dataSource in PVC to specify the source volume.

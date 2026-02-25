@@ -1,0 +1,81 @@
+STATIC POD:
+----------
+
+-> Pods created by kubelet on its own without the intervention from the API server or the rest of the k8s cluster components are known as Static Pods.
+-> Kubelet can manage node independently, as it has docker on every node.
+-> We don't have any apiServer to provide pod definition.
+-> We can configure kubelet to read pod definition file from a folder and create pod and ensure pod should be alive. If pod fails it should replace and a manifest file removed pod should be deleted.
+-> kubelet works at pod level that is why it can able to create.
+-> Designated location for manifest file could be any directory on the host. And the location of the directory is passed in to the kubelet as a option while running the service.
+-> The option named as "manifest path" and here it is set to "/etc/Kubernetes/manifests "
+-- pod-manifest-path=/etc/Kubernetes/manifests\\
+
+-> Another way is to specifying the option directly in the Kubernetes.service file, you could provide a path to another config file using config option, and define directory path as staticPodPath in that file. Cluster setup by kubeadmin tool uses this approach.
+-- config=kubeconfig.yaml
+staticPodPath: /etc/Kubernetes/manifests
+
+-> If you are inspecting an existing cluster, you should inspect this option of the kubelet to identify the path to the directory. You will then know where to place the definition file for your static pods.
+
+docker ps: to view the right path for static pods creation
+-> We cannot use kubectl because we don't have rest of the k8s setup here. Kubectl utility works with kube-apiserver.
+
+-> Two ways to take input for pod creation:
+1. POD definition files from staticPod folder
+2. HTTP API endpoint
+
+-> API Server will be aware of pods created by kubelet.
+-> If pods created through apiserver then pod mirror will be created in kubeapi server also. It will be readonly. We cannot edit, delete it like usual parts.
+-> We can only delete them by modifying the files from the nodes manifest folder.
+
+Q. Why static pods?
+-> Since static pods are not dependent on the Kubernetes control plane, you can use static pods to deploy the control plane components itself as pods on a node.
+-> Start by installing kubelet on all the master nodes. Then create pod definition files that uses Docker images of the various control plane components such as the api server, controller etcd etc.
+-> Place the definition files in the designated manifests folder. and kubelet takes care of deploying the control plane components themselves as PODs on the cluster.
+-> This way you don't have to download the binaries configure services or worry about so the service is crashing. If any of these services were to crash since its a static pod it will automatically be restarted by kubelet. Neat and Simple. That's how kubeadmin tool sets up K8s cluster. Which is why when you list the pods in the kube-system namespace, you see the control plane components as PODs in a cluster setup by the kubeadmin tool. 
+
+Static pod				Daemonset
+Created by kubelet 			Created by kube-api server (Daemonset controller)
+Deploy control plane comp as static pods Deploy monitoring agents, logging agents on nodes
+
+Q. How many static pods exist in this cluster in all namespaces?
+-> kubectl get pods --all-namespaces (Look for with -controlplane)
+
+Q. On which nodes are the static pods created currently??
+-> kubectl get pods --all-namespaces -o wide
+
+Q. Create a static pod named static-busybox that uses the busybox image and the command sleep 1000
+-> Create a pod definition file in the manifests folder. To do this, run the command:
+kubectl run --restart=Never --image=busybox static-busybox --dry-run=client -o yaml --command -- sleep 1000 > /etc/kubernetes/manifests/static-busybox.yaml
+
+Q. We just created a new static pod named static-greenbox. Find it and delete it. This question is a bit tricky. But if you use the knowledge you gained in the previous questions in this lab, you should be able to find the answer to it.
+1. First, let's identify the node in which the pod called static-greenbox is created. To do this, run:
+root@controlplane:~# kubectl get pods --all-namespaces -o wide  | grep static-greenbox
+default       static-greenbox-node01                 1/1     Running   0          19s     10.244.1.2   node01       <none>           <none>
+
+From the result of this command, we can see that the pod is running on node01.
+
+2. Next, SSH to node01 and identify the path configured for static pods in this node.
+Important: The path need not be /etc/kubernetes/manifests. Make sure to check the path configured in the kubelet configuration file.
+
+root@controlplane:~# ssh node01 
+root@node01:~# ps -ef |  grep /usr/bin/kubelet 
+root        4147       1  0 14:05 ?        00:00:00 /usr/bin/kubelet --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf --config=/var/lib/kubelet/config.yaml --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock --pod-infra-container-image=registry.k8s.io/pause:3.9
+root        4773    4733  0 14:05 pts/0    00:00:00 grep /usr/bin/kubelet
+
+root@node01:~# grep -i staticpod /var/lib/kubelet/config.yaml
+staticPodPath: /etc/just-to-mess-with-you
+
+Here the staticPodPath is /etc/just-to-mess-with-you
+3. Navigate to this directory and delete the YAML file:
+root@node01:/etc/just-to-mess-with-you# ls
+greenbox.yaml
+root@node01:/etc/just-to-mess-with-you# rm -rf greenbox.yaml 
+
+4. Exit out of node01 using CTRL + D or type exit. You should return to the controlplane node. Check if the static-greenbox pod has been deleted:
+root@controlplane:~# kubectl get pods --all-namespaces -o wide  | grep static-greenbox
+
+Q. how to run pod on particular node?
+-> $$  kubectl label nodes node-1 environment=production
+-> In the pod spec, you will need to include the nodeSelector field and set it to the label you want to match.
+-> $$ kubectl create -f pod.yaml   
+   (In some cases, you may want to use affinity and anti-affinity rules to ensure that pods are scheduled on specific nodes or avoid other pods.)

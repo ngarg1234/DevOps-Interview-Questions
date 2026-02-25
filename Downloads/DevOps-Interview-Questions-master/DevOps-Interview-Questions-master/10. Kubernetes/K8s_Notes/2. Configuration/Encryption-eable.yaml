@@ -1,0 +1,15 @@
+---
+apiVersion: apiserver.config.k8s.io/v1
+kind: EncryptionConfiguration
+resources:
+  - resources:
+      - secrets
+    providers:
+      - aescbc:
+          keys:
+            - name: key1
+              secret: <BASE 64 ENCODED SECRET>
+      - identity: {}
+
+# <BASE 64 ENCODED SECRET>: head -c 32 /dev/urandom | base64
+# you will get a secret which u need to paste in above secret value.

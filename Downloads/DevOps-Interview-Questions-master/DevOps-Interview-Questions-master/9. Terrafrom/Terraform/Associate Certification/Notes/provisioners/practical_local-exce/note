@@ -1,0 +1,67 @@
+r
+
+
+The local-exec provisioner invokes a local executable after a resource is created. This invokes a process on the machine running 
+Terraform
+
+
+
+
+
+resource "aws_instance" "web" {
+  # ...
+
+  provisioner "local-exec" {
+    command = "echo ${self.private_ip} >> private_ips.txt"
+  }
+}
+
+
+Argument Reference
+
+command - (Required) This is the command to execute.
+
+working_dir - (Optional) If provided, specifies the working directory where command will be executed.
+
+interpreter - (Optional) If provided, this is a list of interpreter arguments used to execute the command
+
+when - (Optional) If provided, specifies when Terraform will execute the command. For example, when = destroy
+
+quiet - (Optional) If set to true, Terraform will not print the command to be executed to stdout,
+
+
+
+Interpreter Examples
+
+resource "terraform_data" "example1" {
+  provisioner "local-exec" {
+    command = "open WFH, '>completed.txt' and print WFH scalar localtime"
+    interpreter = ["perl", "-e"]
+  }
+}
+
+
+
+example 2
+
+resource "terraform_data" "example2" {
+  provisioner "local-exec" {
+    command = "Get-Date > completed.txt"
+    interpreter = ["PowerShell", "-Command"]
+  }
+}
+
+
+
+
+Destroy-Time Provisioners
+
+
+resource "aws_instance" "web" {
+  # ...
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "echo 'Destroy-time provisioner'"
+  }
+}

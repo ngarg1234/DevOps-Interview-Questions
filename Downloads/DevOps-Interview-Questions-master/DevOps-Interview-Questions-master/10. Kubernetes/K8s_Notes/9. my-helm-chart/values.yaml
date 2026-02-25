@@ -1,0 +1,52 @@
+# Defines default configuration values for the chart.
+
+# Application-specific values
+app:
+  name: devops-app
+  image:
+    repository: nginx
+    tag: "1.21.6"
+    pullPolicy: IfNotPresent
+
+# Kubernetes resource configurations
+replicaCount: 2
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: devops-app.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+# Resource limits
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 250m
+    memory: 128Mi
+
+# ConfigMap values
+config:
+  APP_ENV: "development"
+  APP_DEBUG: "true"
+
+# Secrets
+secrets:
+  APP_SECRET: "my-super-secret"
+
+# Tolerations and Affinity
+nodeSelector: {}
+tolerations: []
+affinity: {}

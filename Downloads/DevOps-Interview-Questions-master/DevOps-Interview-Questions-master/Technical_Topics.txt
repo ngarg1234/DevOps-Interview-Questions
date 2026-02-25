@@ -1,0 +1,7 @@
+IAM - cross account access
+Route 53, Hosted Zone, 4 Name Servers, record set, routing policies
+AWS Organisation SCP Landing Zone Control Tower, Permission Boundaries, AWS IAM Access Analyser..
+Cloud Front, Edge Location, Regional Edge Location..
+Cost Optimization, AWS Compute Optimizer
+VPC, ENI, VPC Endpoint, VPC Interface Endpoints..
+AWS Three trier architdture. features, HAFTASCCLE.. xe6

@@ -1,0 +1,200 @@
+-> Amazon Elastic Kubernetes Service (Amazon EKS) is a managed Kubernetes service that eliminates
+ the need to operate and maintain the availability and scalability of Kubernetes clusters
+ in Amazon Web Services (AWS) and in your own data centers. 
+-> Kubernetes is an open source system that automates the management, scaling,
+ and deployment of containerized applications.
+
+Features of Amazon EKS
+----------------------
+1. Fully Managed Kubernetes Control Plane
+-- Highly available and scalable Kubernetes control plane across multiple AZs.
+-- Automated management of API servers and etcd.
+-- EKS Auto Mode: Fully automated cluster infrastructure (compute, storage, networking, cost optimization, patching).
+
+2. Kubernetes Compatibility
+-- Runs upstream Kubernetes, certified Kubernetes-conformant.
+-- Supports all standard Kubernetes tooling and plug-ins.
+-- Long-term Kubernetes version support (up to 26 months per version).
+
+3. Machine Learning Support
+-- Suitable for AI/ML workloads (training/inference).
+-- Support for GPU instances, AWS Neuron, and high-performance compute options.
+-- Elastic scaling for ML pipelines.
+
+4. Hybrid and Edge Deployments
+-- AWS Outposts, Local Zones, Wavelength, EKS Anywhere (on-prem).
+-- Amazon EKS Connector for managing external clusters.
+-- EKS Distro: AWS Kubernetes distribution for self-managed environments.
+
+5. Compute Options
+-- Full range of EC2 instance types (including Nitro, Graviton, Spot, and Savings Plans).
+-- Support for on-demand and cost-optimized compute.
+
+6. Networking & Load Balancing
+-- Native VPC integration with Amazon VPC CNI Plugin.
+-- Pod-level IPs from VPC.
+-- IPv4, IPv6, Dual-stack support.
+-- ALB/NLB support via AWS Load Balancer Controller.
+-- Amazon VPC Lattice for cross-cluster communication.
+
+7. Security and Compliance
+-- Integration with AWS IAM and Kubernetes RBAC.
+-- Pod IAM Roles (Pod Identity) for fine-grained AWS service access.
+-- Security Groups for Pods (SGP).
+-- Compliance: SOC, PCI, ISO, FedRAMP, HIPAA, HITRUST, etc.
+
+8. Observability and Monitoring
+-- Integrated with CloudWatch, CloudTrail, AWS Managed Prometheus (AMP), GuardDuty.
+-- AWS Distro for OpenTelemetry (ADOT) for tracing/logging.
+-- CloudWatch Container Insights for performance metrics.
+-- EKS console-based monitoring.
+
+9. Storage Integrations
+-- Supports CSI drivers for AWS storage services:
+-- Amazon EBS, Amazon EFS, Amazon S3, Amazon FSx, Amazon File Cache.
+-- Persistent storage for Kubernetes workloads.
+
+10. Add-ons and Third-party Integrations
+-- Amazon EKS Add-ons: AWS-managed operational Kubernetes components.
+-- Unified management for third-party Kubernetes software.
+-- Add-ons for networking, load balancing, storage, observability, security.
+
+11. Cluster Management Interfaces
+-- Multiple management options:
+-- AWS Console, CLI, eksctl, CDK, CloudFormation, Terraform.
+-- AWS Controllers for Kubernetes (ACK) for managing AWS services via Kubernetes CRDs.
+
+12. Operating Systems Support
+-- Amazon EKS-optimized AMIs: Amazon Linux 2, Amazon Linux 2023, Bottlerocket, Windows, Canonical Ubuntu.
+-- Support for NVIDIA and AWS Neuron in AMIs.
+-- Custom AMI support.
+
+========================================================================================
+🌐 Amazon VPC Lattice - Overview
+-> Amazon VPC Lattice is a fully managed application networking service that simplifies service-to-service communication across VPCs, accounts, and clusters without complex networking setups (like peering, transit gateways, or shared VPCs).
+-> It abstracts service communication into HTTP/HTTPS level connectivity with built-in security, observability, and traffic management.
+
+🔑 Key Features of VPC Lattice for Kubernetes & Cross-Cluster Communication
+
+Cross-Cluster Communication: Enables secure, scalable communication between multiple EKS clusters in different VPCs or accounts.
+Application-Aware Networking: Connect services by name (like payment-service.default) rather than IPs.
+No VPC Peering/Transit Gateway: Removes the need for VPC peering, simplifying network topology.
+End-to-End TLS Encryption: Supports secure TLS communication by default.
+Service Discovery & DNS: Provides automatic service discovery across VPCs and clusters.
+Traffic Management: Supports routing rules, path-based routing, weighted routing.
+IAM and RBAC: Fine-grained access controls using AWS IAM and service policies.
+Observability: Integrated logging, metrics, tracing with CloudWatch and X-Ray.
+Scalable: Elastic and highly available, auto-scales as traffic grows.
+Integrated with AWS Services: Works natively with EKS, ECS, Lambda, EC2, and more.
+
+
+📦 Use Cases for Kubernetes (EKS)
+1. 🧭 Cross-cluster microservices communication:
+Multiple EKS clusters in different VPCs/regions/accounts communicate securely without network complexity.
+
+2. 🔐 Zero-trust networking for services:
+Apply service-level authorization/authentication without managing mTLS at the app layer.
+
+3. 🔀 Traffic Routing & Canary Deployments:
+Implement weighted traffic shifting, A/B testing, or canary releases across clusters.
+
+4. 🌍 Multi-region service mesh alternatives:
+Simplify multi-region Kubernetes communication without complex service mesh setup (e.g., Istio).
+
+
+🚀 Example: Architecture for Two EKS Clusters (Cross-Cluster)
+EKS Cluster 1 (VPC-A)                EKS Cluster 2 (VPC-B)
++---------------------+             +---------------------+
+|   Order Service     |<--- Lattice --->|   Payment Service   |
+|   (order.default)   |             |   (payment.default) |
++---------------------+             +---------------------+
+
+>> Connected via VPC Lattice
+>> No VPC peering, no TGW needed..
+>> Managed routing, TLS, IAM control..
+
+========================================================================================
+⚙️ Amazon EKS Managed Node Groups vs Self-Managed Nodes
+✅ Provisioning & Management: MNG - AWS automatically provisions and manages EC2 instances as nodes; Self-Managed - You provision and manage EC2 instances manually.
+
+✅ Kubernetes Integration: MNG - Fully integrated, automatically joins cluster; Self-Managed - You manually configure nodes to join the cluster.
+
+✅ Auto Scaling (Cluster Autoscaler): MNG - Fully supported, integrated with EKS; Self-Managed - Supported, but requires manual setup and maintenance.
+
+✅ Upgrades & Patching: MNG - Automated OS & version upgrades via EKS API; Self-Managed - Manual updates (AMIs, kubelet, kube-proxy, etc.).
+
+✅ Lifecycle Management: MNG - AWS handles provisioning, updating, and draining nodes; Self-Managed - You manage lifecycle (creation, updates, terminations).
+
+✅ IAM Role for Nodes: MNG - Automatically attached via nodeRole; Self-Managed - You need to manually attach and manage IAM roles.
+
+✅ Launch Templates: MNG - Supports Launch Templates (customization limited); Self-Managed - Fully customizable Launch Templates.
+
+✅ Control Plane Auto Registration: MNG - Automatic; Self-Managed - Manual (using bootstrap script or aws-auth config).
+
+✅ Cost: MNG - Slight AWS service overhead for management; Self-Managed - No overhead, but higher operational effort.
+
+✅ Spot Instances Support: MNG - Supported (mixed instances for cost optimization); Self-Managed - Supported (you configure Spot, on-demand mix manually).
+
+✅ Custom AMI Support: MNG - Supported via Launch Template (with some limits); Self-Managed - Fully supported, full control over AMIs.
+
+✅ Node Labels and Taints: MNG - Configurable via API/Launch Template; Self-Managed - Full control via custom kubelet config.
+
+✅ Use Case: MNG - Ideal for ease of use, production-ready, less operational effort; Self-Managed - Ideal for complex, customized environments, edge cases.
+
+🎯 Key Takeaways for Interview:
+-> Managed Node Groups are AWS-managed, production-ready, scalable node groups with minimal manual intervention.
+-> Self-Managed Nodes give full flexibility and customization but require manual operations for scaling, patching, and lifecycle.
+-> Cluster Autoscaler works with both, but MNG integrates seamlessly.
+-> MNG is great for production workloads, while Self-Managed is for customized environments.
+
+
+========================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

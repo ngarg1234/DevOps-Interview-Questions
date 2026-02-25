@@ -1,0 +1,51 @@
+Stateless Applications:
+-----------------------
+-> Deployment is an API object used to manage Pods and ReplicaSets that are part of stateless applications. They support declarative configuration, rollouts, and rollbacks. You use them to automate Pod updates.
+
+-> Because Deployments use a declarative management model, you only need to define what your desired state looks like. 
+-> When you apply a Deployment manifest, Kubernetes will automatically compare the state it describes to the current version in your cluster. 
+-> The Deployment controller will then reconcile the existing state to the new desired state, which results in Pods being added and removed as required.
+
+-> In practical terms, it allows you to change the number of Pod replicas by adjusting the value in your Deployment’s manifest. Kubernetes will automatically add the correct number of new Pods, or remove existing ones, to achieve the rollout. Deployments also allow you to pause a rollout if you detect a problem and rollback to a previous state.
+
+When to use Deployments?
+------------------------
+-> Use a Deployment to run stateless applications that need to benefit from declarative updates and rollbacks. They permit you to rollout changes safely, without the threat of downtime.
+
+StatefulSet vs. Deployment
+--------------------------
+
+1. StatefulSet:
+---------------
+✅ Stateful/Stateless applications: Stateful
+✅ Pod identities: Pods are assigned a persistent identifier, derived from the StatefulSet’s name and their ordinal creation index.
+✅ Pod interchangeability: Pods in a StatefulSet are not interchangeable. It’s expected that each Pod has a specific role, such as always running as a primary or read-only replica for a database application.
+✅ Rollout ordering: Pods are guaranteed to be created and removed in sequence. When you scale down the StatefulSet, Kubernetes will terminate the most recently created Pod.
+✅ Storage access: Each Pod in the StatefulSet is assigned its own Persistent Volume (PV) and Persistent Volume Claim (PVC).
+
+2. Deployment/Stateless:
+------------------------
+✅ Stateful/Stateless applications: Stateless
+✅ Pod identities: Pods are assigned random identifiers, derived from the Deployment’s name and a unique random string.
+✅ Pod interchangeability: All Pods are identical, so they’re interchangeable and can be replaced at any time.
+✅ Rollout ordering: No ordering is supported. When you scale down the Deployment, Kubernetes will terminate a random Pod.
+✅ Storage access: All Pods share the same PV and PVC.
+
+
+Feature				Deployment						StatefulSet
+Use Case	Stateless applications (e.g., web servers, APIs)	Stateful applications (e.g., databases, message queues)
+Pod Identity	Pods are interchangeable (identical)			Each pod has a unique, persistent identity, derived from the StatefulSet’s name and their ordinal creation index.
+Pod Naming	Randomly assigned names (e.g., nginx-abc123)		Sequential, stable names (e.g., db-0, db-1, db-2)
+Scaling		Adds/removes pods without order				Pods are added/removed in a controlled sequence
+Storage		Uses ephemeral storage (deleted when pod terminates)	Uses Persistent Volume Claims (PVCs), which persist across restarts
+Network Identity	No stable DNS name for each pod			Each pod gets a stable network identity (e.g., db-0.svc.cluster.local)
+Rolling Updates		Supports rolling updates and rollbacks easily	Updates must be carefully managed (pods are updated one by one)
+
+4. When to Use Which?
+Scenario			Use Deployment?	   Use StatefulSet?
+Stateless Web Applications	✅			❌
+APIs or Microservices		✅			❌
+Databases (MySQL, PostgreSQL)	❌			✅
+Distributed Systems (Kafka, Zookeeper)	❌		✅
+Cache (Redis, Memcached)	✅ (for stateless) / 	✅ StatefulSet (if persistence needed)	✅ (for master-slave setup)
+

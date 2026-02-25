@@ -1,0 +1,19 @@
+digraph {
+	compound = "true"
+	newrank = "true"
+	subgraph "root" {
+		"[root] aws_iam_user.lb (expand)" [label = "aws_iam_user.lb", shape = "box"]
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"]" [label = "provider[\"registry.terraform.io/hashicorp/aws\"]", shape = "diamond"]
+		"[root] var.list1" [label = "var.list1", shape = "note"]
+		"[root] var.list2" [label = "var.list2", shape = "note"]
+		"[root] aws_iam_user.lb (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
+		"[root] output.combined (expand)" -> "[root] var.list1"
+		"[root] output.combined (expand)" -> "[root] var.list2"
+		"[root] output.users_arn (expand)" -> "[root] aws_iam_user.lb (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] aws_iam_user.lb (expand)"
+		"[root] root" -> "[root] output.combined (expand)"
+		"[root] root" -> "[root] output.users_arn (expand)"
+		"[root] root" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)"
+	}
+}
+

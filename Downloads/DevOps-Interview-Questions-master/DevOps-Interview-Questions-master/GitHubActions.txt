@@ -1,0 +1,1959 @@
+# 🔥 **GitHub Actions – Deep, Interview-Ready Answers (One-by-One)**
+
+(Use these exact responses in your interview.)
+
+---
+
+# ✅ **1. Where do you define workflows and why is it important?**
+
+Workflows are stored in:
+
+```
+.github/workflows/<workflow-name>.yml
+```
+
+**Why this location is important:**
+
+* GitHub Actions **only scans this folder**, not anywhere else.
+* Keeps CI/CD in version control → every change is tracked.
+* Developers can update workflows via PR review.
+* Allows GitHub to detect events (push/PR/schedule) and run workflows automatically.
+* Ensures consistency between environments because the workflow lives with the code.
+
+---
+
+# ✅ **2. Difference between Jobs and Steps**
+
+### **Jobs**
+
+* A job is a **collection of steps** executed in its own **runner (VM/container)**.
+* Jobs run **in parallel by default**, unless `needs:` is used.
+* Each job has its own isolated filesystem and environment.
+
+### **Steps**
+
+* Individual actions or shell commands inside a job.
+* Steps **run sequentially** within a job.
+* Steps share environment variables, workspace, and file system **within the job only**.
+
+Example explanation (interview friendly):
+
+> “Jobs are the execution units running on runners, and steps are the actual tasks inside the job.
+Steps share the same workspace, but jobs are isolated unless you explicitly pass outputs.”
+
+---
+
+# ✅ **3. How can you conditionally run a step?**
+
+Use the `if:` attribute.
+
+Examples:
+
+```yaml
+if: github.ref == 'refs/heads/main'
+```
+
+More advanced conditions:
+
+### Run only if a previous step failed:
+
+```yaml
+if: failure()
+```
+
+### Run only on PRs:
+
+```yaml
+if: github.event_name == 'pull_request'
+```
+
+### Run when a variable is set:
+
+```yaml
+if: env.DEPLOY_ENV == 'prod'
+```
+
+This is one of the most common questions.
+
+---
+
+# ✅ **4. What does `runs-on` do?**
+
+Specifies the **type of runner** (execution environment) the job should run on.
+
+Examples:
+
+* `ubuntu-latest`
+* `windows-latest`
+* `macos-latest`
+* `self-hosted`
+
+It defines:
+
+* OS
+* Kernel
+* Tools available
+* RAM / CPU
+* Shell environment
+
+Interview line:
+
+> “`runs-on` is basically your compute environment. You are deciding the OS and machine type where all steps in that job will execute.”
+
+Here is a **clear, complete, interview-ready explanation** for:
+
+# **How do you define the runner, what types exist, and how do you set up a custom (self-hosted) runner?**
+
+This is exactly the level of detail interviewers look for.
+
+---
+
+# ✅ **1. How do you define the runner in GitHub Actions?**
+
+You define the runner using **`runs-on:`** inside a job.
+
+### **Example**
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+```
+
+`runs-on` specifies the VM/environment where the job will run.
+
+---
+
+# ✅ **2. What types of GitHub runners exist?**
+
+GitHub supports **three types** of runners:
+
+---
+
+## **A. GitHub-Hosted Runners (Default)**
+
+GitHub provides the VM.
+
+Examples:
+
+```
+ubuntu-latest
+windows-latest
+macos-latest
+```
+
+**Pros**
+
+* No maintenance
+* Auto-scaled
+* Preinstalled tools
+
+**Cons**
+
+* Limited CPU/RAM
+* Ephemeral (clean every run)
+
+---
+
+## **B. Self-Hosted Runners (Custom VM/Server)**
+
+You host the machine.
+
+```
+runs-on: self-hosted
+```
+
+You can also add custom labels:
+
+```
+runs-on: [self-hosted, linux, large-runner]
+```
+
+**Pros**
+
+* More CPU/RAM
+* Access to private networks
+* Not ephemeral → faster builds
+* Full control: install anything
+
+**Cons**
+
+* You manage updates, security, scaling
+
+---
+
+## **C. GitHub Enterprise Cloud Hosted Runners (Premium)**
+
+* GPU/more vCPU
+* Larger RAM
+* Dedicated compute
+
+(Usually for large orgs)
+
+---
+
+# ✅ **3. How do you set up a Custom Self-Hosted Runner (step-by-step)?**
+
+This is a common interview question.
+Here’s the exact process explained simply:
+
+---
+
+# **Step-by-Step: Set Up a Self-Hosted Runner**
+
+## **Step 1 → Go to the repository or org**
+
+**Settings → Actions → Runners → Add Runner**
+
+You choose:
+
+* OS: Linux, Windows, macOS
+* Architecture: x64, ARM64
+
+GitHub will show commands like:
+
+---
+
+## **Step 2 → Download the runner package**
+
+Example (Linux):
+
+```bash
+curl -o actions-runner-linux-x64.tar.gz -L https://github.com/actions/runner/releases/download/v2.311.0/actions-runner-linux-x64-2.311.0.tar.gz
+tar xzf actions-runner-linux-x64.tar.gz
+```
+
+---
+
+## **Step 3 → Configure the runner**
+
+GitHub provides a command like:
+
+```bash
+./config.sh --url https://github.com/ORG/REPO --token RUNNER_TOKEN
+```
+
+You can add labels here:
+
+```bash
+./config.sh --labels my-runner,linux,prod
+```
+
+---
+
+## **Step 4 → Install as a Service**
+
+Linux:
+
+```bash
+sudo ./svc.sh install
+sudo ./svc.sh start
+```
+
+Windows:
+
+```powershell
+./config.cmd
+./svc install
+./svc start
+```
+
+---
+
+## **Step 5 → Use it in your workflow**
+
+### **Minimal**
+
+```yaml
+runs-on: self-hosted
+```
+
+### **With labels**
+
+```yaml
+runs-on: [self-hosted, linux, prod]
+```
+
+This job will run **only** on a runner with those labels.
+
+---
+
+# 🔍 **Important concepts (Interview gold)**
+
+### **1️⃣ Self-hosted runners use LABEL matching**
+
+Your workflow must match all labels:
+
+```yaml
+runs-on: [self-hosted, gpu, ubuntu]
+```
+
+Runner must have all 3 labels.
+
+---
+
+### **2️⃣ Runners pick jobs via pull model**
+
+The runner polls GitHub and asks:
+
+> “Do you have a job for me?”
+
+GitHub does not push jobs.
+
+---
+
+### **3️⃣ Secrets automatically flow to self-hosted runners**
+
+But ensure:
+
+* runner is secure
+* isolated
+* least privilege
+
+---
+
+### **4️⃣ Runners need internet to reach GitHub**
+
+Common failure:
+Runner shows **offline** when network blocks outbound HTTPS to GitHub.
+
+---
+
+# 📌 YAML Example: Use GitHub-hosted vs Self-hosted
+
+### **GitHub-hosted**
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+```
+
+---
+
+### **Self-hosted**
+
+```yaml
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux, prod]
+```
+
+---
+
+### **Mixed workflow**
+
+```yaml
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+  build:
+    runs-on: [self-hosted, ubuntu, large]
+
+  deploy:
+    needs: build
+    runs-on: [self-hosted, prod]
+```
+
+---
+
+# 🎯 Interview-Ready Summary
+
+> **You define runners using `runs-on`. GitHub Actions supports GitHub-hosted runners, self-hosted runners, and enterprise runners. For custom runners, you install the GitHub runner agent on your machine, configure it using a token, assign labels, install it as a service, and then reference it in workflows using `runs-on: [self-hosted, <labels>]`.**
+
+---
+
+If you want, I can prepare:
+
+✅ A **diagram** of GitHub Runner Architecture
+✅ A **mock interview** on GitHub Actions
+✅ A **full CI/CD pipeline YAML** using self-hosted runners
+
+Just tell me!
+
+
+---
+
+# ✅ **5. How do you reuse environment variables across jobs?**
+
+### A) **Workflow-level env block**
+
+```yaml
+env:
+  APP_ENV: production
+```
+
+### B) **Share dynamic values via job outputs**
+
+Step:
+
+```yaml
+echo "APP_VERSION=1.2.3" >> $GITHUB_OUTPUT
+```
+
+Job:
+
+```yaml
+outputs:
+  version: ${{ steps.ver.outputs.APP_VERSION }}
+```
+
+Other job:
+
+```yaml
+echo "Using version ${{ needs.build.outputs.version }}"
+```
+
+Interview hint:
+**Workflow-level env is static. Outputs allow sharing dynamic values.**
+
+---
+
+# ✅ **6. What is `uses:` in a step?**
+
+`uses:` tells GitHub to run an **action** rather than a shell command.
+
+Examples:
+
+* Marketplace action
+* Local action
+* Reusable workflow
+
+Use cases:
+
+```yaml
+uses: actions/checkout@v4
+uses: actions/setup-node@v4
+uses: ./my-custom-action
+```
+
+This is like importing a function instead of writing logic manually.
+
+---
+
+# ✅ **7. How to access secrets inside workflows?**
+
+```yaml
+${{ secrets.MY_SECRET }}
+```
+
+Access example:
+
+```yaml
+env:
+  TOKEN: ${{ secrets.API_TOKEN }}
+```
+
+GitHub protection:
+
+* Secrets are encrypted at rest
+* Secrets are masked in logs
+* Secrets are not available to forked PRs by default
+
+---
+
+In GitHub Actions, you never define secrets directly inside the workflow file (for security reasons).
+Instead, you store secrets in the GitHub repo or org settings, and then reference them inside the workflow using the secrets. context.
+
+Here’s the correct and safe way:
+
+✅ How to Add Secrets in GitHub
+1. Add Secrets in GitHub UI
+
+Go to your repository
+➝ Settings
+➝ Secrets and variables
+➝ Actions
+
+Click New repository secret
+
+Add:
+
+Name (e.g., AWS_ACCESS_KEY_ID)
+
+Value (your actual secret)
+
+✅ How to Use Secrets Inside a GitHub Actions YAML
+
+You reference secrets like this:
+
+env:
+  MY_SECRET: ${{ secrets.MY_SECRET }}
+
+
+or
+
+- name: Login to AWS
+  run: |
+    aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+    aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+
+or as environment variables inside a job or step:
+
+Example: Using Secrets in a Job
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print secret (testing)
+        run: echo "Secret is set"
+        env:
+          TOKEN: ${{ secrets.MY_API_TOKEN }}
+
+
+❗ GitHub Actions will mask secrets automatically in logs (even if printed).
+
+⭐ Full Example GitHub Actions Workflow With Secrets
+
+Here is a clean sample YAML:
+
+name: Deploy App
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up AWS CLI
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws configure set default.region ap-south-1
+
+      - name: Deploy to S3
+        run: |
+          aws s3 sync ./build s3://my-bucket --delete
+
+⚠️ Important Rules
+You CAN	You CANNOT
+Reference secrets from YAML	Store real secret values in YAML
+Use secrets.MY_SECRET	Hardcode passwords/API keys
+Create secrets in GitHub UI	Upload secrets in plain text to repo
+
+If you want, I can also:
+
+✅ create a full GitHub Actions YAML based on your project
+✅ add multiple environments (dev, stage, prod)
+✅ show how to encrypt & use multiple secrets
+
+Just tell me!
+
+# ✅ **8. Trigger workflow on multiple events**
+
+```yaml
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * *"
+```
+
+Multiple events = more flexible CI/CD.
+
+---
+
+# ✅ **9. How to move a resource between Terraform modules safely?**
+
+Use:
+
+```
+terraform state mv SOURCE DESTINATION
+```
+
+Important details:
+
+* Moves only **state**, not infrastructure
+* Prevents resource recreation
+* Ensures no downtime
+
+Example:
+
+```
+terraform state mv module.old.aws_instance.app module.new.aws_instance.app
+```
+
+---
+
+# ✅ **10. Prevent workflow execution on specific paths**
+
+```yaml
+on:
+  push:
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
+```
+
+Meaning:
+Workflow will not run when commits touch ignored paths.
+
+---
+
+# ✅ **11. How do you cache dependencies in GitHub Actions?**
+
+Using `actions/cache@v3`:
+
+```yaml
+uses: actions/cache@v3
+with:
+  path: ~/.npm
+  key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+```
+
+Key points:
+
+* Uses hashing — cache invalidates when dependencies change.
+* Reduces build time significantly.
+* Very common in large projects.
+
+---
+
+# ✅ **12. If one job fails, can others still run?**
+
+* **YES**, if there are *no dependencies* using `needs:`
+* **NO**, if the failing job is a dependency
+
+Example:
+
+```yaml
+deploy:
+  needs: test
+```
+
+If **test** fails, deploy will not run.
+
+---
+
+# ✅ **13. What does `continue-on-error: true` do?**
+
+It allows the step to fail **without failing the job**.
+
+Useful for:
+
+* Lint warnings
+* Optional tests
+* Non-critical checks
+
+Example:
+
+```yaml
+continue-on-error: true
+run: npm run lint
+```
+
+---
+
+# ✅ **14. How do you share data between steps and jobs?**
+
+### Between Steps
+
+Use **GITHUB_ENV**:
+
+```bash
+echo "VERSION=1.0" >> $GITHUB_ENV
+```
+
+### Between Jobs
+
+Use **outputs**:
+
+```yaml
+outputs:
+  version: ${{ steps.set_version.outputs.VERSION }}
+```
+
+Here is a **clear, complete, interview-ready explanation** of the three ways one GitHub Actions workflow can trigger another — with deep detail, examples, and when to use each.
+
+---
+
+# ✅ **15. Can One GitHub Actions Workflow Trigger Another?**
+
+**Yes.**
+There are **three official methods** to trigger Workflow-B from Workflow-A:
+
+---
+
+# 1️⃣ **`workflow_call` — Reusable Workflows (Best & Recommended)**
+
+### **How it works**
+
+* Workflow-B becomes a **reusable workflow**.
+* Workflow-A **calls** it directly.
+* Very clean, secure, and maintainable.
+
+---
+
+### **Workflow-B (`.github/workflows/deploy.yml`)**
+
+```yaml
+name: Deploy Reusable Workflow
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+    secrets:
+      AWS_SECRET:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Deploying to ${{ inputs.environment }}"
+      - run: echo "Using secret: ${{ secrets.AWS_SECRET }}"
+```
+
+---
+
+### **Workflow-A (caller workflow)**
+
+```yaml
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Build complete"
+
+  deploy:
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: production
+    secrets:
+      AWS_SECRET: ${{ secrets.AWS_SECRET }}
+```
+
+---
+
+### ⭐ When to use?
+
+* Microservices
+* Dev/Stage/Prod shared pipelines
+* Standardizing CI/CD
+* Multiple repos calling a common workflow
+
+---
+
+---
+
+# 2️⃣ **`repository_dispatch` — Tell Another Workflow to Run (API Based)**
+
+### **How it works**
+
+* Workflow-A sends a webhook event to GitHub’s API.
+* Workflow-B listens for this custom event.
+
+---
+
+### **Workflow-B (`deploy.yml`)**
+
+```yaml
+on:
+  repository_dispatch:
+    types: [run-deploy]
+```
+
+---
+
+### **Workflow-A (sender)**
+
+Sends a POST request to GitHub API:
+
+```yaml
+- name: Trigger Deploy Workflow
+  run: |
+    curl -X POST \
+      -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+      -H "Accept: application/vnd.github+json" \
+      https://api.github.com/repos/${{ github.repository }}/dispatches \
+      -d '{"event_type": "run-deploy"}'
+```
+
+---
+
+### ⭐ When to use?
+
+* Trigger workflow across repos
+* Trigger from external services/tools
+* Trigger manually using API
+
+---
+
+### ⚠️ Limitation:
+
+`GITHUB_TOKEN` *cannot* be used to trigger workflows by default.
+You must set:
+
+```
+permissions:
+  id-token: write
+  contents: read
+  actions: write
+```
+
+or use a **PAT** if required.
+
+---
+
+---
+
+# 3️⃣ **`workflow_run` — Run Workflow-B After Workflow-A Completes**
+
+### **How it works**
+
+* Workflow-B waits until workflow-A **succeeds / fails / completes**.
+
+---
+
+### **Workflow-B**
+
+```yaml
+name: Deploy After Build
+
+on:
+  workflow_run:
+    workflows: ["Build Pipeline"]
+    types:
+      - completed
+```
+
+This will trigger when the workflow named **"Build Pipeline"** finishes.
+
+---
+
+### ⭐ When to use?
+
+* Multi-stage pipelines
+  (Build → Test → Deploy, each in separate workflow files)
+* Decoupling CI and CD pipelines
+* Reducing workflow complexity
+
+---
+
+### ⚠️ Limitation:
+
+* Cannot pass variables/outputs directly between workflows.
+* You must use:
+
+  * artifacts
+  * GitHub API
+  * repo files
+  * caching
+
+---
+
+---
+
+# 🧠 Summary Table
+
+| Method                  | Description           | Best For              | Pros                                   | Cons                       |
+| ----------------------- | --------------------- | --------------------- | -------------------------------------- | -------------------------- |
+| **workflow_call**       | Reusable workflows    | Shared CI/CD logic    | Clean, secure, supports inputs/secrets | Same repo only             |
+| **repository_dispatch** | Trigger via API       | Cross-repo triggers   | Flexible                               | Requires extra permissions |
+| **workflow_run**        | Trigger on completion | Multi-stage pipelines | Very simple                            | No parameter passing       |
+
+---
+
+If you want, I can also:
+
+✅ create example YAMLs for each method
+✅ build a complete CI/CD chain (build → test → deploy)
+✅ write interview answers based on your experience
+
+Just tell me!
+
+
+# ✅ **16. What is a Matrix Build?**
+
+Matrix runs the job in **parallel** for each combination of variables (OS, language version, etc.)
+
+Example:
+
+```yaml
+matrix:
+  os: [ubuntu-latest, windows-latest]
+  node: [16, 18]
+```
+
+Produces 4 parallel jobs.
+
+---
+
+# ✅ **17. How to make a job depend on multiple jobs?**
+
+Use:
+
+```yaml
+needs: [build, test, security-scan]
+```
+
+---
+
+# ✅ **18. How do you reuse workflows across repos?**
+
+With **reusable workflows**:
+
+```yaml
+uses: org/repo/.github/workflows/deploy.yml@main
+```
+
+---
+Here is a **full, detailed, interview-ready explanation** for:
+
+# **19. How do you limit concurrency of a workflow in GitHub Actions?**
+
+---
+
+# ✅ **Limit concurrency of a workflow**
+
+GitHub Actions provides the `concurrency` key to ensure **only one workflow run** from a particular group runs at a time.
+
+This prevents parallel deployments, race conditions, and conflicting updates.
+
+---
+
+# ✅ **Basic Example**
+
+```yaml
+concurrency:
+  group: prod-deploy
+  cancel-in-progress: true
+```
+
+---
+
+# 🔍 **Meaning of Each Field**
+
+### **1️⃣ `group`**
+
+Defines the **locking group**.
+
+All workflow runs that share the same group **cannot run at the same time**.
+
+Common patterns:
+
+```yaml
+group: prod-deploy
+```
+
+Dynamic naming:
+
+```yaml
+group: deploy-${{ github.ref }}
+```
+
+Use case: prevent deployments *per environment* or *per branch*.
+
+---
+
+### **2️⃣ `cancel-in-progress`**
+
+* **true** → cancel any old run when a new run starts
+* **false** → let the old run finish, queue the new one
+
+Example:
+
+| Setting | Behavior                                                          |
+| ------- | ----------------------------------------------------------------- |
+| `true`  | New run cancels old runs (good for CI builds)                     |
+| `false` | New run waits for old run to finish (good for production deploys) |
+
+---
+
+# 🎯 **Why It’s Important**
+
+### ✔ Prevents multiple deployments at once
+
+Example: Two commits pushed quickly — only latest deploys.
+
+### ✔ Prevents race conditions
+
+E.g., Terraform applying state twice.
+
+### ✔ Ensures safe, sequential jobs
+
+Especially in production.
+
+---
+
+# 📌 **Full Example: Safe Production Deployment Workflow**
+
+```yaml
+name: Production Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Deploying safely…"
+```
+
+✔ Only **1 deployment** will run at a time.
+✔ New runs will **wait** instead of canceling old ones.
+
+---
+
+# 📌 **CI Example: Cancel old builds**
+
+```yaml
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+```
+
+Good for branches where old builds do not matter.
+
+---
+
+# 🧠 Interview-Ready Summary
+
+> **We use the `concurrency` setting in GitHub Actions to limit simultaneous workflow runs.
+> It defines a locking group and ensures only one workflow from that group runs at a time.
+> `cancel-in-progress` lets us decide whether new runs cancel old ones or wait.
+> This prevents race conditions, parallel deployments, and ensures safe CI/CD pipelines.**
+
+---
+
+If you want, I can also generate:
+
+✅ Terraform safe deployment example
+✅ Concurrency per environment
+✅ A full CI/CD YAML template
+
+Just tell me!
+
+---
+
+# ✅ **20. Difference between `env:` and `with:`**
+
+### `env:`
+
+Defines environment variables.
+
+### `with:`
+
+Defines inputs passed to an action.
+
+Example:
+
+```yaml
+uses: actions/setup-node@v4
+with:
+  node-version: 18
+```
+
+---
+
+# ✅ **21. How to fail a workflow intentionally?**
+
+Example:
+
+```yaml
+run: exit 1
+```
+
+Or conditionally:
+
+```yaml
+run: |
+  if [ "$ENV" != "prod" ]; then exit 1; fi
+```
+
+---
+
+# ✅ **22. How do you encrypt/store secrets?**
+
+GitHub uses:
+
+* Encrypted libsodium-based secrets
+* Stored at org/repo/environment level
+* Never exposed in logs
+
+Add via:
+**Settings → Secrets → Actions**
+
+---
+
+# ✅ **23. How do you debug a failing GitHub Action?**
+
+Use:
+
+```bash
+ACTIONS_STEP_DEBUG=true
+ACTIONS_RUNNER_DEBUG=true
+```
+
+Steps:
+
+* Enable debugging logs
+* Add `echo` statements
+* Inspect job runner environment
+* Use “Re-run failed jobs with debug logging”
+
+---
+
+# ✅ **24. Difference: `GITHUB_ENV` vs. `GITHUB_OUTPUT`**
+
+| Purpose         | File         | Scope                            |
+| --------------- | ------------ | -------------------------------- |
+| `GITHUB_ENV`    | env vars     | For later steps in SAME job      |
+| `GITHUB_OUTPUT` | step outputs | For passing values to OTHER jobs |
+
+---
+
+# ✅ **25. How to prevent secrets from being exposed in PRs?**
+
+* Don’t allow secrets for fork PRs
+* Use `pull_request_target` carefully
+* GitHub masks secret patterns automatically
+* Use environment protection rules
+* Use OIDC instead of long-lived secrets
+
+---
+
+# ✅ **26. Trigger workflow only on specific branch paths**
+
+```yaml
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "src/**"
+```
+
+---
+
+# ✅ **27. Workflow not triggering on PR — reasons**
+
+* Wrong event: `pull_request` vs `pull_request_target`
+* No workflow file in base branch
+* Path filters blocking PR
+* PR from fork → no secrets allowed
+* Typo in workflow name or key
+* Branch protection rules
+
+---
+
+# ✅ **28. Self-hosted runner offline — causes**
+
+* Runner service crashed
+* Token expired
+* Host system rebooted
+* Network issues
+* Disk full
+* Wrong permissions
+* Outdated runner version
+
+---
+
+# ✅ **29. Prevent parallel deployment from multiple commits**
+
+```yaml
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+```
+
+---
+
+# ✅ **30. Avoid secret leaking in jobs**
+
+* Never echo secrets
+* Use `${{ secrets.KEY }}` only in env
+* Use `::add-mask::` to mask custom sensitive data
+* Avoid storing cloud keys (use OIDC)
+* Avoid printing logs with URLs containing tokens
+
+---
+
+# 🎁 **If you want, I can now give you:**
+
+### 🔹 A **GitHub Actions YAML** to write in the interview
+
+### 🔹 A **mock interview** on GitHub Actions
+
+### 🔹 A **quiz** to test your readiness
+
+### 🔹 A **cheat sheet** you can revise in 10 minutes
+
+Just tell me **what you want next**!
+
+
+# ✅ **1. Basic GitHub Actions CI Workflow (simple & clean)**
+
+```yaml
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+```
+
+📌 **What this demonstrates:**
+
+* triggers
+* jobs
+* steps
+* uses
+* run
+
+---
+
+# ✅ **2. Matrix Build Workflow (highly asked)**
+
+```yaml
+name: Matrix Build
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node: [16, 18, 20]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install
+        run: npm install
+
+      - name: Test
+        run: npm test
+```
+
+📌 **What this demonstrates:**
+
+* matrix strategy
+* running parallel jobs
+
+---
+
+# ✅ **3. Multi-job Workflow With Dependencies + Outputs**
+
+```yaml
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    outputs:
+      VERSION: ${{ steps.version.outputs.VERSION }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: version
+        run: |
+          echo "VERSION=1.0.${{ github.run_number }}" >> $GITHUB_OUTPUT
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Deploy app
+        run: |
+          echo "Deploying version ${{ needs.build.outputs.VERSION }}"
+```
+
+📌 **What this demonstrates:**
+
+* `needs` dependency
+* job outputs
+* reusable data across jobs
+
+---
+
+# ✅ **4. Caching + Secrets + Conditional Steps + Continue-on-error + Path filters**
+
+This is the **best all-in-one example** for an interview.
+
+```yaml
+name: Advanced CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "src/**"
+      - "!docs/**"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    env:
+      APP_ENV: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache npm packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint (optional)
+        continue-on-error: true
+        run: npm run lint
+
+      - name: Run tests only on main
+        if: github.ref == 'refs/heads/main'
+        run: npm test
+
+      - name: Use secret
+        run: echo "Using secret"
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+```
+
+📌 **What this demonstrates:**
+✔ path filtering
+✔ caching
+✔ conditional steps
+✔ secrets
+✔ continue-on-error
+✔ env at job level
+
+---
+
+# Want a **Deploy to AWS**, **Terraform CI**, or **Docker build + push** YAML?
+
+I can provide:
+
+🔥 **GitHub Actions for AWS ECS/EKS deploy**
+🔥 **Terraform plan/apply workflow**
+🔥 **Docker build & push workflow**
+🔥 **Reusable workflow example**
+🔥 **Self-hosted runner workflow**
+
+Just tell me which one you want.
+
+Here is a **clean and interview-ready explanation of OIDC in GitHub Actions**, along with architecture, workflow examples, and FAQs.
+
+---
+
+# ✅ **OIDC in GitHub Actions — Simple + Detailed Explanation**
+
+## **1. What is OIDC?**
+
+OIDC (**OpenID Connect**) is an identity layer that allows trusted authentication between two systems **without storing long-lived credentials**.
+
+In GitHub Actions context:
+
+* Your workflow obtains a **short-lived identity token (JWT)** from GitHub.
+* AWS/Azure/GCP verify that token.
+* They issue short-lived cloud credentials.
+
+👉 **No Access Keys stored in GitHub Secrets. Much safer.**
+
+---
+
+# ✅ **2. Why OIDC? (Benefits)**
+
+| Feature                  | Benefit                                                    |
+| ------------------------ | ---------------------------------------------------------- |
+| No long-lived secrets    | Avoid storing AWS_ACCESS_KEY_ID / SECRET in GitHub Secrets |
+| Short-lived credentials  | Rotates every run, reduces attack surface                  |
+| Tight trust relationship | Cloud IAM trusts GitHub repo, branch, workflow             |
+| More secure deployments  | Only specific workflows/branches can deploy                |
+
+---
+
+# ✅ **3. How GitHub OIDC Works (Architecture)**
+
+1. Your workflow requests an **OIDC token**:
+
+   ```
+   $ACTIONS_ID_TOKEN_REQUEST_TOKEN
+   ```
+
+2. GitHub issues a **signed JWT** that contains:
+
+   * repo name
+   * actor / workflow
+   * branch / tag
+   * environment
+   * run ID
+
+3. AWS/Azure/GCP validates:
+
+   * token signature
+   * claims (subject, audience)
+   * issuer (`https://token.actions.githubusercontent.com`)
+
+4. Cloud provider issues **temporary STS credentials**.
+
+---
+
+# ✅ **4. OIDC with AWS (MOST COMMON)**
+
+### **Step 1: Create AWS IAM Role Trusted by GitHub OIDC**
+
+Trust policy:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:sub": "repo:OWNER/REPO:ref:refs/heads/main"
+        }
+      }
+    }
+  ]
+}
+```
+
+### **Step 2: GitHub Workflow Uses OIDC to Assume Role**
+
+```yaml
+permissions:
+  id-token: write   # REQUIRED for OIDC
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/github-oidc-role
+          aws-region: ap-south-1
+
+      - name: Deploy to S3
+        run: aws s3 sync ./build s3://my-bucket
+```
+
+👉 **No AWS secret keys in GitHub.**
+
+---
+
+# ✅ **5. OIDC with Azure Example**
+
+Azure login:
+
+```yaml
+permissions:
+  id-token: write
+  contents: read
+
+steps:
+  - name: Azure Login
+    uses: azure/login@v2
+    with:
+      client-id: ${{ secrets.AZURE_CLIENT_ID }}
+      tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+      subscription-id: ${{ secrets.AZURE_SUB_ID }}
+```
+
+---
+
+# ✅ **6. OIDC with GCP Example**
+
+```yaml
+permissions:
+  id-token: write
+  contents: read
+
+steps:
+  - id: auth
+    uses: google-github-actions/auth@v2
+    with:
+      workload_identity_provider: projects/12345/locations/global/workloadIdentityPools/github/providers/my-provider
+      service_account: deployer@myproject.iam.gserviceaccount.com
+```
+
+---
+
+# 🚀 **7. Important Claims in GitHub OIDC Token**
+
+Token contains this info:
+
+| Claim              | Meaning                  |
+| ------------------ | ------------------------ |
+| `sub`              | identifies repo + branch |
+| `repository`       | which repo triggered     |
+| `repository_owner` | owner                    |
+| `ref`              | branch/tag               |
+| `workflow`         | workflow file name       |
+| `actor`            | who triggered            |
+| `aud`              | cloud provider audience  |
+
+Example:
+
+```
+sub: repo:myorg/myrepo:ref:refs/heads/main
+```
+
+---
+
+# 🧠 **8. Interview-Ready Short Answer**
+
+**Q: How does OIDC work in GitHub Actions?**
+
+**Answer:**
+
+> GitHub Actions uses OIDC to provide short-lived cloud credentials without storing access keys.
+> The workflow requests an OIDC token from GitHub, which is a signed JWT. The cloud provider (AWS/Azure/GCP) validates this token based on claims like repo, branch, and workflow. If valid, the provider issues temporary credentials. This improves security by removing long-lived secrets and tightly binding deployments to specific branches or workflows.
+
+---
+
+# 🧪 **9. Common Interview Questions (with crisp answers)**
+
+### **1. Do we need GitHub secrets for AWS when using OIDC?**
+
+👉 No. Only for Azure (client ID), but **AWS does not require any secret**.
+
+---
+
+### **2. What permissions must be added in the workflow?**
+
+```
+permissions:
+  id-token: write
+```
+
+---
+
+### **3. What is GitHub OIDC issuer URL?**
+
+```
+https://token.actions.githubusercontent.com
+```
+
+---
+
+### **4. How do you restrict which branches can assume AWS role?**
+
+Using trust policy:
+
+```json
+"Condition": {
+  "StringEquals": {
+    "token.actions.githubusercontent.com:sub": "repo:myorg/app:ref:refs/heads/main"
+  }
+}
+```
+
+---
+
+If you want, I can also create:
+
+✅ A **visual diagram**
+✅ A **full project example**
+✅ A **learning cheat sheet**
+✅ **Interview Q/A** (10–20 questions)
+
+Just tell me!
+
+
+Below are **the best interview questions + crisp, strong, cloud-architect-level answers** for **OIDC in GitHub Actions**.
+This will cover **AWS + Azure + GCP**, **token structure**, **security**, **misconfigurations**, and **real scenarios**.
+
+---
+
+# 🔥 **TOP 25 Interview Questions on OIDC in GitHub Actions (with Answers)**
+
+---
+
+## **1️⃣ What is OIDC in GitHub Actions?**
+
+**Answer:**
+OIDC (OpenID Connect) allows GitHub Actions to request a **short-lived identity token (JWT)** from GitHub, which cloud providers (AWS/Azure/GCP) verify to issue **temporary credentials**.
+It replaces long-lived secrets like AWS_ACCESS_KEY and improves security.
+
+---
+
+## **2️⃣ Why do we need OIDC instead of GitHub Secrets?**
+
+**Answer:**
+
+* No long-lived credentials
+* No rotation needed
+* Repo/branch/workflow-based trust
+* Credentials expire automatically
+* Eliminates leaked-secret risks
+* Follows Zero-Trust principles
+
+---
+
+## **3️⃣ How does the OIDC flow work in GitHub Actions?**
+
+**Answer:**
+
+1. Workflow requests OIDC token from GitHub
+2. GitHub issues signed JWT containing repo, branch, workflow, actor
+3. Cloud provider validates the JWT
+4. Cloud issues short-lived credentials (STS/Azure AD token/GCP WIF)
+5. Workflow performs deployments
+
+---
+
+## **4️⃣ What permissions must be added to use OIDC?**
+
+```yaml
+permissions:
+  id-token: write
+```
+
+Without this, GitHub cannot ask for an identity token.
+
+---
+
+## **5️⃣ What is the GitHub OIDC issuer URL?**
+
+```
+https://token.actions.githubusercontent.com
+```
+
+---
+
+## **6️⃣ How do you restrict AWS IAM role so only specific repo/branch can assume it?**
+
+Using the "sub" claim:
+
+```json
+"StringEquals": {
+  "token.actions.githubusercontent.com:sub": "repo:myorg/myrepo:ref:refs/heads/main"
+}
+```
+
+---
+
+## **7️⃣ What JWT claims does GitHub include in the OIDC token?**
+
+Important claims:
+
+* **sub** → `repo:ORG/REPO:ref:refs/heads/main`
+* **repository**
+* **ref**
+* **workflow**
+* **actor**
+* **aud**
+* **run_id**
+
+---
+
+## **8️⃣ What is the “sub” claim used for?**
+
+**Answer:**
+To identify which **repo + branch/ref** issued the token.
+Cloud providers use it for authorization.
+
+---
+
+## **9️⃣ How do you test/debug the OIDC token?**
+
+Run:
+
+```yaml
+- name: Print OIDC Token
+  run: echo "${{ steps.token.outputs.token }}"
+```
+
+Or:
+
+```yaml
+curl -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN"
+```
+
+---
+
+## **🔟 How does GitHub Actions assume AWS IAM role using OIDC?**
+
+Using `sts:AssumeRoleWithWebIdentity`.
+
+Example:
+
+```yaml
+uses: aws-actions/configure-aws-credentials@v4
+```
+
+---
+
+## **1️⃣1️⃣ What are common OIDC misconfigurations?**
+
+* Forgetting `permissions: id-token: write`
+* Wrong AWS trust policy `sub` matched with wrong branch
+* Using `AssumeRole` instead of `AssumeRoleWithWebIdentity`
+* Missing `aud` in trust policy
+* Using wrong OIDC provider ARN
+
+---
+
+## **1️⃣2️⃣ Do we need GitHub Secrets for AWS when using OIDC?**
+
+👉 **No.**
+AWS requires **no access key** when OIDC is configured properly.
+
+---
+
+## **1️⃣3️⃣ Do we need GitHub Secrets for Azure OIDC?**
+
+👉 **Yes (only Client ID, tenant ID)**
+Azure authentication still needs:
+
+* AZURE_CLIENT_ID
+* AZURE_TENANT_ID
+* SUBSCRIPTION_ID
+
+Azure AD issues access_token, not STS.
+
+---
+
+## **1️⃣4️⃣ Do we need GitHub Secrets for GCP OIDC?**
+
+👉 **No**, unless using a fallback key.
+Proper setup uses:
+
+* GCP Workload Identity Pool
+* Service Account Binding
+
+---
+
+## **1️⃣5️⃣ How does OIDC improve security?**
+
+* Eliminates secret storage
+* Short-lived tokens with auto-expiry
+* Repo/branch restrictions
+* Zero-trust model
+* Cloud roles tightly bound to GitHub metadata
+
+---
+
+## **1️⃣6️⃣ Why is short-lived credential issuance safer?**
+
+Because leaked credentials become useless quickly and cannot be reused.
+
+---
+
+## **1️⃣7️⃣ How do you restrict access only to GitHub Environments?**
+
+Use claim:
+
+```
+environment
+```
+
+Example:
+
+```json
+"StringEquals": {
+  "token.actions.githubusercontent.com:environment": "prod"
+}
+```
+
+---
+
+## **1️⃣8️⃣ Can OIDC work with self-hosted runners?**
+
+Yes.
+Cloud provider still validates token, not runner machine.
+
+---
+
+## **1️⃣9️⃣ How to restrict OIDC role assumption only from PR workflows?**
+
+Use condition:
+
+```json
+"StringLike": {
+  "token.actions.githubusercontent.com:ref": "refs/pull/*"
+}
+```
+
+---
+
+## **2️⃣0️⃣ How does GitHub rotate OIDC signing keys?**
+
+GitHub hosts a JWKS endpoint:
+
+```
+https://token.actions.githubusercontent.com/.well-known/jwks
+```
+
+Cloud providers automatically validate signatures.
+
+---
+
+## **2️⃣1️⃣ Can two GitHub repos use same AWS OIDC role?**
+
+Yes, if trust policy allows multiple `sub` values.
+
+---
+
+## **2️⃣2️⃣ How to restrict deployments only from “main” branch?**
+
+AWS example:
+
+```json
+"Condition": {
+  "StringEquals": {
+    "token.actions.githubusercontent.com:sub": "repo:org/repo:ref:refs/heads/main"
+  }
+}
+```
+
+---
+
+## **2️⃣3️⃣ How long do AWS temporary credentials last via OIDC?**
+
+Default: **1 hour**
+Can reduce for high security:
+
+```json
+"DurationSeconds": 900
+```
+
+---
+
+## **2️⃣4️⃣ What happens if someone forks your repo—can they assume the role?**
+
+No.
+Forked repos have different identity claims:
+
+```
+repo:forkeduser/repo
+```
+
+---
+
+## **2️⃣5️⃣ Is OIDC mandatory? Or optional?**
+
+Optional but **best practice**.
+GitHub recommends OIDC over secrets.
+
+---
+
+# 🔥 BONUS: Scenario-Based Questions
+
+---
+
+## **Scenario 1: Your GitHub workflow fails with “AccessDenied: Unable to assume role”**
+
+**Root causes:**
+
+* Wrong `sub` claim in AWS trust policy
+* Wrong branch (main vs master)
+* Missing `aud` = sts.amazonaws.com
+* Missing `id-token: write`
+* Wrong OIDC provider ARN
+
+---
+
+## **Scenario 2: Your deployment is triggered from a PR but should only trigger from main**
+
+Fix in trust policy:
+
+```json
+"StringEquals": {
+  "token.actions.githubusercontent.com:ref": "refs/heads/main"
+}
+```
+
+---
+
+## **Scenario 3: You want to restrict OIDC token usage to a specific workflow**
+
+Add claim:
+
+```
+workflow: deploy.yml
+```
+
+AWS condition:
+
+```json
+"StringEquals": {
+  "token.actions.githubusercontent.com:workflow": "deploy.yml"
+}
+```
+
+---
+
+If you want, I can now prepare:
+
+✅ A **one-page OIDC cheat sheet**
+✅ **Real interview experience notes**
+✅ **20 more scenario-based questions**
+
+Just tell me.
+

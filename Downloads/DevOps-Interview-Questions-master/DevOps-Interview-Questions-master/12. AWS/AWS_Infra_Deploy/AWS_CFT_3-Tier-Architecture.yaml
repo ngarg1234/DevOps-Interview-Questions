@@ -1,0 +1,242 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: A simple 3-tier architecture with EC2, ELB, and RDS
+
+Parameters:
+  VpcCIDR:
+    Description: VPC CIDR block
+    Type: String
+    Default: "10.0.0.0/16"
+  PublicSubnetCIDR:
+    Description: Public subnet CIDR block for web tier
+    Type: String
+    Default: "10.0.1.0/24"
+  PrivateSubnetCIDR:
+    Description: Private subnet CIDR block for application and database tier
+    Type: String
+    Default: "10.0.2.0/24"
+  DBUsername:
+    Description: The database admin username
+    Type: String
+    NoEcho: true
+  DBPassword:
+    Description: The database admin password
+    Type: String
+    NoEcho: true
+  InstanceType:
+    Description: EC2 Instance Type
+    Type: String
+    Default: t2.micro
+
+Resources:
+  # VPC
+  MyVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+      Tags:
+        - Key: Name
+          Value: MyVPC
+
+  # Public Subnet (for Web Tier)
+  PublicSubnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: !Ref PublicSubnetCIDR
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      MapPublicIpOnLaunch: 'true'
+      Tags:
+        - Key: Name
+          Value: PublicSubnet
+
+  # Private Subnet (for App and Database Tiers)
+  PrivateSubnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: !Ref PrivateSubnetCIDR
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      Tags:
+        - Key: Name
+          Value: PrivateSubnet
+
+  # Internet Gateway (for internet access)
+  InternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties:
+      Tags:
+        - Key: Name
+          Value: InternetGateway
+
+  # Attach Internet Gateway to VPC
+  AttachGateway:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref MyVPC
+      InternetGatewayId: !Ref InternetGateway
+
+  # Security Group for Web Tier
+  WebSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Allow HTTP, HTTPS, and SSH from anywhere'
+      VpcId: !Ref MyVPC
+      SecurityGroupIngress:
+        - IpProtocol: 'tcp'
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: '0.0.0.0/0'
+        - IpProtocol: 'tcp'
+          FromPort: '443'
+          ToPort: '443'
+          CidrIp: '0.0.0.0/0'
+        - IpProtocol: 'tcp'
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: '0.0.0.0/0'
+
+  # Security Group for Application Tier (private access)
+  AppSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Allow app access from web tier'
+      VpcId: !Ref MyVPC
+      SecurityGroupIngress:
+        - IpProtocol: 'tcp'
+          FromPort: '8080'
+          ToPort: '8080'
+          CidrIp: !Ref PublicSubnetCIDR
+
+  # Security Group for RDS (only allow app tier to connect)
+  RdsSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Allow MySQL access from app tier'
+      VpcId: !Ref MyVPC
+      SecurityGroupIngress:
+        - IpProtocol: 'tcp'
+          FromPort: '3306'
+          ToPort: '3306'
+          CidrIp: !Ref PrivateSubnetCIDR
+
+  # EC2 Web Server (Public Subnet)
+  WebServerInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: 'ami-xxxxxxxxxxxxxxxxx'  # Replace with a valid AMI ID
+      SecurityGroupIds:
+        - !Ref WebSecurityGroup
+      SubnetId: !Ref PublicSubnet
+      Tags:
+        - Key: Name
+          Value: WebServer
+
+  # EC2 Application Server (Private Subnet)
+  AppServerInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: 'ami-xxxxxxxxxxxxxxxxx'  # Replace with a valid AMI ID
+      SecurityGroupIds:
+        - !Ref AppSecurityGroup
+      SubnetId: !Ref PrivateSubnet
+      Tags:
+        - Key: Name
+          Value: AppServer
+
+  # Elastic Load Balancer (Web Tier)
+  WebELB:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Name: web-elb
+      Subnets:
+        - !Ref PublicSubnet
+      SecurityGroups:
+        - !Ref WebSecurityGroup
+      Scheme: internet-facing
+      LoadBalancerAttributes:
+        - Key: idle_timeout.timeout_seconds
+          Value: '60'
+      Tags:
+        - Key: Name
+          Value: WebELB
+
+  # Target Group for Web ELB
+  WebELBTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Port: 80
+      Protocol: HTTP
+      VpcId: !Ref MyVPC
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: /health
+      HealthCheckPort: 80
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      UnhealthyThresholdCount: 2
+      HealthyThresholdCount: 5
+      Tags:
+        - Key: Name
+          Value: WebELBTargetGroup
+
+  # Listener for Web ELB
+  WebELBListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        - Type: fixed-response
+          FixedResponseConfig:
+            StatusCode: 200
+            ContentType: text/plain
+            MessageBody: 'OK'
+      LoadBalancerArn: !Ref WebELB
+      Port: 80
+      Protocol: HTTP
+
+  # RDS Database Instance (Private Subnet)
+  DBInstance:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      DBInstanceIdentifier: mydbinstance
+      AllocatedStorage: '20'
+      DBInstanceClass: db.t2.micro
+      Engine: mysql
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      VPCSecurityGroups:
+        - !Ref RdsSecurityGroup
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      MultiAZ: 'false'
+      PubliclyAccessible: 'false'
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      Tags:
+        - Key: Name
+          Value: MyDatabase
+
+  # RDS DB Subnet Group (Private Subnet)
+  DBSubnetGroup:
+    Type: 'AWS::RDS::DBSubnetGroup'
+    Properties:
+      DBSubnetGroupDescription: 'Private subnets for database'
+      SubnetIds:
+        - !Ref PrivateSubnet
+      Tags:
+        - Key: Name
+          Value: MyDBSubnetGroup
+
+Outputs:
+  WebServerPublicIP:
+    Description: 'Public IP of the Web Server'
+    Value: !GetAtt WebServerInstance.PublicIp
+  AppServerPrivateIP:
+    Description: 'Private IP of the App Server'
+    Value: !GetAtt AppServerInstance.PrivateIp
+  DBInstanceEndpoint:
+    Description: 'Endpoint of the RDS Database'
+    Value: !GetAtt DBInstance.Endpoint.Address
+  WebELBDNSName:
+    Description: 'DNS name of the Web ELB'
+    Value: !GetAtt WebELB.DNSName

@@ -1,0 +1,438 @@
+Here’s a clear and simple explanation:
+
+## ✅ Are **CMF** and **AWS Migration Service** actual services?
+
+**Yes — but they are very different things.**
+
+You are probably referring to:
+
+### **1. Cloud Migration Factory (CMF)**
+
+Often called **Migration Factory**, **AWS Migration Factory**, or **Cloud Migration Factory (CMF)**.
+It is **not a single AWS service**, but a **framework / solution / operating model** that automates and streamlines large-scale cloud migrations.
+
+**CMF can be:**
+
+* A methodology
+* A set of scripts/tools (often built using AWS services)
+* AWS’s open-source **Migration Factory Solution** (sometimes deployed using AWS ProServe)
+* A way to coordinate many migrations in parallel
+
+---
+
+### **2. AWS Application Migration Service (AWS MGN)**
+
+This **is an AWS-managed service** used for *lift-and-shift* migrations.
+It replicates physical/virtual servers to AWS using continuous block-level replication.
+
+---
+
+## 🔍 Key Differences
+
+| Feature       | **CMF (Cloud Migration Factory)**                                            | **AWS Migration Service (MGN)**             |
+| ------------- | ---------------------------------------------------------------------------- | ------------------------------------------- |
+| Type          | Framework / methodology / solution                                           | AWS managed service                         |
+| Purpose       | Coordinate & automate large-scale migrations (hundreds/thousands of servers) | Migrate individual servers (lift-and-shift) |
+| Components    | Can include scripts, automation pipelines, dashboards                        | Uses AWS MGN console + agents               |
+| Scope         | End-to-end migration lifecycle                                               | Server replication + cutover                |
+| Customization | Highly customizable                                                          | Less customizable (AWS-managed)             |
+| Who uses it   | Enterprises doing bulk migrations                                            | Anyone migrating servers                    |
+
+---
+
+## 💡 How they work together
+
+CMF (the factory) often **uses AWS MGN** under the hood for the actual server migration.
+
+**Example:**
+
+* CMF handles planning, scheduling, tracking, automation.
+* MGN handles server replication and cutover.
+
+---
+
+## 🧠 Simple Analogy
+
+**CMF = the entire migration factory (process + automation + orchestration)**
+**AWS MGN = the machine inside the factory that moves the servers**
+
+---
+
+If you want, I can also explain:
+
+* CMF architecture
+* When to use CMF vs MGN
+* Real AWS interview-style explanation
+* Diagram of their relationship (text-based)
+
+Just tell me!
+
+
+Hey Friends, Please Pass The Tea.
+
+Super Quick Memory Hack
+
+Lift and Shift → Rehost
+Lift and Tweak → Replatform
+Rebuild → Refactor
+Buy New → Repurchase
+Throw Away → Retire
+Keep It → Retain
+
+Below is a **clean, interview-ready, easy-to-remember** set of answers for EVERY topic you listed.
+I’ve organized it so you can **prepare fast**, using **STAR method**, **short bullets**, and **simple explanations**.
+
+---
+
+# 🌟 **1. Tell me about yourself (Short & Strong Answer)**
+
+“I’m a Cloud/Migration engineer with experience in AWS, Infrastructure automation, database migrations, and Kubernetes. I’ve worked on large-scale on-prem → AWS migrations using AWS MGN, DMS, Terraform, GitOps, and EKS. I focus on designing resilient architectures, planning cutovers, reducing downtime, and ensuring secure deployments. I enjoy solving complex migration challenges and improving customer confidence through strong communication and execution.”
+
+---
+
+# 🌟 **2. What is your AWS experience?**
+
+* Server migration using AWS MGN
+* Database migration using AWS DMS
+* Designing VPCs, subnets, routing, VPN, Direct Connect
+* Terraform-based infra provisioning
+* EKS cluster setup, upgrade, monitoring, deployments & rollbacks
+* Security: IAM, KMS, SGs, NACLs, Encryption, CIS checks
+* Cutover planning for large infra
+* Troubleshooting networking/performance issues
+
+---
+
+# 🌟 **3. What did you do in AWS migration?**
+
+* Performed application discovery & dependency mapping
+* Designed target AWS architecture
+* Set up replication using AWS MGN & DMS
+* Managed pilot migrations & testing
+* Performed cutover planning & execution
+* Validated post-migration sanity checks
+* Optimized cost & performance after migration
+
+---
+
+# 🌟 **4. Challenges faced in migration (easy to remember: NADS)**
+
+**N – Network issues** (firewall ports, routing, DNS delays)
+**A – Application dependencies not documented**
+**D – Data sync delays** (large DBs or slow links)
+**S – Stakeholder alignment** (timings, approvals)
+
+**How I mitigated:**
+
+* Performed prechecks & connectivity testing
+* Used dependency tools (Dynatrace, CMDB, AWS ADS)
+* Enabled continuous data sync
+* Conducted weekly review calls + dry runs
+
+---
+
+# 🌟 **5. Cutover phase steps (very simple 6-step flow)**
+
+1. **Freeze changes** (code freeze, DB freeze depending on plan)
+2. **Final data sync** (MGN/DMS complete sync)
+3. **Switch traffic** (DNS, Load balancer)
+4. **Promote database** (read replica → primary)
+5. **Application testing** (sanity checks)
+6. **Decommission old infra** (after stabilization)
+
+---
+
+# 🌟 **6. What is AWS MGN & how migration works?**
+
+### **AWS MGN (CloudEndure Replacement)**
+
+Used for **VM migration** (on-prem → AWS).
+
+### **Process**
+
+1. Install **MGN agent** on source servers
+2. Continuous block-level replication to AWS
+3. Launch **test instances**
+4. Fix issues → dry run
+5. During cutover, **launch final instances**
+6. Move traffic → validate
+
+---
+
+# 🌟 **7. What is AWS DMS & how you used it?**
+
+AWS DMS → Migrates **databases** with minimal downtime.
+
+### **Process**
+
+1. Create **Replication Instance**
+2. Add **Source & Target endpoints**
+3. Create **Task**:
+
+   * Full Load
+   * CDC (ongoing replication)
+4. Validate tables, row counts, lag
+5. Cutover → stop writes → promote target DB
+
+---
+
+# 🌟 **8. Security Best Practices (MGN migration)**
+
+* IAM least privilege for migration tools
+* Replication encrypted in-transit (TLS)
+* Use KMS encrypted EBS volumes
+* No source credentials stored in plain text
+* Security Group rules minimal
+* Enable logging: CloudTrail, VPC Flow Logs
+
+---
+
+# 🌟 **9. Explain MS SQL DB migration (End-to-End)**
+
+1. **Assessment:** DB size, version, features
+2. **Provision target DB:** SQL on EC2 / RDS SQL
+3. **DMS setup:** Full load + CDC
+4. **Schema migration:** Using SCT
+5. **Validation:** Row checks, latency check
+6. **Cutover:**
+
+   * Stop writes
+   * Apply final sync
+   * Promote new DB
+7. **Sanity testing:** App login, queries, reports
+
+---
+
+# 🌟 **10. How do you ensure sanity testing after DB migration?**
+
+* Application connectivity test
+* Check critical queries
+* Validate data row counts
+* Validate user authentication
+* Validate stored procedures & triggers
+* Performance comparison check
+
+---
+
+# 🌟 **11. How to plan MS SQL cutover?**
+
+* Disable jobs in source
+* Stop application writes
+* Final sync
+* Switch connection strings
+* Mark AWS DB as **primary**
+* Enable jobs again
+* Run sanity tests
+
+---
+
+# 🌟 **12. How do you prevent data loss during migration?**
+
+* Use **continuous replication** (MGN/DMS CDC)
+* Enable **transaction logs** for DBs
+* Perform dry runs
+* Validate before cutover
+* Use pilot migrations
+
+---
+
+# 🌟 **13. How do you handle stateful apps with DB in AWS Outposts?**
+
+* Use local storage for low latency
+* Ensure network path to parent region for backups
+* Replicate data to Region (S3, RDS)
+* Use EBS local snapshots
+* Use multi-AZ/backup strategy
+
+---
+
+# 🌟 **14. Application discovery & dependency mapping**
+
+Tools used:
+
+* AWS Application Discovery Service
+* CMDB (ServiceNow)
+* Dynatrace / Datadog APM
+* Network scans (ports, flows)
+* Manual interviews with teams
+
+Goal: Identify **DB → App → API → Load balancer → External dependencies**.
+
+---
+
+# 🌟 **15. Lift-and-shift migration (easy lines)**
+
+### **What is it?**
+
+Move servers **as-is**, no changes.
+
+### **Process:**
+
+1. Replicate → Test → Cutover → Validate
+
+### **Challenges:**
+
+* Performance mismatch
+* Old OS/patching issues
+* Higher cost until optimization
+
+---
+
+# 🌟 **16. How to migrate a database to AWS?**
+
+* Use AWS DMS for data
+* AWS SCT for schema
+* Test → Validate → Cutover
+
+---
+
+# 🌟 **17. Database sizing (CPU/MEM/Storage)**
+
+* Use existing monitoring (Perfmon, Nagios)
+* Look at:
+
+  * Peak CPU
+  * Peak RAM
+  * IOPS and Throughput
+  * Growth rate
+* Choose instance type based on this
+
+---
+
+# 🌟 **18. How to make DB primary during migration?**
+
+* Stop writes on source
+* Apply final logs
+* Promote AWS DB
+* Point apps to new connection string
+
+---
+
+# 🌟 **19. Rollback strategy**
+
+* Keep source DB running until post-cutover validation
+* If issue:
+
+  * Point apps back to on-prem
+  * Re-enable DB jobs
+  * Resume normal operations
+
+---
+
+# 🌟 **20. Application deployment during cutover**
+
+* Deploy latest code
+* Update config/db strings
+* Restart app components
+* Run automated smoke tests
+
+---
+
+# 🌟 **21. EKS monitoring**
+
+* CloudWatch Container Insights
+* Prometheus + Grafana
+* Node health, Pod health, API server logs
+
+### **Control plane monitoring**
+
+* API latency
+* ETCD health
+* Scheduler/Controller metrics
+
+---
+
+# 🌟 **22. Terraform experience**
+
+* Infra creation: VPC, EC2, ALB, RDS, EKS
+* Modules for reusability
+* Workspaces for dev/stage/prod
+* Pipelines using GitLab CI/CD
+
+---
+
+# 🌟 **23. GitOps tools used**
+
+* ArgoCD
+* FluxCD
+* GitLab pipelines
+* Used for:
+
+  * App deployment
+  * Rollback
+  * Version control for manifests
+
+---
+
+# 🌟 **24. Unhappy customer scenario (STAR answer)**
+
+**Situation:** Customer unhappy about migration delays.
+**Task:** Restore confidence & improve delivery.
+**Action:** Scheduled daily standups, fixed blockers, shared migration dashboard.
+**Result:** Delivered migration on time & customer satisfaction improved.
+
+---
+
+# 🌟 **25. DB backup & recovery**
+
+### **Backup types:**
+
+* Full backup
+* Differential
+* Transaction log backup
+* Snapshot for EC2/RDS
+
+### **Recovery:**
+
+* Restore full → differential → logs
+* For RDS: point-in-time restore
+
+---
+
+# 🌟 **26. Networking difference: AWS Outposts vs Region**
+
+| Feature       | AWS Outposts     | AWS Region        |
+| ------------- | ---------------- | ----------------- |
+| Location      | On-prem          | AWS DC            |
+| Latency       | Very low         | Higher            |
+| Control plane | AWS Region       | Region            |
+| Data path     | Local processing | Remote processing |
+
+---
+
+# 🌟 **27. EKS upgrade management**
+
+* Upgrade control plane first
+* Upgrade node groups
+* Drain nodes → rolling update
+* Test workloads
+
+---
+
+# 🌟 **28. EKS deployment & rollback**
+
+* Use manifests (kubectl apply)
+* Rolling deployments
+* Rollback using:
+
+  * `kubectl rollout undo`
+  * ArgoCD sync rollback
+
+---
+
+# 🌟 **29. AWS Migration Services**
+
+* **MGN** → server migration
+* **DMS** → Database migration
+* **SMS** (older) → deprecated
+
+---
+
+If you want, I can also prepare:
+
+🔥 **A one-page cheat sheet for interview**
+🔥 **STAR-based answers for all questions**
+🔥 **Mock interview practice**
+🔥 **Your resume-based customized answers**
+
+Just tell me!

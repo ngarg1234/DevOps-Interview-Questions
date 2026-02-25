@@ -1,0 +1,169 @@
+Here are **RBAC (Role-Based Access Control) interview questions** with **clear, simple explanations**, focused on **Kubernetes + general security** (very commonly asked) 👇
+
+---
+
+## 🔹 Basic RBAC Interview Questions
+
+### 1️⃣ What is RBAC?
+**Answer:**  
+RBAC (Role-Based Access Control) is a security mechanism where **permissions are assigned to roles**, and **roles are assigned to users or service accounts**.  
+So users don’t get permissions directly.
+
+---
+
+### 2️⃣ Why do we need RBAC?
+**Answer:**  
+- Improves security (least privilege)
+- Easy to manage permissions
+- Prevents unauthorized access
+- Scales well in large systems
+
+---
+
+### 3️⃣ What are the main RBAC components in Kubernetes?
+**Answer:**  
+1. **Role** – permissions within a namespace  
+2. **ClusterRole** – permissions across the cluster  
+3. **RoleBinding** – assigns Role to user/service account  
+4. **ClusterRoleBinding** – assigns ClusterRole to user/service account
+
+---
+
+### 4️⃣ Difference between Role and ClusterRole?
+**Answer:**
+
+| Role | ClusterRole |
+|----|----|
+| Namespace-scoped | Cluster-wide |
+| Access only inside one namespace | Access across all namespaces |
+| Example: pod read in dev namespace | Example: node access |
+
+---
+
+### 5️⃣ Difference between RoleBinding and ClusterRoleBinding?
+**Answer:**
+
+| RoleBinding | ClusterRoleBinding |
+|-----------|-------------------|
+| Binds Role to user | Binds ClusterRole to user |
+| Namespace-specific | Cluster-wide |
+| Can bind ClusterRole inside a namespace | Always cluster-wide |
+
+---
+
+## 🔹 Medium-Level RBAC Questions
+
+### 6️⃣ What is a ServiceAccount?
+**Answer:**  
+A ServiceAccount is an identity used by **pods to talk to the Kubernetes API** securely.
+
+---
+
+### 7️⃣ How does a pod use RBAC?
+**Answer:**  
+- Pod uses a **ServiceAccount**
+- ServiceAccount is linked via **RoleBinding / ClusterRoleBinding**
+- Permissions come from Role / ClusterRole
+
+---
+
+### 8️⃣ What is the principle of least privilege?
+**Answer:**  
+Give **only minimum permissions** required to perform a task — nothing extra.
+
+---
+
+### 9️⃣ Can a RoleBinding bind a ClusterRole?
+**Answer:**  
+✅ **Yes**  
+But access is **limited to that namespace only**.
+
+---
+
+### 🔟 How do you check permissions of a user?
+**Answer:**
+```bash
+kubectl auth can-i create pods --namespace dev
+```
+
+---
+
+## 🔹 Advanced RBAC Interview Questions
+
+### 1️⃣1️⃣ What happens if RBAC is not enabled?
+**Answer:**  
+Anyone with API access can perform **any action** (very insecure).
+
+---
+
+### 1️⃣2️⃣ Difference between RBAC and ABAC?
+**Answer:**
+
+| RBAC | ABAC |
+|----|----|
+| Role-based | Attribute-based |
+| Easier to manage | Complex rules |
+| Preferred in Kubernetes | Deprecated |
+
+---
+
+### 1️⃣3️⃣ What verbs are used in RBAC?
+**Answer:**  
+Common verbs:
+- get
+- list
+- watch
+- create
+- update
+- patch
+- delete
+
+---
+
+### 1️⃣4️⃣ What are API Groups in RBAC?
+**Answer:**  
+API groups define **which Kubernetes API** the permission applies to  
+Example:
+- `""` → core API (pods, services)
+- `apps` → deployments, replicasets
+
+---
+
+### 1️⃣5️⃣ How do you restrict access to secrets?
+**Answer:**  
+- Do NOT give `secrets` access unless required
+- Use namespace-based Roles
+- Use ServiceAccounts instead of users
+
+---
+
+## 🔹 Scenario-Based Questions (Very Important)
+
+### 1️⃣6️⃣ Give a real-time RBAC example
+**Answer:**  
+> Developer should only view pods in dev namespace
+
+**Solution:**
+- Create Role → `get`, `list` pods
+- Bind Role to developer using RoleBinding
+
+---
+
+### 1️⃣7️⃣ How do you allow a pod to access S3?
+**Answer (Kubernetes + AWS):**
+- Use **IAM Role for Service Account (IRSA)**
+- Avoid hardcoding credentials
+
+---
+
+## 🔑 One-Line Summary for Interviews
+> **RBAC controls who can do what on which resource.**
+
+---
+
+If you want, I can also share:
+- 🔹 **Top 10 RBAC YAML examples**
+- 🔹 **RBAC interview cheat sheet (1-page)**
+- 🔹 **Real production RBAC mistakes & fixes**
+
+Just tell me 👍

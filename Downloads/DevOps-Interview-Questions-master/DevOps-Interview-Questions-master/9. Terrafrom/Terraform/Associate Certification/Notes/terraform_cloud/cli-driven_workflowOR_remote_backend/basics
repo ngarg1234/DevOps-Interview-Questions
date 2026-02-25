@@ -1,0 +1,11 @@
+The CLI integration brings Terraform Cloud's collaboration features into the familiar Terraform CLI workflow. 
+It offers the best of both worlds to developers who are already comfortable with using the Terraform CLI, and it can work 
+with existing CI/CD pipelines.
+
+You can start runs with the standard terraform plan and terraform apply commands and then watch the progress of the run from your 
+terminal. These runs execute remotely in Terraform Cloud, use variables from the appropriate workspace, enforce any applicable 
+Sentinel or OPA policies, and can access Terraform Cloud's private registry and remote state inputs.
+
+
+basically, you can run the terraform plan and apply from local and it will be executed on the terraform cloud but you will be able to
+see the logs on your local terminal 

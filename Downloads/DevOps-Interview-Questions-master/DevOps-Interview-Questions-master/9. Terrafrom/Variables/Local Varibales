@@ -1,0 +1,16 @@
+-- Local variables are used to define intermediate values within a module or configuration. They are not exposed as input variables and are typically used for simplifying complex expressions or for storing calculated values.
+-- You use local variables when you need to compute or derive values within your Terraform code. Locals can be based on input variables or constants, but they stay within the configuration itself and aren’t passed in by users.
+Example:
+# Local variables to compute derived values
+locals {
+  instance_name = "${terraform.workspace}-terraform"
+}
+
+Q. Difference between local variable and input variable
+1. Local variables cant be over-written through command line [Ex: terraform plan -var "size=t2.medium"]
+2. Local variables can be defined dynamically [Ex: instance-name = "${terraform.workspace}-terraform"]
+-- But input variables will have the privilege to over write while passing the terraform command, can be over-written 
+-- It can not able to define dynamically, it has to be passed as string, number, Boolean etc. and provide the value their itself.
+-- Input variables can be overridden externally via .tfvars files, CLI arguments, or environment variables.
+-- Local variables are computed within the Terraform code and cannot be overridden externally. They are meant for internal calculations and simplifications within the configuration.
+

@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: guaranteed-pod
+spec:
+  containers:
+  - name: app
+    image: nginx
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "256Mi"
+        cpu: "250m"
+
+# Guaranteed: requests == limits for both CPU and memory
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: burstable-pod
+spec:
+  containers:
+  - name: app
+    image: nginx
+    resources:
+      requests:
+        memory: "128Mi"
+      limits:
+        memory: "256Mi"
+
+# Explanation: Requests < Limits.
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: besteffort-pod
+spec:
+  containers:
+  - name: app
+    image: nginx
+
+# Explanation: No resources specified — lowest priority, evicted first under node pressure.

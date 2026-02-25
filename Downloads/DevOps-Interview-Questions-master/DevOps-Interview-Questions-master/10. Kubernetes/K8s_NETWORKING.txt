@@ -1,0 +1,277 @@
+
+NETWORKING:
+==========
+
+-> Network: 
+
+Basic Networking:
+-----------------
+
+Switching and Routing:
+----------------------
+1. Switching: Switching is the process of transferring data packets within a local network (LAN). It involves forwarding packets between devices (e.g., computers, printers) on the same network segment.
+
+-> Layer 2 Switches:
+** Operate at the Data Link Layer (Layer 2) of the OSI model.
+** Use MAC addresses to forward packets between devices in the same VLAN or subnet.
+** Maintain a MAC address table to determine which port to forward the traffic.
+** Example devices: Cisco Catalyst switches, Netgear ProSafe switches.
+
+
+2. Routing: Routing is the process of transferring data packets between different networks or subnets. It occurs at the Network Layer (Layer 3) of the OSI model and involves determining the best path to the destination network.
+
+-> Traditional Methods:
+a. Static Routing:
+-> Routes are manually configured by the network administrator.
+-> Best for small, simple networks where routes do not frequently change.
+-> Example Static Route Configuration (Cisco CLI):
+Router> enable
+Router# configure terminal
+Router(config)# ip route 192.168.2.0 255.255.255.0 192.168.1.1
+192.168.2.0: Destination network.
+255.255.255.0: Subnet mask.
+192.168.1.1: Next-hop IP address
+
+b. Dynamic Routing Protocols:
+-> Use protocols like RIP, OSPF, or BGP to automatically learn and adapt to changes in the network topology.
+-> Example: RIP Configuration:
+Router> enable
+Router# configure terminal
+Router(config)# router rip
+Router(config-router)# version 2
+Router(config-router)# network 192.168.1.0
+Router(config-router)# network 192.168.2.0
+
+
+Gateway: A gateway connects two different networks and often acts as the "default gateway" for devices in a local network. It is typically a router configured to forward traffic from the local network to other networks, such as the internet.
+
+a. Manual Default Gateway Configuration:
+-> Devices in the LAN are manually configured with the IP address of the gateway (router).
+-> Example: On a Linux server, the gateway can be set using:
+sudo route add default gw 192.168.1.1 eth0
+
+b. NAT (Network Address Translation):
+-> Gateways perform NAT to map private IP addresses (e.g., 192.168.1.0/24) to a public IP address when connecting to external networks (e.g., the internet).
+-> Example of NAT configuration on a Cisco router:
+Router> enable
+Router# configure terminal
+Router(config)# interface FastEthernet0/0
+Router(config-if)# ip nat inside
+Router(config-if)# exit
+Router(config)# interface FastEthernet0/1
+Router(config-if)# ip nat outside
+Router(config-if)# exit
+Router(config)# access-list 1 permit 192.168.1.0 0.0.0.255
+Router(config)# ip nat inside source list 1 interface FastEthernet0/1 overload
+
+
+Take Aways:
+ip link
+ip addr
+ip adde add 192.168.1.10/24 dev eth0
+ip route
+ip route add 192.168.1.0/24 via 192.168.2.1
+cat /proc/sys/net/ipv4/ip_forward
+route
+
+====================================================================================
+
+DNS: It helps manage name resolution in large environments with many hostnames and Ips, and how you can configure your hosts to point to a DNS serve
+1. DNS configuration on Linux
+2. CoreDNS Introduction 
+
+-> DNS server default listening port is 53
+
+Name Resolution: 
+----------------
+-> Converting  human-readable domain names into machine-readable IP addresses. 
+
+Adding entry: cat >> /etc/hosts  [192.168.1.11    db]
+ping db
+ssh db
+curl http://www.google.com
+
+cat etc/hosts
+192.168.1.11    db
+192.168.1.11    www.google.com
+
+-> Managing too many IP's was becoming a challenge so we have created a new host called "DNS".
+
+DNS:
+----
+-> (Domain Name System) is the system that translates human-readable domain names (such as example.com) into machine-readable IP addresses (such as 192.0.2.1). This process is called "Name Resolution". 
+-> The DNS system acts like a phonebook for the internet, allowing users to access websites using easy-to-remember domain names rather than complex IP addresses.
+
+cat /etc/resolv.conf
+nameserver	192.168.1.100
+
+/etc/hosts: Defines static hostname-to-IP mappings on the local machine.
+
+/etc/resolv.conf: Defines DNS servers for dynamic domain name resolution.
+-> When the system cannot resolve a hostname using /etc/hosts, it consults DNS servers (defined in this file) to perform the resolution.
+
+/etc/nsswitch.conf: Specifies the order and methods for resolving various system databases, including hostnames, users, and groups, /etc/hosts, DNS servers, NIS (Network Information Service), or LDAP (Lightweight Directory Access Protocol) for tasks like hostname resolution or user authentication.
+
+Q. How they work together:
+-> When you try to access a hostname (e.g., example.com), the system follows the order in /etc/nsswitch.conf for the hosts line.
+-> It first checks /etc/hosts.
+->If not found, it queries DNS servers defined in /etc/resolv.conf.
+
+
+Domain Names:
+--------------
+.com: commercial or general purpose [www.google.com]
+.net: Network  [www.behance.net]
+.edu: Educational org [www.standfor.edu]
+.org: Nonprofit organization [www.care.org]
+
+Root:	"."
+Top Lebel Domain Name:	".com"
+Subdomain:	"google"
+
+
+-> When you try to reach any of these domain names, ex: apps.google.com
+
+[Org DNS] => [Root DNS] => [.com DNS] => [Google DNS] 
+Org DNS Caches Ip requested this site for next time ease of access.
+
+Org DNS: mycompany.com
+SubDomains: 
+mail	drive	www	pay	hr  nfs	web	sql [all these sub domains are configured in organization internal DNS server]
+
+
+RECORD TYPES:
+-------------
+A	web-server	192.168.1.100
+AAAA	web-server	2001:0dbbhe:85guu00000
+CNAME	food.web-server	eat.web-server, hungry.web.web-server  [Name to name mapping]
+
+Ping: may not always be  the right tool test DNS resolution.
+
+nslookup: to query a host name from a DNS server
+-> Does not consider entry in local /etc/hosts/
+-> Entry of web application should be in DNS server.
+
+dig: test DNS sever name resolution, returns more details in a  similar form as is stored on the server
+
+
+CORE DNS:
+----------
+-> First, we put all of the entries into the DNS servers /etc/hosts file. Then, we configure CoreDNS to use that file. 
+-> CoreDNS loads its configuration from a file named Corefile.
+-> Here is a simple configuration that instructs CoreDNS to fetch the IP to hostname mappings from the file /etc/hosts. 
+-> When the DNS server is run, it now picks the IPs and names from the /etc/hosts file on the server.
+-> CoreDNS also supports other ways of configuring DNS entries through plugins. We will look at the plugin that it uses for Kubernetes in a later section.
+
+https://github.com/kubernetes/dns/blob/master/docs/specification.md
+https://coredns.io/plugins/kubernetes/
+
+
+---------------------------------------------------------------------------------------
+Network Namespaces:
+-------------------
+-> Namespaces (NS): 
+
+-> While testing the Network Namespaces, if you come across issues where you can't ping one namespace from the other, make sure you set the "NETMASK" while setting IP Address. ie: 192.168.1.10/24
+
+-> ip -n red addr add 192.168.1.10/24 dev veth-red Another thing to check is FirewallD/IP Table rules. 
+-> Either add rules to IP Tables to allow traffic from one namespace to another. Or disable IP Tables all together (Only in a learning environment).
+
+
+** Create two network NS: 
+$$ ip netns add red
+$$ ip netns add blue
+
+$$ ip nents add red: To create network ns
+$$ ip netns: To list namespaces
+$$ ip link: To list interfaces on my host
+
+-> iplink for namespace red/blue:
+$$ ip netns exec red ip link 
+$$ ip -n red link
+
+
+** arp: list of entries on host, inisde container no entries
+$$ ip netns exec red arp
+
+
+** To create a cable:
+$$ ip link add veth-red type veth peer name veth-blue
+To delete: ip -n red link del veth-red
+
+$$ ip link set veth-red netns red
+
+$$ ip link set veth-blue netns blue
+
+$$ ip -n red addr add 192.168.15.1 dev veth-red
+
+$$ ip -n blue addr add 192.168.15.2 dev veth-blue
+
+$$ ip netns exec red arp
+
+
+Linux Bridge:
+$$ ip link add veth-red type veth peer name veth-red-br
+
+=======================================================================================
+Docker Networking:
+------------------
+
+1. NONE: Contianer can not reach outside world.
+$$ docker run --network none nginx
+
+2. HOST: Container attached to host. No network isolation between host and container.
+$$ docker run --network host nginx
+http://192.168.1.10:80
+-> f you try to run another instance of the same container that listens on the same port it wont work as they share hosts networking and two processes can not listen on the same port at the same time. 
+
+3. Bridge Network: Internal private network is created which the docker host and container attach to.
+-> The network has an address 172.17.0.0 by default and each device connecting to this network get their own internal private network address on this network.
+-> When docker installed on the host it creates an internal private network called bridge by default. 
+$$ docker network ls
+-> Docker calls the network by "Bridge". 
+-> But on the host, the network is created by the name docker0. You can see this in the output of the "ip link" command.
+-> Bridge in the docker network is output refers to the name docker0 on the host.
+-> Remember bridge network is like an interface to the host, but a switch to the namespace or containers within the host. So the interface docker0 on the host assigned an IP 172.17.0.1.
+-> Whenever a container is created Docker creates a network namespace for it just like we created network namespace.
+-> Run "$$ ip netns" command to list namespaces created by docker.
+-> You can see the namespace associated with each container in the output of the "docker inspect namespace" command.
+
+
+Normal method to access service on 8080 and application on80:
+iptables \
+  -t nat \
+  -A PREROUTING \
+  -j DNAT \
+  --dport 8080 \
+  --to-destination 80
+
+Docker Method:
+iptables \
+  -t nat \
+  -A DOCKER \
+  -j DNAT \
+  --dport 8080 \
+  --to-destination 172.17.0.3:80
+
+$$ iptables -nvl -t nat
+
+
+NETWORK NAMESPACE:
+-----------------
+1. Create Network Namespace
+2. Create Bridge Network/Interface
+3. Create VET Pairs (Pipe, Virtual Cable)
+4. Attach vEth to NAmespace
+5. Attach Other vEth to Bridge
+6. Assign IP Addresses
+7. Bring the interface up
+8. Enable NAT - Ip Masquerade
+
+-> Normal Network Namespaces, Docker, rkt, MESOS, K8s all follows almost same steps.
+
+
+
+
+
+

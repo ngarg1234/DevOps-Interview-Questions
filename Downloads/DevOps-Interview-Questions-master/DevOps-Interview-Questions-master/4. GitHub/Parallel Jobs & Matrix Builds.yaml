@@ -1,0 +1,24 @@
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16, 18, 20]
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Run Tests
+        run: npm test
+
+
+# 🔹 Benefits:
+# ✔️ Runs tests simultaneously across different OS and Node.js versions.
+# ✔️ Reduces build time significantly.

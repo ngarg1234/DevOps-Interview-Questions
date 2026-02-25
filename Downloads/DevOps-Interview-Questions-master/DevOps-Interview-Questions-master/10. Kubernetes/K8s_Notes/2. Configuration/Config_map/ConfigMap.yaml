@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+data:
+  APP_COLOR: darkblue
+  APP_OTHER: disregard
+  port: "3306"
+  max_allowed_packet: 128M
+
+
+# kubectl create -f config-map.yaml

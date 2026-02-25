@@ -1,0 +1,539 @@
+POD SCHEDULING TO WORKER NODE:
+------------------------------
+
+MULTIPLE SCHEDULERS:
+--------------------
+-> Default scheduler has an algorithm that distributes pods across node evenly, as well as takes into consideration we specify through taints and tolerations and node affinity etc.
+
+Q. What if none of these satisfy your condition?
+-> K8s highly extensible, We can write our own scheduler program package it and deploy it as default scheduler or custom scheduler.
+-> K8s cluster must have multiple scheduler, when creating a pod we can specify which scheduler to be used to schedule a pod to node.
+
+scheduler-config.yaml
+apiVersion: kubescheduler.config.k8s.io/v1
+kind: KubeSchedulerConfiguration
+profile:
+- schedulerName: default-scheduler
+
+-> If you dont specify the name it will pick "default-scheduler"
+
+my-scheduler-config.yaml      
+apiVersion: kubescheduler.config.k8s.io/v1
+kind: KubeSchedulerConfiguration
+profile:
+- schedulerName: my-scheduler-1
+leaderElection:
+  leaderElect: true
+  resourceNamespace: kube-system
+  resourceName: lock-object-my-scheduler
+
+-> Deploy Additional Scheduler:
+wget https://storage.googleapis.com/kubernetes-release/elease/v1.12.0/bin/linux/amd64/kube-scheduler
+
+kube-scheduler.service
+ExecStart=/usr/local/bin/kube-scheduler \\
+  --config=/etc/Kubernetes/manifests/kube-scheduler.yaml
+
+my-scheduler-1
+ExecStart=/usr/local/bin/kube-scheduler \\
+  --config=/etc/Kubernetes/manifests/my-scheduler-1-config.yaml
+
+Preferred deployment of Scheduler:
+-> Deploy Additional Scheduler as a pod
+-> Once you deploy pod using manifest file, check the created scheduler as a pod "kubectl get pods --namespace=kube-system
+-> once you see pod running, use that name in your pod definition file to schedule it.
+
+VIEW EVENTS:
+Q. How to know which scheduler picked up?
+-> kubectl get events -o wide  (lists all events happened)
+-> kubectl logs my-custom-scheduler --namespace=kube-system
+
+=======================================================================================================================================
+
+CONFIGURING SCHEDULER PROFILES:
+-------------------------------
+Stages:
+1. Scheduling queue: When pods are created, pods will be in queue to be scheduled, and based on priority class it will be scheduled. 
+
+2. Filtering: Pods enters filter stage, where nodes that can not run the pods are filtered out. So in our case two nodes do not have sufficient resources, so do not have 10CPU remaining, so they are filtered out.
+
+3. Scoring: This is where nodes are scored with different weighs. From the two remaining nodes, the scheduler associates a score to each node based on the free space that it will have after reserving the cpu required for that pod. So, in this case the first one has 2 left and second node will have 6 left, so second one gets a higher score. And so second node gets picked up.
+
+4. Binding: This is where a pod is finally bound to a node with the highest score. All these operations are achieved with certain plugins.
+
+-> Above all stages will be achieved using plugins.
+Scheduling: PrioritySort plugin
+Filtering: NodeResourceFit or NodeName or NodeUnschedulable
+Scoring: NodeResourceFit or ImageLocality
+Binding: DefaultBinder
+
+-> Extension Points: 
+Scheduling: PrioritySort plugin: queueSort
+Filtering: NodeResourceFit or NodeName or NodeUnschedulable: prefilter or filter or postfilter or preScore
+Scoring: NodeResourceFit or ImageLocality: score or reserve
+Binding: DefaultBinder: permit or prebind or bind or postBind
+
+Scheduler Profiles:
+-> With 1.18 release of K8s, a feature to support multiple profiles in a single scheduler was introduced. So now, you can configure multiple profiles within a single scheduler in the scheduler configuration file by adding more entries to the list of profiles and for each profile specify a separate scheduler name. 
+-> So, this creates a scheduler profile for each scheduler which acts as a separate scheduler itself, except that now multiple scheduler are run in the same binary as opposed to creating separate binaries for each scheduler. 
+
+Q. So how do you configure them to work differently?
+-> Under each scheduler profile, we can configure the plugins the way we want to for example, for the my-scheduler-2 profile, i am going to disable certain plugins like the TaintToleration plugin and enable my own custom plugns.
+For my-scheduler-3 profile, I am going to disable all the preScore and score plugins. 
+
+References:
+https://github.com/kubernetes/community/blob/master/contributors/devel/sig-scheduling/scheduling_code_hierarchy_overview.md
+
+https://kubernetes.io/blog/2017/03/advanced-scheduling-in-kubernetes/
+
+https://jvns.ca/blog/2017/07/27/how-does-the-kubernetes-scheduler-work/
+
+https://stackoverflow.com/questions/28857993/how-does-kubernetes-scheduler-work
+
+Q. What is the image used to deploy the kubernetes scheduler? Inspect the kubernetes scheduler pod and identify the image:
+-> kubectl describe pod kube-scheduler-controlplane --namespace=kube-system
+
+=====================================================================================
+SCHEDULING PODS TO WORKER NODES:
+=================================
+
+1. Manual scheduling:
+Q. How it works?
+-> Every time you create a pod, k8s will add a section called "nodeName" and scheduler will search for it in all pods, the pod which does not have this properties in it, and identifies right node for the pod, once identifies scheduler will schedule that pod to node by providing 'nodeName' by creating binding object.
+
+Q. What if 'No scheduler'?
+-> Pod continues to be in pending state and you can schedule it by manually.
+-> You can assign a node name "node02" section while creating. Pod will get assigned to specified node, and it can be done while creating itself. Once created, K8s will not allow it to add.
+-> If pod is already exist then, create a binding object and send a post request to the pods binding api thus mimicking  what the actual scheduler does.
+$$ curl --header "content-Type:application/json" --request POST --data '{"apiVersion":"v1", "kind":"Binding" ...} http://$SERVER/api/v1/namespace/default/pods/$PODNAME/binding/
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: myapp
+    type: front-end
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx
+      ports:
+        - containerPort: 80
+      nodeName: Node02
+
+-> "If you provide nodeNAme inside pod manifest file, and if you taint that node, it will schedule the pod to that node which has been tainted with key value pair"
+-> Pod with "nodeName" will override the taints applied to worker node using command line.
+=======================================================================================================================================
+
+How to create/schedule pods in a particular worker node?
+	1. Taint and tolerations. 
+	2. Affinity and Anti-Affinity. 
+        3. Node selector.
+
+1. Taint and Tolerations:
+--------------------------
+-> Used to set restriction on what pods can be schedule on a node.
+-> Taints are used to repel pods from specific nodes.
+-> We apply a "taint" to node which tells the scheduler to repel pods from that worker node.
+-> Only pods consisting of "toleration" for that taint will be created in 
+-> "Taint effect" defines how nodes with taint react to pods.
+-> Lets say we have dedicated resource in Node-1 and we cant schedule all pods to it. so we need taint and toleration here to assign pods to node.
+-> Tolerated pod can be scheduled any other node which does not have taint. So overcome this we will learn "NODE SELECTOR" or "NODE-AFFINITY".
+
+-> The master node is already tainted by:
+		taints:
+		 - effect: NoSchedule
+		   key: node-role.kubernetes.io/master
+$$ kubectl describe node kubemaster | grep Taint
+	node-role.kubernetes.io/master:NoSchedule
+
+to check taints applied to a worker node
+$$ kubectl describe node ip-10-55-29-49.eu-west-1.compute.internal | grep -i taints
+Taints:  app=stage:NoSchedule
+
+-> Taint will be set on 'node' and toleration is added to 'pod'.
+   -> How to taint a node:
+   $$ kubectl taint nodes node-name taint_key=taint_value:taint-effect
+-> Note: taint key and value can be anything user defined.
+
+-> kubectl taint nodes ip-10-55-29-49.eu-west-1.compute.internal app=stage:NoSchedule
+-> kubectl taint nodes ip-10-55-27-41.eu-west-1.compute.internal app=qa:NoSchedule
+
+** Types of taint-effects in K8s: (what happens to PODS that do not tolerate this taint)
+1. NoSchedule taint
+2. PreferNoSchedule - Kubernetes will try to not schedule the pod onto the node.
+3. NoExecute taint: To delete/evict all the pods except some required pods.
+
+
+1. NoSchedule: 
+-> Effect: Ensures that no pods (without a matching toleration) will ever be scheduled on the node.
+-> Behavior: Kubernetes strictly enforces the rule, and the scheduler will not place pods on the node unless the pod has a corresponding toleration for the taint.
+-> Use Case: When you want to completely block certain pods from running on specific nodes unless explicitly allowed with a toleration.
+$$ kubectl taint nodes <node-name> key=value:NoSchedule
+
+			  
+2. PreferNoSchedule:
+-> Effect: Indicates a preference, not a mandate, to avoid scheduling pods on the node.
+-> Behavior: Kubernetes will try to avoid placing pods on nodes with this taint if possible, but it does not strictly enforce this rule.
+-> If no other nodes are available, the scheduler may place pods on the node even if they do not tolerate the taint.
+-> Use Case: When you want to guide the scheduler to avoid the node for certain pods but allow them to run there as a fallback.
+$$ kubectl taint nodes <node-name> key=value:PreferNoSchedule
+
+			 
+3. NoExecute:
+-> The NoExecute taint effect in Kubernetes is stricter than both NoSchedule and PreferNoSchedule. It governs both scheduling and eviction behavior for pods. Here’s how it works:
+-> Effect: Pods without a toleration for the NoExecute taint are:
+  ** Evicted if they are already running on the node.
+  ** Prevented from being scheduled on the node.
+-> Behavior:
+  ** If a pod is already running on a node and the node is tainted with NoExecute, the pod will be removed unless it has a matching toleration.
+  ** New pods that lack a toleration for the NoExecute taint cannot be scheduled on the node.
+
+Q. Remove the taint on controlplane, which currently has the taint effect of NoSchedule.
+  $$ kubectl taint nodes controlplane node-role.kubernetes.io/control-plane:NoSchedule-
+kubectl taint: used to apply or remove taints from nodes.
+-: The hyphen at the end of the taint specification means that you are removing this taint from the node, instead of adding it.
+$$ kubectl taint nodes <node-name> key=value:NoExecute
+
+	
+- Adding toleration to pod	
+$$ kubectl taint nodes node1 app=blue:NoSchedule
+$$ kubectl taint nodes ip-10-55-27-41.eu-west-1.compute.internal app=qa:NoSchedule-
+		
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+  labels:
+    app: myapp
+    type: front-end
+spec:
+  containers:
+    - name: myapp
+      image: front-end
+      ports:
+        - containerPort: 80
+  tolerations:
+  -key: "app"
+   operator: "Equal"
+   value: "blue"
+   effect: "NoSchedule"
+   tolerationSeconds: 3600  # Optional: Pod will be evicted after 1 hour.
+	
+NOTE: The default value for operator is Equal.
+
+-> Their is a chance where pod can be schedule to one of the node which we don't want pod to be scheduled. Because the particular pod will not be scheduled to the nodes which have taint, but the nodes which does not have taint to them our pod can be scheduled. So to overcome we need to provide "NodeSelector" or "Node Affinity".
+
+*******************************************************************************************************
+
+Taints and Tolerations vs Node Affinity:
+-------------------------------------
+
+1. NODE SELECTOR: 
+-> Node Selector is a way to bind the pod to a particular worker node, whose label match the "NodeSelector" labels.
+-> When you provide node selector other pods can be scheduled on nodes. So we need "NodeSelector" but for precision of scheduling pods to nodes we need "NodeAffinity".
+-> Logical expressions type of selection cannot be achieved by "NodeSelector".
+
+Limitations: It only supports simple key-value pairs, and does not offer more advanced or complex scheduling rules.
+
+Step1:		
+-> list nodes: $$ sudo kubectl get nodes 
+-> Get details of nodes: $$ sudo kubectl describe nodes
+-> Get details of particular node / nodes: $$ sudo kubectl describe node <node_name>
+-> list pods with nodes details: $$ sudo kubectl get pods -o wide
+							
+STEP 2: 	
+-> Create a label for the node: 
+	$$ sudo kubectl label nodes <node_name> <label_key>=<label_value>
+	Ex: sudo kubectl label node ip-172-31-46-206 env=test
+	
+STEP 3: 	
+-> use nodeSelector field in spec file 
+apiVersion: v1
+kind: Pod
+metadata:
+   name: node-selector
+   labels:
+     env: test
+   spec:
+      containers:
+      - name: nginx
+	image: nginx
+      nodeSelector:
+	env: test
+
+*******************************************************************************************************
+
+2. Node Affinity and Anti-Affinity:
+----------------------------------
+
+-> Lets say we have 3 nodes with labels Large, Small and Medium. By providing "NodeSelector" we can assign node to pod but what happens when we want pod to be scheduled on node with large and medium labels. Like place pod on any node but not small. We can achieve this using  concept called "Node Affinity".  
+
+-> Using affinity we can completely dedicate pod to particular nodes.
+
+a. NODE AFFINITY: 
+-----------------
+-> Allows us to schedule the pods to specific nodes with conditional expressions or advanced capabilities.	
+-> Creating pods across different availability zones to improve the application availability (resilience).
+-> Allocating pods to nodes based on memory-intensive mode. Means create pod based on CPU and RAM availability in worker nodes.
+
+-> With great power comes great complexity.
+
+** NOTE:  Hard and Soft rules for affinity & anti-affinity 
+	
+1. Hard rule 
+-> requiredDuringSchedulingIgnoredDuringExecution - With “hard” affinity, users can set a precise rule that should be met in order for a Pod to be scheduled on a node.
+
+** operator for node affinity: Check docs
+
+Q. What if their are not nodes with mentioned labels?
+Q. What if someone deletes labels in node after scheduling pods? Will pod continue to stay?
+-> There are two types of node affinity available during scheduling, ignored during execution.
+1. requiredDuringSchedulingIgnoredDuringExecution:
+2. preferredDuringSchedulingIgnoredDuringExecution
+
+Answer: Node Affinity types
+Available:
+1. requiredDuringSchedulingIgnoredDuringExecution
+2. preferredDuringSchedulingIgnoredDuringExecution
+-> Two states "DuringScheduling" & "DuringExecution"
+Type1:          Required		Ignored
+Type2:		Preferred		Ignored
+
+
+Planned:
+1. requiredDuringSchedulingRequiredDuringExecution
+2. preferredDuringSchedulingRequiredDuringExecution
+-> Two states "DuringScheduling" & "DuringExecution"
+Type3:          Required		Required
+Type4:		Preferred		Required
+
+
+a.  "DuringScheduling": 
+-> It is a state where pod does not exist and is created for the first time. We have no doubt that pod is first created, the affinity rules specified are considered to place the pod on the right node.
+
+Q. What if their are not nodes with matching labels? For ex we forgot to label node.
+-> This is where "Required" type will come into picture. The scheduler will mandate the pod to be placed on node with given affinity rules. If it can not find node, the pod will not be scheduled. This type will be used in cases where the placement of the pod is crucial.
+
+-> If matching node does not exist, the pod will not be scheduled, but lets say the pod placement is less important than running the workload itself. In that case, you could set it to "Preferred", and in cases where a matching node is not found. The scheduler will simply ignore node affinity rules and place the pod on any available node. 
+-> It is like telling scheduler to place the pod on matching node, but if you really can not find node, just place it anywhere.
+
+
+b. "DuringExecution"
+-> If pod has been running and a change is made in the environment that affects node affinity, such as a change in label of a node.
+-> Ex: Administrator removed the label we set earlier called size equals large from the node. Now, what will happen to the pods that are running on node?
+-> As you can see two types of affinity available today has this value set to "ignored", which means pods will continue to run and any changes in node affinity will not impact them once they are scheduled.
+
+-> The two new types expected in the future only have a difference "DuringExecution" phase. A new option called "RequiredDuring Execution" is introduced, which will evict any pods that are running on nodes that do not meet affinity rules. 
+-> In the earlier example, a pod running on the large node will be evicted or terminated if the label large is removed from the node.
+
+https://kubernetes.io/docs/concepts/configuration/assign-po-node/
+
+-> Environment based worker nodes.
+-> Size based worker nodes.
+
+During scheduling: 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: myapp
+    type: front-end
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx
+      ports:
+        - containerPort: 80
+  affinity: 
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+	 nodeSelectorTerms: 
+	 - matchExpressions: 
+	     - key: size
+	       operator: in 
+	       values:
+	       - large
+ 	       - medium
+
+		  
+2. Soft rule - preferredDuringSchedulingIgnoredDuringExecution - Using “soft” affinity, you can ask the scheduler to try to run the set of Pod in availability zone XYZ, but if it’s impossible, allow some of these Pods to run in the other Availability Zone.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: soft-affinity-example
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - preference:
+            matchExpressions:
+              - key: failure-domain.beta.kubernetes.io/zone
+                operator: In
+                values:
+                  - xyz
+          weight: 1
+
+# The weight determines the importance of the preference. The higher the weight, the more likely it will be considered by the scheduler. In this case, the weight is 1, meaning it's a light preference.
+
+	  
+b. Anti-Affinity (Inter-pod affinity)
+-> We can define whether a given Pod should or should not be scheduled onto a particular node based on labels.
+	
+apiVersion: v1
+kind: Pod
+metadata:
+  name: with-pod-affinity
+spec:
+  containers:
+  - name: with-pod-affinity
+    image: registry.k8s.io/pause:2.0
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: security
+            operator: In
+            values:
+            - S1
+        topologyKey: topology.kubernetes.io/zone=V
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: security
+              operator: In
+              values:
+              - S2
+          topologyKey: topology.kubernetes.io/zone=R
+
+-> weight: This indicates the importance of the rule. A higher weight means the rule is more strongly preferred. In this case, the weight is 100, which is a significant preference.
+
+-- This example defines one Pod affinity rule and one Pod anti-affinity rule. 
+-- The Pod affinity rule uses the "hard" requiredDuringSchedulingIgnoredDuringExecution, 
+while the anti-affinity rule uses the "soft" preferredDuringSchedulingIgnoredDuringExecution.
+
+-> The affinity rule says that the scheduler can only schedule a Pod onto a node if the node is in the same zone as one or more existing Pods with the label security=S1. 
+-> More precisely, the scheduler must place the Pod on a node that has the topology.kubernetes.io/zone=V label, as long as there is at least one node in that zone that currently has one or more Pods with the Pod label security=S1.
+
+-> The anti-affinity rule says that the scheduler should try to avoid scheduling the Pod onto a node that is in the same zone as one or more Pods with the label security=S2. More precisely, the scheduler should try to avoid placing the Pod on a node that has the topology.kubernetes.io/zone=R label if there are other nodes in the same zone currently running Pods with the Security=S2 Pod label.
+
+NOTE: 	
+	Naming convention of Kubernetes objects name ?
+		- contain no more than 253 characters.
+		- contain only lowercase alphanumeric characters, '-' or '.'
+		- start with an alphanumeric character.
+		- end with an alphanumeric character.
+		
+
+Topology Spread Constraints:
+--------------------------
+-> The topology spread constraints in Kubernetes allow you to control the distribution of pods across different topological domains, such as zones, regions, or nodes. 
+-> This ensures a balanced workload and helps to improve availability and fault tolerance by spreading pods across failure domains.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-deployment
+  namespace: example-namespace
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: example-app
+  template:
+    metadata:
+      labels:
+        app: example-app
+    spec:
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: "topology.kubernetes.io/zone"
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: example-app
+      - maxSkew: 2
+        topologyKey: "kubernetes.io/hostname"
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: example-app
+      containers:
+      - name: nginx
+        image: nginx:1.21.6
+
+whenUnsatisfiable: DoNotSchedule
+whenUnsatisfiable: ScheduleAnyway
+
+-- DoNotSchedule: For 6 replicas, if there are 3 zones, each zone will have 2 pods. If one zone has more than 2 pods, scheduling is blocked (DoNotSchedule).
+-- ScheduleAnyway: Allows some flexibility (ScheduleAnyway) if perfect distribution is not possible.
+
+whenUnsatisfiable:
+DoNotSchedule: Ensures hard constraints for zone-level spread.
+ScheduleAnyway: Allows soft constraints for node-level spread.
+
+1. maxSkew:The maximum difference in the number of pods allowed between the most and least loaded domains.
+-> It calculates the current skew (difference in the number of pods across domains) and ensures it adheres to maxSkew.
+# Example: If maxSkew=1, the difference between the number of pods in any two domains must not exceed 1.
+
+2. topologyKey: The label key to group nodes into topological domains, such as kubernetes.io/hostname, topology.kubernetes.io/zone, or custom node labels.
+
+3. whenUnsatisfiable: Specifies what to do when the constraint is violated:
+  # DoNotSchedule: Prevents scheduling a pod if it violates the spread constraint.
+  # ScheduleAnyway: Allows scheduling but does not guarantee compliance with the constraint.
+
+4. LabelSelector: Used to select which pods are considered for the topology spread.
+
+
+1. Topology Spread Across Zones:
+topologyKey: "topology.kubernetes.io/zone"
+-- Ensures that pods are evenly distributed across availability zones.
+-- For 6 replicas, if there are 3 zones, each zone will have 2 pods. If one zone has more than 2 pods, scheduling is blocked (DoNotSchedule).
+
+2. Topology Spread Across Nodes:
+topologyKey: "kubernetes.io/hostname"
+-- Distributes pods across nodes within a single zone.
+-- Allows some flexibility (ScheduleAnyway) if perfect distribution is not possible.
+
+
+Node Affinity
+-------------
+-> Affects how pods are scheduled based on node labels.
+-> Ensures pods are scheduled on specific nodes that match the desired criteria.
+-> Based on labels applied to nodes.
+-> Ensure a pod runs on a specific node or set of nodes (e.g., region, zone).
+-> Optimize performance or isolate workloads on specific nodes.
+-- requiredDuringSchedulingIgnoredDuringExecution (hard rule).
+-- preferredDuringSchedulingIgnoredDuringExecution (soft rule).
+-> Matches pod scheduling preferences to node properties.
+
+Pod Affinity:
+-------------
+-> Affects how pods are scheduled based on the presence of other pods.
+-> Ensures pods are scheduled near other pods or away from them (via anti-affinity).
+-> Based on labels applied to other pods.
+-> Group related pods together (e.g., services that need low-latency communication).
+-> Spread workloads for high availability (using anti-affinity).
+-- requiredDuringSchedulingIgnoredDuringExecution (hard rule).
+-- preferredDuringSchedulingIgnoredDuringExecution (soft rule).
+-> Matches topology keys like kubernetes.io/hostname or zones/regions.
+-> Matches pod scheduling preferences to the placement of other pods.
+
+
+Q. how to run pod on particular node?
+-> $$  kubectl label nodes node-1 environment=production
+-> In the pod spec, you will need to include the nodeSelector field and set it to the label you want to match.
+-> $$ kubectl create -f pod.yaml   
+   (In some cases, you may want to use affinity and anti-affinity rules to ensure that pods are scheduled on 
+   specific nodes or avoid other pods.)
+

@@ -1,0 +1,17 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp2-sc # Example for AWS EBS gp2, change according to your cloud provider
+provisioner: kubernetes.io/aws-ebs # (For AWS, use appropriate provisioner for other clouds)
+parameters:
+  type: gp2 # Type of storage
+  fsType: ext4 # Filesystem type
+reclaimPolicy: Retain # Prevents automatic deletion of volume when PVC is deleted
+volumeBindingMode: WaitForFirstConsumer # Delay provisioning until a pod is scheduled
+allowVolumeExpansion: true # Allow resizing PVC later
+
+
+# Notes:
+# reclaimPolicy: Retain helps retain data even if PVC is deleted (good for production).
+# volumeBindingMode: WaitForFirstConsumer avoids provisioning volumes that are never used.
+# allowVolumeExpansion: true enables dynamic resizing.

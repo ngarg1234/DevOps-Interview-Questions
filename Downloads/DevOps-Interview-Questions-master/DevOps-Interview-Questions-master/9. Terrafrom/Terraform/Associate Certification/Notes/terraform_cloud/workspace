@@ -1,0 +1,24 @@
+workspace needs to be created inside a project
+
+while creating a workspace, you have to choose a workflow.
+
+there are mainly 3 workflows
+
+1, vcs driven
+2, cli driven
+3, api driven
+
+vcs driven -> you need to connect a workspace with a repo.
+
+                it will allow you to run plan and apply, automatically when  a code commit happens
+
+                you can connect a workspace to either root folder of your repo or any other folder
+
+                NOTE: you can connet a workspace with only one folder on a repo,
+
+                if you want to connect a workspace to a specific folder on a repo, in workspace setting, you have to set the working directory to that folder
+
+
+
+if you have a folder called sample inside the repo tf_cloud
+ie, tf_cloud/sample, and you need to create resources defined inside sample, you need to set the working directory as sample

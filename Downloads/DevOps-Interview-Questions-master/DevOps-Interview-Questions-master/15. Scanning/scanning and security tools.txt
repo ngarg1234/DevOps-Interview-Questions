@@ -1,0 +1,62 @@
+🔹 Code Scanning & Quality Analysis
+✅ SonarQube – Static code analysis for vulnerabilities, bugs, and code smells.
+✅ Checkmarx – SAST (Static Application Security Testing) for code security.
+✅ Snyk – Scans open-source dependencies and container images for vulnerabilities.
+✅ GitHub Advanced Security (CodeQL) – Analyzes code for security vulnerabilities in GitHub repositories.
+✅ Bandit – Python security linter to find common security issues.
+
+
+🔹 SCM (Git, GitHub, GitLab) Security
+✅ TruffleHog – Scans Git repositories for secrets and credentials.
+✅ GitLeaks – Detects hardcoded secrets in Git repositories.
+✅ Talisman – Prevents sensitive information from being committed to Git repositories.
+
+
+🔹 CI/CD Pipeline Security (Jenkins, GitHub Actions, GitLab CI/CD)
+✅ OWASP Dependency-Check – Identifies known vulnerabilities in dependencies.
+✅ OWASP ZAP (Zed Attack Proxy) – Automated security scanner for web applications.
+✅ JFrog Xray – Scans dependencies and artifacts for vulnerabilities.
+✅ Anchore – Scans container images for security risks before deployment.
+✅ Vault (HashiCorp) – Securely manages secrets and credentials within CI/CD pipelines.
+
+
+🔹 Container Security (Docker, Kubernetes, Helm)
+✅ Clair – Scans Docker images for vulnerabilities.
+✅ Grype – Vulnerability scanner for container images and filesystems.
+✅ Trivy – Fast security scanner for containers, dependencies, and IaC.
+✅ Kube-Bench – Checks Kubernetes cluster security configurations (CIS benchmark).
+✅ Kube-Hunter – Actively hunts for security issues in Kubernetes clusters.
+✅ Falco – Runtime security monitoring for Kubernetes workloads.
+
+
+🔹 Infrastructure as Code (IaC) Security (Terraform, Ansible, CloudFormation)
+✅ Checkov – Scans Terraform, Kubernetes, and CloudFormation for misconfigurations.
+✅ tfsec – Security scanner for Terraform configurations.
+✅ TFLint – Detects errors and enforces best practices in Terraform code.
+✅ Kics (Keep Infrastructure as Code Secure) – Detects misconfigurations in Terraform, Ansible, and Kubernetes.
+✅ Prowler – AWS security scanning tool for compliance checks.
+
+
+🔹 Cloud Security (AWS, Azure, GCP)
+✅ AWS Security Hub – Centralized security checks and compliance audits.
+✅ AWS Inspector – Scans EC2 instances for vulnerabilities.
+✅ GuardDuty – Threat detection for AWS accounts and workloads.
+✅ Azure Security Center – Threat protection and security management for Azure resources.
+✅ GCP Security Command Center – Monitors and remediates security risks in Google Cloud.
+
+
+🔹 Web Application Security
+✅ Burp Suite – Security testing for web applications.
+✅ Nikto – Web vulnerability scanner.
+✅ Arachni – Automated scanner for web application security.
+
+
+🔹 Log & Monitoring Security (CloudWatch, Prometheus, Grafana)
+✅ Prometheus AlertManager – Detects anomalies in application behavior.
+✅ ELK Stack (Elasticsearch, Logstash, Kibana) – Centralized logging and anomaly detection.
+✅ Datadog Security Monitoring – Threat detection across logs, infrastructure, and applications.
+✅ Sysdig Secure – Runtime threat detection for cloud-native workloads.
+
+
+
+

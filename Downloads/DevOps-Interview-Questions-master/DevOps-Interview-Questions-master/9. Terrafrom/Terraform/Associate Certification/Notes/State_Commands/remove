@@ -1,0 +1,9 @@
+==> terraform state rm <resource name>
+
+terraform state rm command is used to manually remove a resource from the statefile, but it will not be destroyed from the infra 
+=> the resource will no longer be managed by terraform
+
+here also, you should remove the terraform resource block from your terraform configuration, otherwise next terraform plan will show
+
+Plan: 1 to add, 0 to change, 0 to destroy 
+

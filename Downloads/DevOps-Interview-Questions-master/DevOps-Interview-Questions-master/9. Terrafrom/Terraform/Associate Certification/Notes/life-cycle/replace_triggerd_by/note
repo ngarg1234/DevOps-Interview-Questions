@@ -1,0 +1,15 @@
+ In the example below, any change to the foo_value.foo resource replaces the foo_value.bar resource.
+
+ <!-- resource "foo_value" "foo" {
+  value = "foo"
+}
+
+resource "foo_value" "bar" {
+  value = "bar"
+
+  lifecycle {
+    replace_triggered_by = [
+      foo_value.foo,
+    ]
+  }
+} -->

@@ -1,0 +1,95 @@
+Here’s a cheat sheet of **useful commands for ARM templates** and **Bicep** in Azure, categorized for clarity:
+
+---
+
+## 🛠️ ARM Templates (Azure Resource Manager)
+
+### 1. **Validate ARM Template**
+```bash
+az deployment group validate \
+  --resource-group <your-rg> \
+  --template-file <template.json> \
+  --parameters <parameters.json>
+```
+
+### 2. **Deploy ARM Template**
+```bash
+az deployment group create \
+  --resource-group <your-rg> \
+  --template-file <template.json> \
+  --parameters <parameters.json>
+```
+
+> Use `--mode Complete` to remove resources not in the template.
+
+### 3. **What-if Deployment (Preview Changes)**
+```bash
+az deployment group what-if \
+  --resource-group <your-rg> \
+  --template-file <template.json> \
+  --parameters <parameters.json>
+```
+
+---
+
+## 💡 Bicep (ARM Template Abstraction Language)
+
+### 1. **Install Bicep CLI**
+```bash
+az bicep install
+```
+
+### 2. **Build Bicep File to ARM JSON**
+```bash
+az bicep build --file <template.bicep>
+```
+> Outputs `template.json` (ARM equivalent)
+
+### 3. **Decompile ARM JSON to Bicep**
+```bash
+az bicep decompile --file <template.json>
+```
+
+### 4. **Validate Bicep Template**
+```bash
+az deployment group validate \
+  --resource-group <your-rg> \
+  --template-file <template.bicep> \
+  --parameters <parameters.json>
+```
+
+### 5. **Deploy Bicep File**
+```bash
+az deployment group create \
+  --resource-group <your-rg> \
+  --template-file <template.bicep> \
+  --parameters <parameters.json>
+```
+
+### 6. **Bicep Linting (Check Syntax & Best Practices)**
+```bash
+bicep build <template.bicep> --stdout
+```
+
+---
+
+## 🌍 Additional Tips
+
+### Deploy to Subscription Scope (instead of RG)
+```bash
+az deployment sub create \
+  --location <location> \
+  --template-file <template.bicep or .json>
+```
+
+### Deploy to Management Group Scope
+```bash
+az deployment mg create \
+  --management-group-id <mg-id> \
+  --location <location> \
+  --template-file <template.bicep>
+```
+
+---
+
+Want me to create a downloadable quick-reference PDF for these too?

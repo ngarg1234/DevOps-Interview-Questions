@@ -1,0 +1,8 @@
+-- Input variables are used to declare the parameters that you want to accept as input when running Terraform. They are defined in the root module or any other module, and their values can be set using command-line flags, environment variables, or by creating a "terraform.tfvars" file.
+
+Example:
+variable "region" {
+  description = "The Azure region where resources will be created."
+  type        = string
+  default     = "East US"
+}

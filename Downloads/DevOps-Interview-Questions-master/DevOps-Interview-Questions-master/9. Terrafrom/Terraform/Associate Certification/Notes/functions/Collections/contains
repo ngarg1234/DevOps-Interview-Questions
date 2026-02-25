@@ -1,0 +1,5 @@
+contains determines whether a given list or set contains a given single value as one of its elements.
+
+contains(list, value)
+
+

@@ -1,0 +1,14 @@
+Write a query to get the second highest salary from an employee table.
+
+SELECT MAX(salary) 
+FROM employees 
+WHERE salary < (SELECT MAX(salary) FROM employees);
+
+
+SELECT max(salary) FROM employees WHERE salary < (Select max(salary) FROM employees);
+
+
+
+
+
+select max(salary) from employees where salary < (Select max(salary) from Employees);

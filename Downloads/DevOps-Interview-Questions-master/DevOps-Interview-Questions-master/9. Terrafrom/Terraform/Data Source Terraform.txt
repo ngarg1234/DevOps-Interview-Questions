@@ -1,0 +1,32 @@
+
+
+Terraform Data Source 
+
+
+
+
+
+Terraform data sources provide information on existing resources. This is handy for configuration dependencies that exist across Terraform plans.
+
+
+
+The key/value pair can be provided using the syntax below:
+
+Key: The name parameter uses the syntax tag:<key> to provide the AWS key name.
+Value: The values parameter provides the AWS key value.
+The full working Terraform code snippet is shown below:
+
+data "aws_ec2_transit_gateway" "tgw" {
+  filter {
+    name   = "tag:Name"
+    values = ["wahlnetwork-tgw-prod"]
+  }
+}
+Now that I had the Transit Gateway’s id value, I was able to supply it to a resource object further along in the plan.
+
+resource "aws_ec2_transit_gateway_vpc_attachment" "vpc-tgw-attachment" {
+  subnet_ids          = [aws_subnet.priv01.id, aws_subnet.priv02.id]
+  transit_gateway_id  = data.aws_ec2_transit_gateway.tgw.id
+  vpc_id              = aws_vpc.vpc.id
+  }
+}

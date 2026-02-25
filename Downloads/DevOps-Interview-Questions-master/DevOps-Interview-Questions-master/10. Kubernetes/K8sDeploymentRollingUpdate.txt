@@ -1,0 +1,43 @@
+
+🔄 Rolling Updates in Kubernetes
+Rolling updates allow you to update applications with zero downtime by incrementally replacing old Pods with new ones. The process involves:
+
+Updating the Deployment YAML: Modify the Docker image tag to the new version.
+Medium
+
+Applying Changes: Use the command kubectl apply -f deployment.yaml to apply the updated configuration.
+
+Rolling Update Strategy: By default, Kubernetes uses the RollingUpdate strategy, which ensures that a specified number of Pods are updated at a time,
+maintaining application availability.
+Read Medium articles with AI
+
+Configuring Update Parameters:
+
+maxSurge: Specifies the maximum number of Pods that can be created above the desired number during the update.
+For example, setting maxSurge: 25% allows up to 25% more Pods than the desired count.
+
+maxUnavailable: Defines the maximum number of Pods that can be unavailable during the update.
+For instance, maxUnavailable: 25% ensures that at least 75% of the desired Pods are always running.
+Medium
+Read Medium articles with AI
+
+These parameters help in controlling the pace and availability during updates. 
+Read Medium articles with AI
+
+🔁 Rollbacks in Kubernetes
+In scenarios where a new deployment causes issues, Kubernetes allows you to rollback to a previous stable version.
+
+Initiating a Rollback: Use the command kubectl rollout undo deployment/<deployment-name> to revert to the previous revision.
+
+Viewing Revision History: Execute kubectl rollout history deployment/<deployment-name> to see the list of revisions.
+
+Rolling Back to a Specific Revision: To rollback to a particular revision, use kubectl rollout undo deployment/<deployment-name> --to-revision=<revision-number>.
+
+Recording Changes: By adding the --record=true flag during deployment (kubectl apply -f deployment.yaml --record=true), you can track the changes made in each revision, aiding in better auditability. 
+Read Medium articles with AI
+
+Deployment Strategies:
+
+Recreate Strategy: Terminates all existing Pods before creating new ones. This approach can lead to downtime and is generally not recommended for production environments.
+
+RollingUpdate Strategy: Updates Pods incrementally, ensuring that some instances of the application are always available during the update process.

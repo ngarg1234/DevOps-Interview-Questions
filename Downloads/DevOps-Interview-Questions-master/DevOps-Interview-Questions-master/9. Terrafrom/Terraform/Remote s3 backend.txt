@@ -1,0 +1,49 @@
+------------------------   Remote S3 Backend for terraform state file
+
+
+-> We Should keep our state files in a common place so that it will be available for all the developers
+
+-> The reason why GitHub is not used as a backend, we need to push the state file always. If someone forgets to do it then everything will be messed up
+
+-> And also there is no locking mechanism for state(in GitHub) so when 2 developers use it at the same time, it will be an issue 
+
+-> Terraform state file will store all the username and password as a plane text.
+
+-> So we keep s3 bucket as backend as the stabiles will get pushed automatically when we do a terraform apply 
+
+-> default backend for statefile is - local 
+
+
+
+
+-----> Creating s3 for storing state file
+
+
+
+resource "aws_s3_bucket" "terraform-state" {
+  
+		bucket = "shyamjith1"
+		key = "vpc"      --------->. Directory in which state file gets stored
+		lifecycle {
+	  	   prevent_destroy = true
+		}
+		versioning {
+			enabled = true
+		}
+}
+
+
+
+----> configuring s3 backend
+
+ terraform {
+    backend "s3" {
+        bucket = "shyamjith1"
+        key = "vpc"
+        region = "us-east-2"
+    }
+}
+
+
+----------------------------- State Locking
+

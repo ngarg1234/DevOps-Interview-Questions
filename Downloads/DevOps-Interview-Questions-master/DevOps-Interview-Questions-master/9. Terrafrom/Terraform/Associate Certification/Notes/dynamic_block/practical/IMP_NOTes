@@ -1,0 +1,52 @@
+
+format for dynamic block
+
+
+variable "sg_ports" {
+    type = list(number)
+    default = [22, 80, 3369, 8080, 9000]
+}
+
+resource "aws_security_group" "after_dynamic_block" {
+    name = "after_dynamic_block"
+
+    dynamic ingress {
+        for_each = var.sg_ports
+
+        content {
+            from_port = ingress.value
+            to_port = ingress.value
+            protocol = "tcp"
+            cidr_blocks = ["0.0.0.0/0"]
+        }
+    }
+
+here yuu can see, the ingress is converted into a dynamic block,
+
+dynamic ingress {}, here ingress is the attribute name, here you can't use any other value, ie for ingress it should be ingress
+
+for egress, it should be egress, ie dynamic egress {}
+
+
+for_each
+
+    for_each = var.sg_ports
+
+    definetley you have to use for_each and iterate through the variable list
+
+    from_port = ingress.value
+    to_port = ingress.value
+
+    to use the values, you have to use ingress.value
+
+
+you can also use seperate iterator in this case
+
+eg:
+
+
+dynamic ingress {
+    for_each = var.sg_ports
+    iterator = port
+    content {
+        from_port = port.value

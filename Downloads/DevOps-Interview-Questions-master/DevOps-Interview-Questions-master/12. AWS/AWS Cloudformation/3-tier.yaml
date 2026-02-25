@@ -1,0 +1,189 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "3-Tier Architecture with VPC, Subnets, EC2, RDS, S3, WAF, and Route 53"
+
+Resources:
+  # VPC
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: "10.0.0.0/16"
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: MyVPC
+
+  # Public Subnet
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: "10.0.1.0/24"
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: "us-east-1a"
+
+  # Private Subnets
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: "10.0.2.0/24"
+      AvailabilityZone: "us-east-1b"
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: "10.0.3.0/24"
+      AvailabilityZone: "us-east-1c"
+
+  # Internet Gateway
+  MyInternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  # Attach IGW to VPC
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref MyVPC
+      InternetGatewayId: !Ref MyInternetGateway
+
+  # NAT Gateway
+  MyEIP:
+    Type: AWS::EC2::EIP
+
+  MyNATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt MyEIP.AllocationId
+      SubnetId: !Ref PublicSubnet
+
+  # Public Route Table
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MyVPC
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref MyInternetGateway
+
+  PublicRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  # Private Route Table
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MyVPC
+
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: "0.0.0.0/0"
+      NatGatewayId: !Ref MyNATGateway
+
+  PrivateRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet1
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet2
+      RouteTableId: !Ref PrivateRouteTable
+
+  # EC2 Instances
+  WebServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: "ami-12345678"
+      InstanceType: "t2.micro"
+      SubnetId: !Ref PublicSubnet
+
+  AppServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: "ami-12345678"
+      InstanceType: "t2.micro"
+      SubnetId: !Ref PrivateSubnet1
+
+  # RDS Database
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: "DB subnet group"
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+
+  Database:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: 20
+      DBInstanceClass: "db.t3.micro"
+      Engine: "mysql"
+      MasterUsername: "admin"
+      MasterUserPassword: "mypassword"
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      PubliclyAccessible: false
+      MultiAZ: false
+
+  # S3 Bucket
+  MyS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: "my-terraform-s3-bucket"
+
+  # AWS WAF
+  MyWAF:
+    Type: AWS::WAF::WebACL
+    Properties:
+      Name: "waf-acl"
+      DefaultAction:
+        Type: ALLOW
+      MetricName: "wafmetric"
+
+  # Route 53
+  MyRoute53Zone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: "example.com"
+
+Outputs:
+  VPCId:
+    Description: "VPC ID"
+    Value: !Ref MyVPC
+
+  PublicSubnetId:
+    Description: "Public Subnet ID"
+    Value: !Ref PublicSubnet
+
+  PrivateSubnet1Id:
+    Description: "Private Subnet 1 ID"
+    Value: !Ref PrivateSubnet1
+
+  PrivateSubnet2Id:
+    Description: "Private Subnet 2 ID"
+    Value: !Ref PrivateSubnet2
+
+  WebServerInstanceId:
+    Description: "Web Server Instance ID"
+    Value: !Ref WebServer
+
+  AppServerInstanceId:
+    Description: "App Server Instance ID"
+    Value: !Ref AppServer
+
+  S3BucketName:
+    Description: "S3 Bucket Name"
+    Value: !Ref MyS3Bucket

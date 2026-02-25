@@ -1,0 +1,128 @@
+-> RBAC (Role-Based Access Control) is a k8s mechanism that regulates access to resources based on the roles assigned to users, groups, or service accounts.
+
+👉 It allows fine-grained control over:
+-> Who: Subject: Users, Groups or service accounts 
+-> Resources: Kubernetes objects which need to be operated with RBAC [(pods, deployments, secrets, etc.)]
+-> what actions : Verbs: The rules/operations which we want to do with the resources. ("get", "list", "watch", "create", "update", "patch", "delete")
+-> In which namespace (or cluster-wide)
+
+
+✅ There are 2 types of accounts in Kubernetes
+		
+1. USER ACCOUNT: It is used to allow us, humans to access the kubernetes cluster.
+			
+2. SERVICE ACCOUNT:
+------------------- 
+-> A Service Account in Kubernetes is an identity that is associated with a set of permissions to interact with the Kubernetes API. 
+-> Service accounts are typically used by applications or workloads running inside the cluster to interact with the Kubernetes control plane (such as accessing the Kubernetes API, creating or modifying resources, etc.).
+
+-> It is primarily used to authenticate Pods so that they can access the Kubernetes API and interact with cluster resources securely.
+-> It is used to access the API server by other tools and also components inside the clusetr.
+-> API server is responsible for such authentication process.
+-> If any application running inside a pod or ouside the cluster can access kubernetes cluster using a service account.
+-> when a service account is created it first creates a token and keeps that token in a secret object and token can be used by mounting the secret object. 
+-> Secret object is linked to the service account.
+
+Service accounts are commonly used for:
+
+-- Allowing Pods to authenticate with Kubernetes APIs.
+-- Granting permissions to Pods for specific actions in the cluster.
+-- Enabling fine-grained access control through RBAC (Role-Based Access Control).
+
+** Key Features of Service Accounts:
+1. Identity for Pods: A service account is assigned to a Pod or Deployment, giving it an identity for API interactions.
+2. Role-Based Access Control (RBAC): Service accounts can be associated with RBAC roles to grant permissions to interact with various Kubernetes resources.
+3. API Access: Pods using a service account can authenticate to the Kubernetes API server with the associated credentials.
+
+** Components:
+-> Service Account: An object representing an identity.
+-> Service Account Token: Each service account is given a secret (JWT token) that pods can use to authenticate.
+-> RBAC Policies: Service accounts are associated with roles and role bindings to control access permissions.
+-> Default Service Account: If no service account is specified, the default service account is used for the pod.
+
+=========================================================================================
+How to Create and Use a Service Account in Kubernetes:
+------------------------------------------------------
+1. Create a Service Account
+2. Assigning Roles and Permissions to the Service Account:
+2.a Create a Role (or ClusterRole) that defines the permissions.
+2.b Create a RoleBinding that binds the my-service-account to the pod-reader role.
+3. Using the Service Account in a Pod
+4. Accessing the Service Account Token Inside the Pod
+
+========================================================================================
+🔐 1. Use Authentication & Authorization
+a. Authentication
+-> Enable strong authentication for all clients (kubectl, CI/CD, apps).
+-> Use X.509 client certificates, OIDC tokens, or Service Account tokens
+
+-> Example: Use --client-ca-file flag to provide a CA bundle for verifying client certificates.
+# Example API server flag
+--client-ca-file=/etc/kubernetes/pki/ca.crt
+
+b. Authorization
+-> Use RBAC (Role-Based Access Control) to define what authenticated users can do.
+-> Avoid using overly broad permissions (e.g., cluster-admin).
+Example:
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+
+  
+🔑 Key Components of RBAC
+Component	Description
+Role	       Set of permissions (verbs on resources) within a namespace
+ClusterRole	    Set of permissions cluster-wide, or across all namespaces
+RoleBinding	    Assigns a Role to a user/group/service account within a namespace
+ClusterRoleBinding	Assigns a ClusterRole to a user/group/service account cluster-wide
+
+🔹 1. Role (Namespace-Scoped)
+-> Defines permissions within a specific namespace.
+
+🔹 2. ClusterRole (Cluster-Scoped)
+-> Defines permissions across all namespaces or cluster-scoped resources (like nodes, persistent volumes).
+
+🔹 3. RoleBinding (Namespace-Specific Binding)
+-> Binds a Role (or even ClusterRole) to a user/group/service account within a namespace.
+
+🔹 4. ClusterRoleBinding (Cluster-Wide Binding)
+-> Binds a ClusterRole to a user/group/service account for cluster-wide access.
+
+✅ How RBAC Works — Flow
+1. User/ServiceAccount sends request to API server (e.g., list pods).
+2. Authentication: Kubernetes authenticates the identity (e.g., certificate, token).
+3. Authorization (RBAC): Kubernetes checks RBAC rules to determine if the action is allowed.
+4. Decision: Permit or deny the request.
+
+🚀 Common Verbs in RBAC Rules
+Verb	Action
+get	    Read a specific resource
+list	List all resources of a type
+watch	Watch for changes
+create	Create new resource
+update	Modify an existing resource
+patch	Partially update a resource
+delete	Delete a resource
+
+✅ Common Resources in RBAC Rules
+Resource	Description
+pods	    Pods
+deployments	Deployments
+services	Services
+configmaps	Configuration data
+secrets	    Sensitive data
+nodes	    Cluster nodes (ClusterRole)
+persistentvolumes	Persistent Volumes (ClusterRole)
+
+⚠️ Security Best Practices for RBAC
+1. Principle of Least Privilege: Grant only the permissions required.
+2. Avoid ClusterRoleBinding unless necessary: Prefer Role + RoleBinding for namespace-level access.
+3. Use separate service accounts for apps with different access needs.
+4. Regularly review RBAC policies to avoid over-permissioning.
+5. Restrict access to secrets and sensitive resources.

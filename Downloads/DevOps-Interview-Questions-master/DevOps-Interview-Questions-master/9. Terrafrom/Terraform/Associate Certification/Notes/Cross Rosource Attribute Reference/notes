@@ -1,0 +1,38 @@
+Each resource has it's own set of attributes associated to it.
+
+NOTE: attributed get created only after the successful creation of the resource
+
+    attributes examples:
+                        arn, public_ip, private_ip, instance_id, private_dns etc..
+
+                        all the above attributes will get created only after the resource is created
+
+    
+how to do cross reference 
+
+ resource "aws_eip" "lb" {
+    domain = "vpc"
+}
+
+resource "aws_security_group" "allow_tls" {
+  name        = "allow_tls"
+  description = "Allow TLS inbound traffic"
+  
+  ingress {
+   
+    from_port   = 443
+    to_port     = 443
+    protocol    = "-1"
+    cidr_blocks = [aws_eip.lb.public_ip/32]   #/32 because it's expecting a cidr
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+    prefix_list_ids = ["pl-12c4e678"]
+  }
+}   
+
+in the above code resource aws_eip.lb will be created first because aws_security_grouop.allow_tls is dependednt on it 

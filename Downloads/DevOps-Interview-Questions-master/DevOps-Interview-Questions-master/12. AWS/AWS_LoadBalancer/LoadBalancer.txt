@@ -1,0 +1,197 @@
+Load balancers:
+----------------
+
+1. Application Load Balancer 
+-> Choose an Application Load Balancer when you need a flexible feature set for your applications with HTTP and HTTPS traffic. 
+-> Operating at the request level, Application Load Balancers provide advanced routing and visibility features targeted at application architectures, including microservices and containers.
+--> define two target groups, blue target group, green tarfget groups and add instances in them....
+
+2. Network Load Balancer -- layer 7 transport layer, it needs just port..
+-> Choose a Network Load Balancer when you need ultra-high performance, TLS offloading at scale, centralized certificate deployment, support for UDP, and static IP addresses for your applications. 
+-> Operating at the connection level, Network Load Balancers are capable of handling millions of requests per second securely while maintaining ultra-low latencies.
+
+3. Gateway Load Balancer
+-> Choose a Gateway Load Balancer when you need to deploy and manage a fleet of third-party virtual appliances that support GENEVE. 
+-> These appliances enable you to improve security, compliance, and policy controls.
+
+
+1. Application Load Balancer  - Layer 7 Application .. it has all details.. so latency as compared to NLB.. like path, query param..
+-> Choose an Application Load Balancer when you need a flexible feature set for your applications with HTTP and HTTPS traffic. 
+-> Operating at the request level, Application Load Balancers provide advanced routing and visibility features targeted at application architectures, including microservices and containers.
+
+How Application Load Balancers work
+-- Clients make requests to your application.
+-- The listeners in your load balancer receive requests matching the protocol and port that you configure.
+-- The receiving listener evaluates the incoming request against the rules you specify, and if applicable, routes the request to the appropriate target group. You can use an HTTPS listener to offload the work of TLS encryption and decryption to your load balancer.
+-- Healthy targets in one or more target groups receive traffic based on the load balancing algorithm, and the routing rules you specify in the listener.
+
+Listeners and rules
+===================
+-> Traffic received by the listener is routed according to the default action and any additional rules. 
+-> Rules are evaluated in priority order from the lowest value to the highest value.
+
+Rules:
+======
+-> Requests reaching this rule must match all specified conditions for the rule to apply. At least 1 condition is required.
+
+Rule condition types
+--------------------
+-> Route traffic based on the condition type of each request. 
+-> Each rule can include one of each of the following conditions: 
+1. host-header, 
+2. path, 
+3. http-request-method and 
+4. source-ip. 
+-> Each rule can include one or more of each of the following conditions: 
+1. http-header and 
+2. query-string.
+
+-> Default actions, choose one of the following:
+1. Forward to target groups – 
+-> Choose one or more target groups to forward traffic to. To add target groups choose Add target group. 
+-> If using more than one target group, select a weight for each target group and review the associated percentage. 
+-> You must enable group-level stickiness on a rule, if you’ve enabled stickiness on one or more of the target groups.
+
+2. Redirect to URL – 
+-> Specify the URL that client requests will be redirected to. 
+-> This can be done by entering each part separately on the URI parts tab, or by entering the full address on the Full URL tab. 
+-> For Status code you can configure redirects as either temporary (HTTP 302) or permanent (HTTP 301) based on your needs.
+
+3. Return fixed response – 
+-> Specify the Response code that will be returned to dropped client requests. 
+-> Additionally, you can specify the Content type and Response body, but they're not required.
+
+Target group stickiness: [enable the Target Group attribute: Stickiness.]
+------------------------
+-> Target group stickiness is the functionality of a load balancer to repeatedly route traffic from a client to a single target group instead of balancing the traffic across multiple target groups. 
+-> Target group stickiness requires using the Forward to target groups routing action and is only available to clients that support cookies.
+
+-> Stickiness duration is the maximum amount of time the load balancer will allow a client connection to maintain its session with the target it’s bound to. 
+-> When the stickiness duration elapses, stickiness is released, and the target binding might change. 
+-> Stickiness duration can be set from 1 second to 7 days with the default being 1 hour (3600 seconds).
+
+Set rule priority Info:
+=======================
+-> Each rule has a priority. 
+-> The default rule is evaluated last. 
+-> You can change the priority of a non-default rule at any time. 
+-> You can't change the priority of the default rule.
+
+Network mapping :
+=================
+-> Targets in the listed zones and subnets are available for traffic from the load balancer using the IP addresses shown.
+-> VPC and subnets should be ready!
+
+Resource mapping
+=================
+-> View, explore, and troubleshoot your load balancer's architecture.
+
+Security
+========
+-> A security group is a set of firewall rules that control the traffic to your load balancer.
+
+Monitoring:
+===========
+1. Target response time
+2. Requests
+3. Rule evaluations
+4. Active Connection Count
+5. Sum rejected connections 
+6. Target connection er rors
+7. ELB 4xx, 5xx, 500, 502, 503, 504 etc
+
+Integrate:
+==========
+1. AWS Web Application Firewall (WAF) [Optimizes: Security] 
+2. AWS Config [Optimizes: Monitoring, Compliance]
+3. AWS Global Accelerator [Optimizes: Performance, Availability]
+4. Amazon CloudFront + AWS Web Application Firewall (WAF) [Optimizes: Performance, Security, Availability]
+5. Amazon Application Recovery Controller (ARC) [Optimizes: Availability]
+
+Attributes:
+===========
+
+Traffic configuration:
+----------------------
+1. 
+
+2. Packet handling
+-------------------
+a. Desync mitigation mode: Determines how the load balancer handles requests that might pose a security risk to your application.
+-> Desync Mitigation Mode is a security feature in ALB to detect and block malformed/desync-prone requests before forwarding them to targets.
+-> Prevents HTTP desync vulnerabilities caused by inconsistent request parsing between ALB and the target server.
+
+🔑 4. Types of Desync Mitigation Modes
+a. Defensive Mode (Default)
+-- Blocks known bad request patterns.
+-- Allows most requests but drops ones that are high-risk (e.g., malformed headers, conflicting headers).
+-- Safe for production — minimal disruption to legitimate traffic.
+
+b. Strictest Mode
+-- Aggressively blocks requests with any parsing ambiguity.
+-- May block more requests, including borderline malformed ones.
+-- Recommended for high-security environments where even a small risk is unacceptable.
+
+c. Monitor Mode
+-- Does NOT block any requests.
+-- Logs suspicious/malformed requests for analysis.
+
+⚙️ What is Desync Attack?
+-- Desynchronization (Desync) attacks exploit differences between how ALB and the target server parse HTTP requests.
+-- The attacker sends a malformed HTTP request that is interpreted differently by the ALB and backend:
+    -- ALB sees it as a normal request and forwards.
+    -- Target sees a different request, potentially executing harmful actions.
+-- Result: Can lead to HTTP Request Smuggling, unauthorized access, data leakage, cache poisoning, etc.
+
+-------------------------------------------------------------
+b. X-Forwarded-For header: Enables you to append, preserve, or remove the X-Forwarded-For header in the HTTP request before the Application Load Balancer sends the request to the target.
+1. append
+2. preserve
+3. Remove
+-> When AWS ALB forwards a request to your target (EC2, ECS, EKS, Lambda, IP), it adds special HTTP headers called X-Forwarded headers. These headers provide important information about the original client making the request, such as:
+-- Client IP address
+-- Protocol (HTTP/HTTPS)
+-- Original Port used by the client
+
+✅ Types of X-Forwarded Headers Added by ALB
+1. X-Forwarded-For
+-- Purpose: Contains the IP address of the original client making the request.
+-- Format: If there are proxies between client and ALB, the list is comma-separated.
+-- Example: X-Forwarded-For: 203.0.113.1, 198.51.100.101
+-- Use Case: Used for logging client IP, rate limiting per IP, security checks.
+
+2. X-Forwarded-Proto
+-- Purpose: Shows whether the client used HTTP or HTTPS to connect to ALB.
+-- Example: X-Forwarded-Proto: https
+-- Use Case: Useful when ALB handles SSL/TLS termination, but backend needs to know if request was secure.
+
+3. X-Forwarded-Port
+-- Purpose: Captures the port number the client used to connect to ALB (typically 80 or 443).
+-- Example: X-Forwarded-Port: 443
+-- Use Case: For apps that need to reconstruct the full original URL.
+
+** Client port preservation
+Indicates whether the X-Forwarded-For header should preserve the source port that the client used to connect to the load balancer.
+
+** Preserve host header
+Indicates whether the Application Load Balancer should preserve the Host header in the HTTP request and send it to targets without any change.
+-----------------------------------------------------------
+Protection:
+----------
+Deletion protection: To prevent your load balancer from being deleted accidentally, turn on deletion protection. If you turn on deletion protection, you must turn it off before you can delete the load balancer.
+
+Monitoring:
+1. Access logs: Access logs deliver detailed logs of all requests made to your Elastic Load Balancer. Choose an existing S3 location. If you don’t specify a prefix, the access logs are stored in the root of the bucket. 
+2. Connection logs: Connection logs deliver detailed logs of all connections made to your Elastic Load Balancer. Choose an existing S3 location. If you don’t specify a prefix, the access logs are stored in the root of the bucket. 
+
+====================================================================================================
+
+Capacity:
+---------
+Load Balancer Capacity Unit Reservation : Your load balancer scales automatically in response to incoming traffic. During extreme traffic spikes, you can set a Load Balancer Capacity Unit Reservation to serve as your baseline.
+
+Classic Load balancer works with HTTP, HTTPS, TCP, SSL..... no targets group in that, directly attaches instances to it.....
+
+Target group can forward tarffic to another LAB, lambda function, ip adresss ot instances(mostly this)....
+
+https://www.youtube.com/watch?v=eQi-BD9uyDI

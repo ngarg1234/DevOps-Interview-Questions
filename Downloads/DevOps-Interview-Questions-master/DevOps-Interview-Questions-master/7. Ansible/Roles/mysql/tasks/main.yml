@@ -1,0 +1,20 @@
+---
+# tasks/main.yml
+- name: Install MySQL server
+  apt:
+    name: mysql-server
+    state: present
+
+- name: Copy MySQL config file
+  template:
+    src: my.cnf.j2
+    dest: /etc/mysql/my.cnf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Ensure MySQL is started
+  service:
+    name: mysql
+    state: started
+    enabled: yes

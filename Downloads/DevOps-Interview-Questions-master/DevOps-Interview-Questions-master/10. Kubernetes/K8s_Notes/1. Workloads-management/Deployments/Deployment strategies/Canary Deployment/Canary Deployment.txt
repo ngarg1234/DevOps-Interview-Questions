@@ -1,0 +1,26 @@
+Canary Deployment:
+---------------------
+💡 Canary Deployment is a gradual rollout strategy where the new version is released to a small subset of users first. If it works fine, it is gradually rolled out to more users, and eventually to everyone.
+
+✅ How Canary Deployment Works:
+1. New version (canary) is deployed alongside existing version.
+2. A small percentage of traffic (e.g., 5%) is routed to canary.
+3. Monitor metrics (errors, latency).
+4. If everything is fine, increase traffic gradually (e.g., 25%, 50%, 100%).
+5. If problems are detected, rollback quickly with minimal user impact.
+
+✅ Key Benefits of Canary:
+-- Low risk — limits impact if there’s a bug.
+-- Gradual rollout with real traffic exposure.
+-- Safe testing in production without affecting all users.
+
+Step 1: 
+90% traffic --> v1 (Stable)
+10% traffic --> v2 (Canary)
+
+Step 2 (if OK):
+50% --> v1
+50% --> v2
+
+Step 3 (Fully rolled out):
+100% --> v2

@@ -1,0 +1,214 @@
+1. 📬 Amazon SQS (Simple Queue Service)
+➤ What is SQS?
+-> A fully managed message queuing service by AWS.
+-> Used for decoupling microservices, distributed systems, and serverless apps.
+-> Asynchronous communication between components.
+-> Ensures message durability, reliability, and scaling.
+
+➤ Key Features:
+-> SQS is not push-based, it is basically on pull-based.
+-> The size of messages in SQS are 256 KB.
+-> There is default retention period in SQS. The default retention period is of 4 days.
+-> Messages in SQS of a queue is kept from 1 minute to 14 days.
+-> SQS also guarantees that the messages will only be processed at least once.
+-> Dead Letter Queue (DLQ) for handling failed message processing.
+
+➤ AWS SQS Pricing
+-> AWS SQS follows two pricing models
+1. Standard: You will be charged for the number of messages that you have sent or receive regardless size of the message. And also it is default pricing of the SQS
+2. Brust: This Pricing model is specially designed for the applications which have brusty traffic patterns. You will be charged on monthly bases.
+
+➤ Types of SQS Queues:
+-> Queue Type	            Purpose
+1. Standard Queue	    Best-effort ordering, high throughput, possible duplicates.
+2. FIFO Queue	       First-In-First-Out, exactly-once processing, ordered delivery.
+
+1. Standard Queue
+-> Standard queue this queue messages are delivered randomly. Also, a message can be delivered multiple times. So you shouldn’t rely on order and only one-time delivery in this type of queues.
+
+** Key Features of Standard Queue
+-- High Throughput: Standard queues can process a virtually unlimited number of transactions per second.
+-- Best-Effort Ordering: While SQS attempts to preserve order, messages may be delivered out of order.
+-- At Least Once Delivery: Messages might be delivered more than once, so it’s essential to have idempotent message processing logic.
+
+** Use Case Examples
+-- Real-Time Data Ingestion: High-velocity logging or metrics collection.
+-- Task Processing: Such as image processing jobs, where the order of tasks doesn’t affect the outcome.
+-- Notification Systems: Where notifications can be sent in any order without affecting user experience.
+
+***************************************************************************************************************
+2. First-in-first-out(FIFO)
+-> irst-in-first-out(FIFO) queue the order of messages is preserved. So if you receive a message from the queue you will get the oldest message. This queue also guarantees that the message will be delivered only once. 
+
+** Key Features of FIFO Queue
+-- Ordered Processing: Messages are always processed in the exact sequence in which they were sent.
+-- Exactly-Once Delivery: Each message is delivered exactly once, preventing duplicates.
+-- Message Grouping: FIFO queues allow you to define message groups, ensuring that related messages are processed in order, while different groups can be processed simultaneously.
+
+** Use Case Examples
+-- Banking Transactions: Ensuring that debits and credits are processed in the right order.
+-- Inventory Systems: Where stock levels need to be updated in sequence.
+-- Workflows: Where tasks must be completed in a specific order, such as video rendering pipelines.
+
+***********************************************************************************************
+⚙️ How SQS Works — Step-by-Step Flow
+1. Producer (Sender) Sends Message to SQS Queue
+2. Message Stored in Queue
+3. Consumer (Receiver) Polls and Retrieves Message
+4. Message Processing
+5. Message Deletion (After Successful Processing)
+6. Retry & Dead Letter Queue (DLQ) Handling
+
+🎯 Visual Flow:
+----------------
+[Producer] --(Message)--> [SQS Queue] --(Poll)--> [Consumer]
+                               |
+                               v
+                            [DLQ] (if processing fails multiple times)
+
+
+
+➤ Common DevOps Use Cases:
+-> Decouple microservices (e.g., order processing, background jobs).
+-> Buffer tasks (e.g., batch jobs, workflows).
+-> Integrate with Lambda, EC2, ECS tasks for auto-scaling workers.
+-> Failure handling with DLQ.
+
+Amazon Web Services – Simple Queue Service(SQS): Complete Setup,Pricing,Features:
+----------------------------------------------------------------------------------
+-> SQS enables web service applications that help to quickly and reliably queue messages. 
+-> These messages have one component in their application that generates only when to be consumed by another component. 
+-> herefore, the queue is a temporary repository for messages and these messages are awaiting processing. 
+-> So, Once these messages are processed, the messages also get deleted from the queue. 
+-> AWS SQS service basically adds messages in a queue and then, Users will pick up these messages from the queue. 
+-> A queue is a place where you can store your messages until they are extracted from the queue or expired.
+
+=========================================================
+🔑 Key Points to Remember:
+
+🚀 Standard (Simple) Queue:
+-> High throughput, best-effort ordering.
+-> Possible duplicates.
+-> Use when speed > ordering, and occasional duplicates are acceptable.
+✅ Example: Application logs, background tasks, bulk email notifications.
+
+🔒 FIFO Queue:
+-> Strict message order.
+-> Exactly-once processing, no duplicates.
+-> Use when order matters and duplicates are not acceptable.
+✅ Example: Bank transactions, e-commerce order processing, sequential workflows.
+
+⚙️ Quick Command to Create Each Type (AWS CLI):
+✅ Standard Queue:
+$$ aws sqs create-queue --queue-name MyStandardQueue
+
+✅ FIFO Queue:
+$$ aws sqs create-queue --queue-name MyFifoQueue.fifo \
+   --attributes FifoQueue=true
+
+✅ Summary Table:
+Aspect	    Standard Queue (Simple)	                   FIFO Queue
+Ordering	Not guaranteed	                    Guaranteed FIFO
+Duplicates	Possible duplicates	                No duplicates (exactly-once)
+Throughput	Nearly unlimited	                Limited (300 - 3,000 TPS)
+Use Case	High-speed, non-ordered tasks	    Ordered, critical, transactional tasks
+Cost	    Lower	                            Higher
+
+======================================================================================================
+➤ Crate queue:
+1. Standard
+2. FIFO
+
+➤ Configuration: Set the maximum message size, visibility to other consumers, and message retention.
+1. Visibility timeout: [Should be between 0 seconds and 12 hours (Set it in seconds, minutes and hours)]
+-> Visibility timeout sets the length of time that a message received from a queue (by one consumer) will not be visible to the other message consumers.
+ 
+
+2. Message retention period: [Should be between 1 minute and 14 days]
+-> It is the amount of time that Amazon SQS retains a message that does not get deleted. Amazon SQS automatically deletes messages that have been in a queue for more than the maximum message retention period. The default retention period is 4 days. The retention period has a range of 60 seconds to 1,209,600 seconds (14 days).
+
+3. Delivery delay: [Should be between 0 seconds and 15 minutes]
+-> If your consumers need additional time to process messages, you can delay each new message coming to the queue. The delivery delay is the amount of time to delay the first delivery of each message added to the queue. Any messages that you send to the queue remain invisible to consumers for the duration of the delay period. The default (minimum) delay for a queue is 0 seconds. The maximum is 15 minutes.
+-> For standard queues, the per-queue delay setting is not retroactive; changing the setting doesn't affect the delay of messages already in the queue.
+-> For FIFO queues, the per-queue delay setting is retroactive; changing the setting affects the delay of messages already in the queue.
+
+4. Maximum message size: [Should be between 1 KB and 256 KB]
+-> You can set the maximum message size for your queue. 
+-> The smallest supported message size is 1 byte (1 character). 
+-> The largest size is 262,144 bytes (256 KB). 
+-> To send messages larger than 256 KB, you can use the "Amazon SQS Extended Client Library" for Java (https://github.com/awslabs/amazon-sqs-java-extended-client-lib). This library allows you to send an Amazon SQS message that contains a reference to a message payload in Amazon S3. The maximum payload size is 2 GB.
+
+5. Receive message wait time: [Should be between 0 and 20 seconds]
+-> The receive message wait time is the maximum amount of time that polling will wait for messages to become available to receive. The minimum value is zero seconds and the maximum value is 20 seconds.
+
+
+➤ Encryption: Amazon SQS provides in-transit encryption by default. To add at-rest encryption to your queue, enable server-side encryption.
+1. Server-side encryption
+-- Disabled
+-- Enabled
+
+If Enabled:
+-> Encryption key type
+1. Amazon SQS key (SSE-SQS): An encryption key that Amazon SQS creates, manages, and uses for you.
+2. AWS Key Management Service key (SSE-KMS): An encryption key protected by AWS Key Management Service (AWS KMS).
+
+
+➤ Access policy: Define who can access your queue.
+1. Basic: Use simple criteria to define a basic access policy.
+2. Advanced: Use a JSON object to define an advanced access policy.
+
+1.1 Define who can send messages to the queue
+-- Only the queue owner: Only the owner of the queue can send messages to the queue.
+-- Only the specified AWS accounts, IAM users and roles: Only the specified AWS account IDs, IAM users and roles can send messages to the queue.
+
+1.2 Define who can receive messages from the queue
+-- Only the queue owner: Only the owner of the queue can receive messages from the queue.
+-- Only the specified AWS accounts, IAM users and roles: Only the specified AWS account IDs, IAM users and roles can receive messages from the queue.
+
+➤ Redrive allow policy - Optional
+-> Identify which source queues can use this queue as the dead-letter queue.
+a. Disabled
+b. Enabled
+
+-- Redrive policy:
+a. Allow all: Allow all source queues from the same account and in the same region to use this queue as the dead-letter queue
+b. By queue: Allow a list of source queues from the same account and in the same region to use this queue as the dead-letter queue
+c. Deny all: Deny all source queues from using this queue as the dead-letter queue
+-> Warning: If any source queues use "Deny all" queue as the dead-letter queue, all messages moved from the source queue to the dead-letter queue will fail.
+
+
+➤ Dead-letter queue - Optional 
+-> Send undeliverable messages to a dead-letter queue.
+a. Disabled
+b. Enabled: Choose queue : Maximum receives(1-100)
+
+➤ Tags
+key:value
+
+======================================================================================================
+
+1. AWS SQS Visibility Timeout
+-> There will be queue of messages or tasks which needs to be performed and if the consumer retrieves the message from the queue then it will not visible to the other consumers with in the stetted timer. 
+-> It will helps us to reduce the duplicting the messeges by which we can ensure that  a message is processed by only one consumer at a time.
+
+2. What Is The Advantage Of AWS SQS?
+-> Amazon SQS provides a locking mechanism for messages during processing, which allows multiple producers to send messages and multiple consumers to receive messages concurrently.
+
+3. What Is Simple Queue Service?
+-> A simple queue is a data structure that follows the first-in-first-out (FIFO) principle. 
+-> This means that the first element added to the queue is the first element to be removed. 
+-> Simple queues are often used to implement buffers and message queues.
+
+4. Can I track and monitor messages in Amazon SQS?
+-> Yes, Amazon SQS integrates with Amazon CloudWatch, allowing you to monitor various metrics such as queue length, message age, and more. 
+-> This helps you track performance and resolve issues.
+
+5. What are dead-letter queues in Amazon SQS?
+-> Dead-letter queues (DLQ) are used to capture messages that cannot be processed successfully after a certain number of attempts, helping to isolate problematic messages for later analysis.
+
+6. What is long polling in Amazon SQS?
+-> Long polling is a feature that allows the Amazon SQS queue to wait for a message to arrive instead of returning an empty response when the queue is empty. 
+-> This reduces the cost of polling and improves performance
+
+7. How does Amazon SQS handle message deduplication?
+-> In FIFO queues, Amazon SQS automatically deduplicates messages within a 5-minute window to prevent the same message from being processed more than once.
