@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: my-app
+spec:
+  hosts:
+  - my-app.default.svc.cluster.local
+  http:
+  - route:
+    - destination:
+        host: my-app
+        subset: v1
+      weight: 80
+    - destination:
+        host: my-app
+        subset: v2
+      weight: 20
+
+     
+      
+# ➡️ Explanation: Route 80% traffic to version v1, 20% to v2 — perfect for canary deployment.

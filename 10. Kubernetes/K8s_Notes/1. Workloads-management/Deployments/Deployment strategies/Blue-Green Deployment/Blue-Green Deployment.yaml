@@ -1,0 +1,105 @@
+
+# ✅ Step 1: Define Blue Deployment (Current Stable Version)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: my-app
+        version: blue
+    spec:
+      containers:
+      - name: my-app
+        image: nginx:1.21   # Stable production image
+        ports:
+        - containerPort: 80
+
+---
+# ✅ Step 2: Define Green Deployment (New Version to Test)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-green
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+      version: green
+  template:
+    metadata:
+      labels:
+        app: my-app
+        version: green
+    spec:
+      containers:
+      - name: my-app
+        image: nginx:1.24   # New version to test
+        ports:
+        - containerPort: 80
+
+---
+# ✅ Step 3: Define Service (Traffic Switch Mechanism)
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-service
+spec:
+  selector:
+    app: my-app
+    version: blue  # Currently pointing to blue (production)
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer  # Or ClusterIP/NodePort as per use case
+
+---
+
+# ✅ 🔁 Step 4: Switching Traffic from Blue to Green
+# ➡️ To switch traffic to Green, update only the selector in Service like this:
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-service
+spec:
+  selector:
+    app: my-app
+    version: green  # Now pointing to green
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer
+
+# Note: You don't need to delete or recreate the Service, just update the selector.
+
+---
+
+# ✅ Step 5: (Optional but Recommended) Health and Readiness Probes
+# To ensure only healthy pods get traffic, add readiness and liveness probes in both Deployments:
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: 80
+  initialDelaySeconds: 5
+  periodSeconds: 10
+livenessProbe:
+  httpGet:
+    path: /
+    port: 80
+  initialDelaySeconds: 15
+  periodSeconds: 20

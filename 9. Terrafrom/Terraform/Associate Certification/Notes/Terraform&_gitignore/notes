@@ -1,0 +1,15 @@
+depending on the environment, it is recommended to avoid commiting certain files to git
+
+Files to Ignore
+
+> .terraform    -> This file will be created when terraform init is run(depends on the provider, it's very large in size)
+
+> terraform.tfvars -> it may contain sesitive informations such as useranme/password
+
+> terraform.tfstate -> it should be stored in the remote side, it can also contain sensitive data 
+
+> crash.log     ->  if terraform crashes, the the logs are stored inside crash.log file 
+
+
+you can add all the above files to .gitignore file, so that it will be ignored while pushing to github
+

@@ -1,0 +1,78 @@
+name: CICD
+
+on:
+    push:
+      - 'main'
+    paths-ignore:
+      - '**.md'
+      - '**.txt'
+      - '**.jpg'
+      - '**.png'
+    tags-ignore:
+      - '**'
+
+#Run workflow manually for building and releasing on non-main brances such as development or hotfix branches.
+workflow_dispatch:
+    inputs:
+      buildType:
+        description: Type of build/release
+        required: true
+        type: choice
+        options: 
+        - dev
+        - hotfix
+
+jobs:
+  deploy:
+    runs-on: self-hosted runner
+    steps:
+        # Cehck out repo at latest commit
+        - name: Checkout Git Repo
+        uses: action/checkout@4
+
+        - uses: donry/paths-filter@v3.0.2
+        id: modified-files
+        with:
+            filters: |
+                botmanager:
+                    - 'bin/stacks/ProjectName-botmanager.ts'
+                director:
+                    - 'bin/stacks/ProjectName-director.ts'
+                security:
+                    - 'bin/stacks/ProjectName-security.ts
+                roles:
+                    - 'bin/stacks/ProjectName-rples.ts'
+                statemachine:
+                    - 'bin/stacks/ProjectName-statemachine.ts'
+                storage:
+                    - 'bin/stacks/ProjectName-storage.ts'
+                parameter:
+                    - 'bin/stacks/ProjectName-parameter.ts'
+                loadbalancer:
+                    - 'bin/stacks/ProjectName-loadbalancer.ts'
+                schedule:
+                    - 'bin/stacks/ProjectName-schedule.ts'
+        
+        -name: Setup CDK, Install dependencies and synth
+        env:
+            NODE_AUTH_TOKEN: ${{ secrets.Artifactory_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+            curl -u"${{ secrets.Artifactory_USER }}:$${{ secrets.Artifactory_TOKEN }}" https:link to access >> ~/.npmrc
+            npm install
+            npm install -g aws-cdk
+            cdk synth
+
+        -name: CDK Deploy for Storage Stck
+            if: ${{ steps.modified-files.outputs.storage == 'true' }}
+            env:
+               NODE_AUTH_TOKEN: ${{ secrets.Artifactory_TOKEN }}
+               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            shell: bash
+            run: |
+                cdk deploy projectCode-ProjectName-storage --required-approval never
+
+
+               
+

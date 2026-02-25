@@ -1,0 +1,34 @@
+
+
+Ways to run workflows\
+\
+CLI\
+GUI\
+API\
+
+in order to use CLI , you need to gernerate a token using the console and configure it with CLI\
+
+Workspace - 
+
+your resources are organized by workspaces, which contain your resource definitions, environment and input variables, and state files. A Terraform operation occurs within a workspace, and Terraform uses the configuration and state for that workspace to modify your infrastructure.
+
+Project - 
+
+Organization 
+
+Publishing a module\
+
+
+ Choose the repository that hosts your module source code. We'll watch this for commits and tags. The format of your repository name should be\'a0
+
+you need to publush a module\
+
+repo name shoulbe ne in thos format - 
+terraform-<PROVIDER>-<NAME>
+
+repo should have tags\
+
+module refference should be - 
+app.terraform.io/shyamjith/s3-module/cloud"
+
+

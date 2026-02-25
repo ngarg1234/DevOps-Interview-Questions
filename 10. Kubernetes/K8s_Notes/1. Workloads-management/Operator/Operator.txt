@@ -1,0 +1,87 @@
+1. What is a Kubernetes Operator?
+-> A Kubernetes Operator automates the deployment, scaling, and management of applications using Custom Resource Definitions (CRDs) and a Controller. 
+-> It extends Kubernetes functionality by introducing "Custom logic for application lifecycle management".
+-> Operators communicate with Kubernetes Master and Worker Nodes through the API Server, managing workloads on the cluster.
+
+-> Operators are mainly used for managing stateful applications like databases, message queues, and distributed systems, which require continuous monitoring and automation beyond simple deployments.
+
+-> Operators are only one of several controllers available in Kubernetes, and unlike the other "native" controllers, operators don't manage resources that are built into Kubernetes by default. That's why operators require custom resource definitions, or CRDs.
+
+----------------------------------------------------------------------
+✅  All Kubernetes controllers work by monitoring the actual state of a resource, comparing it to a desired state defined by an admin, and trying to make the actual state match the desired state. 
+
+✅ Operators do this by comparing a "Desired application deployment" to the "Actual state of the cluster", and then bringing the two states into alignment – which effectively deploys an application.
+✅ What makes operators unique from other Kubernetes controllers?
+->  Is that operators don't monitor any objects that are built into Kubernetes by default. Instead, they focus on custom resources.
+--------------------------------------------------------------------------
+
+** Kubernetes Operator vs. Helm vs. Controller
+
+1. Operator: For deploying or managing highly complex applications or resources.
+2. Helm: For deploying standard applications using packages.
+3. Deployment controller: For deploying standard applications that require just Pods and simple configuration parameters.
+
+✅ Operator samples:
+1. Istio, the open source service mesh.
+2. The Container Security Operator based on Project Quay, an open source container image scanner.
+3. Apache Spark, the open source clustered computing platform.
+4. An operator that integrates Kubernetes with Amazon CloudWatch for logging purposes.
+
+====================================================================================
+2. How Operators Work in Kubernetes?
+------------------------------------
+1. Define a CRD (Custom Resource Definition)
+-> This creates a new type of resource (e.g., Memcached, PostgresCluster).
+-> Example: After installing a Memcached Operator, you can create a Memcached resource.
+
+2. Deploy the Operator (Controller)
+-> The Operator (controller) watches for changes to the CRD objects.
+-> It is installed as a pod inside the cluster and runs in a Deployment.
+
+3. Controller Watches & Reconciles State
+-> The Operator continuously watches Kubernetes resources (CRD instances) via the API Server.
+-> If a user creates or modifies a Memcached resource, the Operator detects the change and adjusts the state.
+
+4. Communicates with Worker Nodes
+-> The Operator schedules and manages application instances (pods) on worker nodes through the Kubernetes Scheduler and Controller Manager.
+
+-- -- Note, however, that most people these days don't develop operators completely from scratch. Instead, they rely on toolkits or SDKs that help to automate the process, such as the Operator Framework.
+
+
+3. How Operators Communicate with Master & Worker Components?
+1. Master Node Components Interaction
+1.1 Kubernetes API Server
+-- Operators communicate with the cluster using the API Server.
+-- They use watch/list/get requests to monitor resources.
+
+1.2 Controller Manager & Scheduler
+-- The Operator doesn't schedule pods itself; it creates workloads (e.g., Deployments, StatefulSets), and Kubernetes' built-in scheduler places them on worker nodes.
+
+2. Worker Node Interaction
+-- The Kubelet on worker nodes ensures the created pods run correctly.
+-- If the Operator updates or scales resources, the API server informs Kubelet to apply the changes.
+
+
+4. Do We Need to Install CRDs and Operators Separately?
+-> Yes! Operators are not built into Kubernetes by default.
+-> To use an operator, you must:
+
+1. Install the CRD (Defines the new resource type)
+2. Deploy the Operator (Runs the logic to manage the resource)
+
+======================================================================================
+📌 Creating a Simple Custom Kubernetes Operator
+-> This example demonstrates a "Hello World" Operator that watches for a custom resource (HelloWorld) and logs messages when a resource is created.
+
+🔹 Steps to Build the Operator
+1. Define a CRD (Custom Resource Definition)
+2. Create the Operator Controller
+3. Deploy the Operator
+4. Create and manage custom resources
+
+
+
+
+
+
+

@@ -1,0 +1,76 @@
+** We have created Loadbalancer and attached to a target group which had 2 instances with nginx installed.
+
+But when we try to acces them using load balancer DNS, we were getting "502 BAD GATEWAY" error.
+
+When we connected one of EC2 and try to access server:
+curl http://localhost:80
+curl: (7) Failed to connect to localhost port 80 after 0 ms: Couldn't connect to server
+
+-> It means something is wrong with NGINX or port 80 isn't listening properly. Let's troubleshoot step by step to resolve this. 🚀
+
+✅ Step-by-Step Troubleshooting for NGINX Not Listening on Port 80
+
+1. ✅ Check if NGINX is Installed
+$$ nginx -v
+
+-> If NGINX is installed, this will show the version (e.g., nginx version: nginx/1.18.0).
+-> ❌ If command not found, NGINX is not installed — install it first:
+
+Amazon Linux 2:
+sudo amazon-linux-extras enable nginx1
+sudo yum install -y nginx
+
+
+2. ✅ Check if NGINX Service is Running
+$$ sudo systemctl status nginx
+- If active (running) → good.
+- If inactive or failed:
+
+sudo systemctl status nginx
+sudo systemctl enable nginx
+sudo systemctl status nginx
+sudo systemctl start nginx
+sudo systemctl status nginx
+curl http://localhost:80
+
+
+3. ✅ Check if NGINX is Listening on Port 80
+$$ sudo netstat -tulnp | grep 80
+or 
+$$ sudo ss -tulnp | grep 80
+
+-> You should see something like:
+tcp        0      0 0.0.0.0:80            0.0.0.0:*               LISTEN      <nginx-pid>/nginx
+❌ If no output, NGINX is not listening — check configuration next.
+
+
+4. ✅ Check NGINX Configuration for Port 80
+$$ sudo cat /etc/nginx/nginx.conf
+-> ➡️ You should see a listen 80; directive:
+
+5. ✅ Test NGINX Configuration Syntax
+Check if NGINX config is valid:
+$$ sudo nginx -t
+
+-> If successful, you will see:
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+
+6. ✅ Reload or Restart NGINX
+$$ sudo systemctl restart nginx
+
+7. ✅ Firewall & Security Group Check (if accessing externally)
+
+
+
+✅ Quick Checklist Summary:
+Checkpoint	                 Command / What to Do
+Is NGINX installed?	            nginx -v
+Is NGINX running?	            sudo systemctl status nginx
+Is NGINX listening on port 80?	`sudo netstat -tulnp
+Is configuration correct (listen 80)?	Check /etc/nginx/nginx.conf or site configs
+Is configuration valid?	        sudo nginx -t
+Restart NGINX	                sudo systemctl restart nginx
+Security Group allows port 80?	Check EC2 Security Group (AWS Console)
+Firewall on instance allows port 80?	sudo iptables -L or sudo ufw status (Ubuntu)

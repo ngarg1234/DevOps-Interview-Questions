@@ -1,0 +1,18 @@
+set contains unique elements
+
+eg:
+
+   demo_set = {"value1", "value2", "value3"}
+
+
+toset function
+
+toset function will convert a list into a set
+
+    suppose if your list contains duplicate element, it will remove it
+
+        example 
+
+                my_list = ["one","two", "one", "three"]
+
+                my_set =toset(my_list)   = {"one","two", "three"}

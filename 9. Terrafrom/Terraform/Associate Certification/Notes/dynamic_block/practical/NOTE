@@ -1,0 +1,9 @@
+
+
+if you don't specify a VPC  while creating SG using terraform, it will be attached to the deafult VPC 
+
+resource "aws_security_group" "before_dynamic_block" {
+    name = "sample_sg2"
+}
+
+the SG, sample_sg2 will be attached to the default VPC

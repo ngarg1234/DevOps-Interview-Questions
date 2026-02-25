@@ -1,0 +1,94 @@
+🔰 Basic Ansible Interview Questions
+What is Ansible?
+
+Ansible is an open-source IT automation tool used for configuration management, application deployment, task automation, and orchestration.
+
+How does Ansible work?
+
+Ansible uses SSH to connect to remote machines and pushes configuration or tasks defined in YAML playbooks. It is agentless.
+
+What is a playbook in Ansible?
+
+A playbook is a YAML file that contains one or more plays, which define automation across a set of hosts.
+
+What is an inventory file in Ansible?
+
+It is a file where the hosts or groups of hosts are defined. It can be in INI or YAML format.
+
+What is the difference between a playbook and a role?
+
+A playbook is a list of tasks executed on hosts. A role is a way to organize playbooks and other files into reusable components.
+
+⚙️ Intermediate Questions
+How do you handle secrets in Ansible?
+
+Using Ansible Vault to encrypt sensitive data like passwords, API tokens, etc.
+
+What are Ansible modules?
+
+Modules are standalone scripts used by Ansible to perform specific tasks like installing packages, copying files, or restarting services.
+
+What are facts in Ansible?
+
+Facts are system properties collected by Ansible from managed nodes using the setup module.
+
+How can you run only one task from a playbook?
+
+Use the --start-at-task="task name" flag with ansible-playbook command.
+
+What are handlers in Ansible?
+
+Handlers are special tasks that run only when notified by other tasks using notify. Useful for restarting services after configuration changes.
+
+🔄 Advanced / Real-World Questions
+How do you perform idempotent operations in Ansible?
+
+Ansible modules are designed to be idempotent. Custom scripts should also ensure they don’t change system state if it’s already as desired.
+
+How to include one playbook inside another?
+
+Use import_playbook or include directives.
+
+What’s the difference between include_tasks and import_tasks?
+
+include_tasks is dynamic and evaluated during runtime. import_tasks is static and evaluated at playbook parsing time.
+
+How do you limit execution to a specific host or group?
+
+Use the --limit flag:
+ansible-playbook playbook.yml --limit hostname
+
+Explain the use of when, tags, and register in Ansible.
+
+when: conditional execution
+
+tags: run specific parts of the playbook
+
+register: store the result of a task for use later in the playbook
+
+🧠 Scenario-Based Questions
+How do you manage different environments (dev, stage, prod)?
+
+Use separate inventory files, group_vars directories, or dynamic inventories and roles with different variable files.
+
+What is a dynamic inventory in Ansible?
+
+Inventory sourced from external systems (e.g., AWS EC2, Azure, GCP) using dynamic inventory scripts or plugins.
+
+How do you handle failed tasks and retries in Ansible?
+
+Use retries, delay, and until to retry failed tasks:
+
+yaml
+Copy
+Edit
+retries: 3
+delay: 5
+until: result.stdout == "success"
+What is Ansible Galaxy?
+
+A community hub for finding and sharing Ansible roles and collections.
+
+What are collections in Ansible?
+
+A packaging format that includes roles, modules, and plugins bundled together.

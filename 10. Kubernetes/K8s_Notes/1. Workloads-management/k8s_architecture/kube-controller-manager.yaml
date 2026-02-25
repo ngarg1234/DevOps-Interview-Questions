@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kube-controller-manager
+  namespace: kube-system
+  labels:
+    component: kube-controller-manager
+    tier: control-plane
+spec:
+  containers:
+    - name: kube-controller-manager
+      image: k8s.gcr.io/kube-controller-manager:v1.21.0
+      command:
+        - kube-controller-manager
+        - --kubeconfig=/etc/kubernetes/controller-manager.conf
+        - --leader-elect=true
+        - --use-service-account-credentials=true
+        - --controllers=*  # Optional: Configure the controllers you want to enable
+        - --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt
+        - --cluster-signing-key-file=/etc/kubernetes/pki/ca.key
+        - --bind-address=0.0.0.0
+        - --secure-port=10257
+        - --port=10252
+        - --authentication-kubeconfig=/etc/kubernetes/controller-manager.conf
+        - --authorization-kubeconfig=/etc/kubernetes/controller-manager.conf
+        - --leader-elect-resource-lock=configmaps
+        - --leader-elect-lease-duration=15s
+        - --leader-elect-renew-deadline=10s
+        - --leader-elect-retry-period=2s
+        - --v=2
+      volumeMounts:
+        - mountPath: /etc/kubernetes/pki
+          name: certs
+        - mountPath: /etc/kubernetes/controller-manager.conf
+          name: kubeconfig
+          subPath: controller-manager.conf
+  volumes:
+    - name: certs
+      hostPath:
+        path: /etc/kubernetes/pki
+        type: DirectoryOrCreate
+    - name: kubeconfig
+      hostPath:
+        path: /etc/kubernetes/controller-manager.conf
+        type: FileOrCreate

@@ -1,0 +1,8 @@
+✅ 1. What is a ConfigMap?
+-> ConfigMap is used to store non-sensitive, plain-text configuration data in key-value pairs.
+Example: App configuration, environment variables, command-line arguments.
+
+
+🔑 Use-cases:
+-> Externalize app configs without rebuilding images.
+-> Pass app settings via environment variables or files/volumes.

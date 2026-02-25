@@ -1,0 +1,214 @@
+In Kubernetes, liveness probes, readiness probes, and startup probes are used to monitor the health of Pods and determine whether they are running properly. These probes are configured within the Pod specification and help ensure that your application is working correctly by performing checks on the running containers.
+
+Here’s a breakdown of each probe, what it does, and how to define them in a Pod's configuration.
+
+1. Liveness Probe
+-> The liveness probe checks if your application is still alive and running. If the liveness probe fails, Kubernetes will automatically restart the container.
+
+2. Readiness Probe
+-> The readiness probe checks if your application is ready to serve traffic. If the readiness probe fails, the Pod will be removed from the service's endpoints until it is ready again.
+
+3. Startup Probe
+-> The startup probe is used to check if the application within the container has started properly. If the startup probe fails, the container will be restarted. This probe is particularly useful for applications that have a long initialization period.
+
+Explanation of Each Probe's Properties:
+Liveness Probe:
+httpGet: Defines the HTTP request that will be sent to the container for the health check. You can use other types such as tcpSocket or exec based on your needs.
+path: The HTTP path to check.
+port: The port to check the health on.
+initialDelaySeconds: How long to wait before starting to check the liveness (i.e., after the container starts).
+periodSeconds: How often to perform the health check.
+timeoutSeconds: The number of seconds to wait for a response from the probe before considering it failed.
+successThreshold: The number of successful probe responses required to be considered successful.
+failureThreshold: The number of failed attempts before the container is restarted.
+Readiness Probe:
+httpGet: Defines the HTTP request that will be sent to the container to check if it's ready to serve traffic.
+initialDelaySeconds: The time to wait after the container starts before the first readiness check.
+periodSeconds: How frequently to check the readiness status.
+timeoutSeconds: The number of seconds the probe will wait for a response.
+successThreshold: The number of successful checks required for the Pod to be considered "ready."
+failureThreshold: The number of failed checks after which the Pod will be marked as "not ready."
+Startup Probe:
+httpGet: Similar to the liveness and readiness probes, but used for startup checking. Can be replaced with exec or tcpSocket.
+initialDelaySeconds: The initial delay to wait before starting the probe after the container starts.
+periodSeconds: How frequently to check the startup status.
+timeoutSeconds: The number of seconds to wait for the response.
+failureThreshold: The number of failures that will trigger a restart of the container.
+
+
+Self Healing Applications
+-------------------------
+-> Kubernetes supports self-healing applications through ReplicaSets and Replication Controllers. 
+-> The replication controller helps ensure that a POD is re-created automatically when the application within the POD crashes. 
+-> It helps in ensuring enough replicas of the application are running at all times.
+
+-> Kubernetes provides additional support to check the health of applications running within PODs and take necessary actions through Liveness and Readiness Probes.
+
+Pod Probes: 
+-----------
+-> Probes are used to obtain the health of an application running inside a pod's container.
+-> Probes can perform periodic call to some application endpoint within a container which can track the success or failure of application periodically.
+-> When subsequent fails occur some user defend triggers can be done with probes.
+	
+	Advantages of probes 
+		- Enable zero downtime deployments.
+		- Prevent deployment of broken images.
+		- Ensure that failed container are automatically restarted.
+		- Can add a delay in starting the application.
+
+
+** Types of probes:
+
+1. Startup Probe: (initial start of container, gives min startuptime, adopt liveness checks on slow starting containers, avoiding them getting killed by the kubelet)
+
+-> This probe will run at the initial start of the container and gives a minimum startup time before running the another probes (liveness, rediness).	
+-> Startup probe is the first probe which will be executed among other probes. 
+-> This can be used to adopt liveness checks on slow starting containers, avoiding them getting killed by the kubelet before they are up and running.
+-> If start up probe succeeds then liveness & readiness will be executed.  
+-> It fine tunes the dependencies.
+	
+	ports:
+		- name:liveness-port
+		containerPort:8080
+		hostPort:8080
+		
+	livenessProbe:
+		httpGet:
+			path:/healthz
+			port:liveness-port
+		failureThreshold:1
+		periodSeconds:10
+
+	startupProbe:
+		httpGet:
+			path:/healthz
+			port:liveness-port
+		failureThreshold:30
+		periodSeconds:10
+
+
+
+2. Liveness Probe: (Health of application, if a container is still running and responsive, if it fails container will be restarted)
+
+-> A Liveness Probe in Kubernetes checks if a container is still running and responsive. If the liveness probe fails, Kubernetes automatically restarts the container.
+-> The liveness Probe is used to determine the health of the application running inside the pod.
+-> If liveness Probe fails the container will be restarted.
+-> Ex: Due to some reason like memory leaks in application or due to high CPU/RAM usage the application is not responding to our requests, Then in this situation liveness Probe will fail and it will restart the pod.
+-> we can define liveness Probe with 3 endpoints 
+	
+		livenessProbe:
+			httpGet:
+				path: /test
+				port: 8080 
+			initialDelaySeconds: 5
+			timeoutSeconds: 2 
+			periodSeconds: 4
+
+		livenessProbe:
+			tcpSocket:
+				port: 8080 
+			initialDelaySeconds: 5
+			timeoutSeconds: 10 
+			periodSeconds: 4
+			successThreshold: 5
+			failuerThreshold: 3
+		
+		Name port: 	
+			ports: 
+				- name: line-port	
+				  conateinerPort: 8080
+				  hostPost: 8080
+				  
+			livenessProbe:
+				httpGet:
+					path: /test
+					port: line-port
+
+** initialDelaySeconds: After the container started the number of seconds to wait before triggering the probe.	
+** timeoutSeconds: Number of seconds after which the probe times out - default/minimun 1 second 
+** periodSeconds: How frequently to perform the probe. Default value is 1 second.
+** successThreshold: minimum consecutive successes for probe to be considered successful after having failed.
+** failureThreshold: no. of times probe tries before giving up/restarting (liveness & startup) or marking as Unready 
+		
+
+
+3. Readiness Probe: (appn is ready to accept traffic, when this prob fails traffic will be halted to this pod and when successful the load balancer traffic is allowed to this pod )
+
+-> A Readiness Probe is used to determine if a application is in a ready state to accept the traffic.
+-> When this probe fails traffic will be halted to this pod and when successful the load balancer traffic is allowed to this pod.	  
+	  
+	- Sometimes, applications are temporarily unable to serve traffic. 
+	  For example, an application might need to load large data or 
+	  configuration files during startup or depend on external services 
+	  after startup. In such cases, you don’t want to kill the application,
+	  but you don’t want to send it requests either
+	  
+	- Readiness and liveness probes can be used in parallel for the same container. 
+	  Using both can ensure that traffic does not reach a container that is not 
+	  ready for it, and the containers are restarted when they fail.
+		
+	- Readiness probe can be defines wtith 3 endpoints same as livenessProbe.	
+		
+Type of probes endpoint: 
+1. HTTP/HTTPS endpoint (httpGet)
+	- For successful replay we need to get 2XX series replay
+	- For failure we need to get 4XX or 5XX http error. 
+	- the kubelet sends an HTTP GET request to the server that is running in the container and listening on port 8080.   
+	- If the handler for the server's /healthz path returns a success code, the kubelet considers the container to be alive and healthy. 	  
+	- If the handler returns a failure code, the kubelet kills the container and restarts it.
+			
+		HTTP probes fields
+			livenessProbe:
+				httpGet: 
+					path: /mail/u/0/#inbox
+					port: 8080
+					host: localhost
+		host: Host name to connect, the default will be IP of pod.
+		path: Path to access on the HTTP server/host.
+		port: the port to access on the container.
+		
+2. TCP endpoints 		
+-> In this case kubelet will try to open a tcp socket the port in the container and it will check whether the applicaiton is accessable on that port.
+-> For successful replay we need to get 2XX series replay	
+		livenessProbe:
+			tcpSocket:
+			port: 9090
+		
+3. EXEC commands		
+-> Run a shell command, on execution in pod’s shell context and considered failed if the execution returns any result code different from 0 (zero).
+			  
+		livenessProbe:
+			exec:
+				command:
+					- cat 
+					- /etc/temp
+			
+
+Type of http status codes 
+1. Informational responses ( 100 – 199 ): don't indicate an error. You don't need to troubleshoot these errors.
+-> server has received the request and is continuing to process it, about the progress of the request.
+
+2. Successful responses ( 200 – 299 ): no troubleshooting, 
+-> the server has successfully processed the request and sent a valid response back to the client.
+
+3. Redirects ( 300 – 399): make sure that the endpoint that the probe is trying to access is correct and that there are no issues with the DNS.
+
+4. Client errors ( 400 – 499 ): indicate that the client has made a mistake in the request.
+-> Check the logs of the container to determine the cause of the error.
+-> $$ kubectl logs my-pod my-container --since=5m   (logs of my-container in my-pod from last 5min )
+-> Make sure that the probe is configured correctly and that the container is listening on the correct port.
+-> 404 Not Found: the requested resource was not found on the server. This can occur if 
+   the client sends a request for a resource that does not exist or is not accessible.
+-> 401 Unauthorized (client needs to authenticate itself ), 403 Forbidden (client does not have permission to access the resource).
+
+5. Server errors ( 500 – 599 ):  indicate that the server was unable to fulfill the request due to an error on the server side.
+-> Check the logs of the container to determine the cause of the error. (kubectl logs my-pod my-container --since=5m)
+-> Make sure that the container is running and that there are no issues with the container's dependencies.
+-> server is not responding, permission error, entire appn is crashed all servers are not workng, permission 
+   issue wit firewall, debug these errors, memory exceeded this type of error is coming,delete cookies.
+-> 500 Internal Server Error, which indicates that an unexpected error occurred on the server while processing the request. 
+   This can occur if there is a bug in the server code, or if there is an issue with the server's infrastructure.
+-> 503 Service Unavailable, which indicates that the server is temporarily unable to handle the request due to high traffic or maintenance. This can occur if the server is overloaded or if it is undergoing maintenance.   
+-> 502 Bad Gateway, which indicates that there was an issue with a gateway or proxy server.
+-> 504 Gateway Timeout, which indicates that a gateway or proxy server did not receive a timely response from an upstream server.
+

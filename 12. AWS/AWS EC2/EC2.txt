@@ -1,0 +1,31 @@
+EC2 Placement Groups in AWS
+EC2 Placement Groups help optimize the placement of instances for low latency, high throughput, or fault tolerance. AWS provides different placement strategies based on workload requirements.
+
+Types of EC2 Placement Groups:
+Cluster Placement Group
+
+Instances are placed close together in a single Availability Zone (AZ).
+Used for low-latency, high-bandwidth applications (e.g., HPC, big data, ML workloads).
+Best for: Workloads requiring high network performance.
+Risk: If the AZ fails, all instances may be impacted.
+
+Spread Placement Group
+
+Instances are placed across multiple hardware racks in different AZs.
+Provides high availability and fault tolerance (max 7 instances per AZ).
+Best for: Critical applications requiring isolation (e.g., database nodes, HA services).
+Risk: Higher latency compared to Cluster Placement Groups.
+
+Partition Placement Group
+
+Instances are divided into partitions across multiple AZs (up to 7 partitions).
+Each partition runs on separate racks with dedicated networking and power.
+Best for: Large-scale distributed applications like Hadoop, Kafka, Cassandra.
+Risk: If a single partition fails, other partitions remain unaffected.
+Key Considerations:
+Cluster PG: High-speed networking (10 Gbps+).
+Spread PG: Good for fault tolerance, but limited to 7 instances per AZ.
+Partition PG: Best for large distributed applications.
+Cannot move instances between placement groups; must be stopped and relaunched.
+
+Would you like examples of how to create and use them in AWS CLI/Terraform? 🚀

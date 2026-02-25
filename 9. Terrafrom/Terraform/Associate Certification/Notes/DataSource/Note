@@ -1,0 +1,65 @@
+Data sources allow Terraform to use information defined outside of Terraform, defined by another separate Terraform configuration, 
+or modified by functions.
+
+
+A data source is accessed via a special kind of resource known as a data resource, declared using a data block:
+
+
+
+data "aws_ami" "example" {
+  executable_users = ["self"]
+  most_recent      = true
+  name_regex       = "^myami-\\d{3}"
+  owners           = ["self"]
+
+  filter {
+    name   = "name"
+    values = ["myami-*"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+=============================================
+
+Owner
+
+In the context of the Terraform aws_ami data source, the owners attribute is used to filter Amazon Machine Images (AMIs) based on the AWS accounts that own them. Each AMI is associated with an owner, which is typically the AWS account that published or created the AMI.
+
+In the example provided:
+
+owners = ["099720109477"]  # Canonical
+The value ["099720109477"] specifies that we are interested in AMIs owned by the AWS account with the ID "099720109477". This ID corresponds to Canonical Ltd., the company that produces and maintains the official Ubuntu images in AWS.
+
+=============================================
+
+filters example
+
+
+data "aws_ami" "app" {
+  most_recent = true
+ 
+  filter {
+    name   = "state"
+    values = ["available"]
+  }
+ 
+  filter {
+    name   = "tag:Project"
+    values = ["cloudcasts"]
+  }
+
+  filter {
+    name   = "name"
+    values = ["cloudcast-staging-*-app"]
+  }
+ 
+  owners = ["self"]
+}

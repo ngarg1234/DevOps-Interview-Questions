@@ -1,0 +1,159 @@
+name: StateMachine
+run-name: ${{ inputs.operation-type }} operation on director ${{ inputs.director-number }} with ${{ inputs.number-of-machines }} machines by ${{ github.actor }}
+on:
+  workflow_dispatch:
+    inputs:
+      director-number:
+        description: 'Automai Director Instance Number'
+        required: true
+        type: choice
+        options: ['1', '2', '3', '4']
+      operation-type:
+        description: 'Operation Type'
+        required: true
+        type: choice
+        options: ['botmanager-asg-desired', 'rloader-counts-by-host', 'shutdown-x-machines-in-botmanager-asg','shutdown-all-machines-in-botmanager-asg', 'wakeup-x-machines-in-botmanager-asg', 'wakeup-all-machines-in-botmanager-asg', 'botmanager-terminate-all', 'replace-botmanagers', 'copy-botmanager-logs', 'stop-director','start-director','stop-and-start-director','restart-director-services', 'measure-director-data-size', 'copy-director-logs',  'copy-botmanager-mp4Files-S3']
+      number-of-machines:
+        description: 'Number of Machines to Scale Up or Scale Down or Warm Pool or ShutDown X BotManagers, Wake Up X BotManagers. Leave Blank for other operations'
+        required: false
+        default: '0'
+      hostnames:
+        description: 'hostnames to replace - comma seperated, leave blank for other operations'
+        required: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.state-machine.outputs.size_file_name }}
+      output2: ${{ steps.state-machine.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set environment variables
+        id: vars
+        run: |
+          if [[ "${{ github.event.inputs.director-number }}" == "4" ]]; then
+            echo "number_of_rloaders=25" >> "$GITHUB_ENV"
+          else
+            echo "number_of_rloaders=100" >> "$GITHUB_ENV"
+          fi;
+      - name: environment variables
+        env: 
+          GH_TOKEN: ${{ secrets.RameshDN_GH_PAT }}
+          RLOADER_DELAY: 5
+        shell: bash
+        run: |
+          gh variable set NO_OF_RLOADERS -b "$number_of_rloaders" -e director-${{ github.event.inputs.director-number }}
+          gh variable set RLOADER_DELAY -b ${{ env.RLOADER_DELAY }} -e director-${{ github.event.inputs.director-number }}
+ 
+      - name: Run reusable github action for State Machine
+        uses: ./.github/actions/state-machine
+        id: state-machine
+        with: 
+          director-number: ${{ github.event.inputs.director-number }}
+          operation-type: ${{ github.event.inputs.operation-type }}
+          number-of-machines: ${{ github.event.inputs.number-of-machines }}
+          hostnames: ${{ github.event.inputs.hostnames }}
+          ms-teams-hook: ${{ secrets.AWSInstance_WORKING_GROUP }}
+          aws-access-key-id: ${{ secrets.ProjectCode_ROBOT_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.ProjectCode9_ROBOT_AWS_SECRET_ACCESS_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+ 
+  artifacts:
+    needs: build
+    if: success() && ( ${{ inputs.operation-type == 'copy-director-logs' || inputs.operation-type == 'copy-botmanager-logs' }} )
+    runs-on: codebuild-atpa_automai-virtual-office-scenarios-${{ github.run_id }}-${{ github.run_attempt }}-ubuntu-7.0-2xlarge
+    steps:
+      - name: print output
+        id: output
+        env:
+          S3_BUCKET: "s3://ProjectCode9-automai-director-logs"
+        if: ${{ inputs.operation-type == 'measure-director-data-size' }}
+        shell: bash
+        run: |
+          director_name="director-${{ inputs.director-number }}"
+          size_file_name="director-data-size-${{ github.run_id }}.txt"
+          echo $size_file_name
+          echo $director_name
+          aws s3 cp "${{ env.S3_BUCKET }}/$director_name/size/$size_file_name" ./size.txt
+          SIZE=$(cat size.txt)
+          echo "$SIZE" >> $GITHUB_STEP_SUMMARY
+ 
+      - name: zip botmanager logs
+        id: botmanager-logs
+        env:
+          S3_BUCKET: "s3://ProjectCode9-automai-botmanager-logs"
+        if: ${{ inputs.operation-type == 'copy-botmanager-logs' }}
+        shell: bash
+        run: |
+          director_name="director-${{ inputs.director-number }}"
+          mkdir logs
+          date=$(date +"%Y-%m-%d")
+          echo $date
+          echo $director_name
+          aws s3 cp "${{ env.S3_BUCKET }}/$date/$director_name/zip_${{ github.run_id }}/botmanager-logs.zip" botmanager-logs.zip
+      - uses: actions/upload-artifact@v4
+        id: upload-botmanager-logs
+        if: ${{ inputs.operation-type == 'copy-botmanager-logs' }}
+        with:
+          name: botmanager-logs
+          path: botmanager-logs.zip
+      - name: zip director logs
+        id: director-logs
+        env:
+          S3_BUCKET: "s3://ProjectCode9-automai-director-logs"
+        if: ${{ inputs.operation-type == 'copy-director-logs' }}
+        shell: bash
+        run: |
+          director_name="director-${{ inputs.director-number }}"
+          date=$(date +"%Y-%m-%d")
+          echo $date
+          echo $director_name
+          mkdir logs
+          aws s3 cp "${{ env.S3_BUCKET }}/$date/$director_name/zip_${{ github.run_id }}/director-logs.zip" director-logs.zip
+      - uses: actions/upload-artifact@v4
+        id: upload-director-logs
+        if: ${{ inputs.operation-type == 'copy-director-logs' }}
+        with:
+          name: director-logs
+          path: director-logs.zip
+      - name: update job summary success
+        if: success()
+        shell: bash
+        run: |
+          echo "Operation ${{ inputs.operation-type }} is been successfully :white_check_mark: performed on Lab ${{ inputs.director-number }}" >> $GITHUB_STEP_SUMMARY
+      - name: update job summary failures
+        if: failure()
+        shell: bash
+        run: |
+          echo "Failed :x: to perform Operation ${{ inputs.operation-type }} on Lab ${{ inputs.director-number }}" >> $GITHUB_STEP_SUMMARY
+      - name: update job summary uploaded file
+        if: ${{ inputs.operation-type == 'rloader-counts-by-host' }}
+        shell: bash
+        env:
+          S3_BUCKET: "s3://ProjectCode9-automai-director-logs"
+        run: |
+          director_name="director-${{ inputs.director-number }}"
+          mkdir logs
+          date=$(date +"%Y-%m-%d")
+          echo $date
+          aws s3 cp "${{ env.S3_BUCKET }}/$director_name/rloader-counts-by-host/hosts_${{ github.run_id }}.md" hosts_${{ github.run_id }}.md
+          cat "hosts_${{ github.run_id }}.md" >> $GITHUB_STEP_SUMMARY
+      - name: update job summary uploaded file
+        if: ${{ inputs.operation-type == 'copy-director-logs' || inputs.operation-type == 'copy-botmanager-logs' }}
+        shell: bash
+        env: 
+          GH_TOKEN: ${{ inputs.github-token }}
+        run: |
+          if [ "${{ inputs.operation-type }}" == "copy-director-logs" ]; then
+            ARTIFACT_ID=${{ steps.upload-director-logs.outputs.artifact-id }}
+          elif [ "${{ inputs.operation-type }}" == "copy-botmanager-logs" ]; then
+            ARTIFACT_ID=${{ steps.upload-botmanager-logs.outputs.artifact-id }}
+          fi;
+          ARTIFACT_API_REPONSE=$(curl -X GET \
+                                -H "Accept: application/vnd.github+json" \
+                                -H "Authorization: Bearer $GH_TOKEN" \
+                                -H "X-GitHub-Api-Version: 2022-11-28" \
+# https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID)
+#           ARTIFACT_DOWNLOAD_URL=$(echo $ARTIFACT_API_REPONSE | jq -r '.archive_download_url')
+#           echo "Artifact download url for operation ${{ inputs.operation-type }} on Lab ${{ inputs.director-number }}: [Click Here to Download]($ARTIFACT_DOWNLOAD_URL)" >> $GITHUB_STEP_SUMMARY
+# has context menu

@@ -1,0 +1,9 @@
+There are 4 arguments available within the lifecycle block
+
+        ingnore_changes -> ignore the manual changes made to the live resource
+
+        create_before_destroy -> New replacement object is created first and then prior object is destroyed 
+
+        prevent_destroy  -> it prevents the destroyment of a resouce
+
+        replace_triggered_by -> replace the resources when any of the referenced items change

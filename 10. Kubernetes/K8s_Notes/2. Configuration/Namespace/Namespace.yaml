@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-resources-quota
+  namespace: my-namespace
+spec:
+  hard:
+    requests.cpu: "4"           # Limit the total CPU requested to 4 CPUs
+    requests.memory: "8Gi"       # Limit the total memory requested to 8Gi
+    limits.cpu: "8"             # Limit the total CPU limit to 8 CPUs
+    limits.memory: "16Gi"       # Limit the total memory limit to 16Gi
+    pods: "10"                  # Limit the total number of Pods in the namespace to 10
+    services: "5"               # Limit the total number of Services to 5
+    persistentvolumeclaims: "5" # Limit the total number of PersistentVolumeClaims to 5
+    configmaps: "10"            # Limit the total number of ConfigMaps to 10
+    secrets: "10"               # Limit the total number of Secrets to 10

@@ -1,0 +1,70 @@
+you can have the following options as the module source 
+
+> local path
+> terraform registry
+> github
+> bitbucket
+> S3 bucket
+> GCS Buckets
+> HTTP URLs
+
+=============================================================
+
+local path example
+
+module "local_path"{
+    source = "../example_path"
+}
+=============================================================
+
+terraform registry example
+
+module "terraform_registry_source"{
+    source = "terraform-aws-modules/ec2-instance/aws"
+}
+
+=============================================================
+github
+
+module "consul" {
+  source = "github.com/hashicorp/example"
+}
+
+module "consul" {
+  source = "git@github.com:hashicorp/example.git"
+}
+
+Generic Git Repository
+
+
+module "vpc" {
+  source = "git::https://example.com/vpc.git"
+}
+
+module "storage" {
+  source = "git::ssh://username@example.com/storage.git"
+}
+
+=============================================================
+
+referring to a specific git branch
+
+
+module "vpc" {
+  source = "git::https://example.com/vpc.git?ref=develop"
+}
+
+
+
+=============================================================
+
+module "consul" {
+  source = "bitbucket.org/hashicorp/terraform-consul-aws"
+}
+
+=============================================================
+
+module "consul" {
+  source = "s3::https://s3-eu-west-1.amazonaws.com/examplecorp-terraform-modules/vpc.zip"
+}
+

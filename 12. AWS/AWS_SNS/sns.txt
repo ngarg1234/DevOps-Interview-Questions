@@ -1,0 +1,42 @@
+-> Amazon Web Services Simple Notification Service (AWS SNS) is a web service that automates the process of sending notifications to the subscribers attached to it. 
+-> SNS provides this service to both application-to-person and application-to-application. 
+-> It uses the publishers/subscribers paradigm for the push and delivery of messages. 
+-> The data loss is prevented by storing the data across multiple availability zones. 
+-> It is cost-efficient and provides low-cost infrastructure, especially for mobile users.
+-> It sends the notifications through SMS or email to an Amazon Simple Queue Service (SQS), AWS lambda functions, or an HTTP endpoint. 
+-> When the CPU utilization of an instance goes above 80%, the AWS cloudwatch alarm is triggered. 
+-> This cloudwatch alarm activates the SNS topic hence notifying the subscribers about the high CPU utilization of the instance. 
+-> SNS service has a topic that has a unique name. It acts as a logical access point and a communication channel between publishers and subscribers. 
+
+Use cases Of (AWS) Amazon Simple Notification Services (SNS)
+Decoupling microservices and distributed systems: SNS is mostly to decouple microservices and distributed systems by providing that will allow them to communicate with each other asynchronously. Helps in improving the scalability and reliability of the systems.
+Sending notifications to users: SNS can be used to send notifications to users about events that occur in your applications. For example, you can use SNS to send users notifications when they receive a new message, when their account is updated, or when an event occurs that they have subscribed to.
+Sending alerts to operators: SNS can be used to send alerts to operators about problems that occur in your applications. For example, you can use SNS to send operators alerts when a server goes down or when an error occurs.
+Building serverless applications: SNS can be used to build serverless applications by providing a way for them to communicate with each other and to send and receive notifications.
+
+Amazon Simple Notification Service (SNS) Publishers And Subscribers
+1. Publishers: Initiating Communication
+They communicate with subscribers asynchronously by producing and sending a message to a topic (i.e. a logical access point and communication channel). They do not include a specific destination (e.g. – email ID) in each message instead, send a message to the topic. They only send messages to topics they have permission to publish. They simply publish messages to an SNS topic, and Amazon SNS handles the distribution to the appropriate subscribers.
+
+Topic: The topic acts as a communication channel that publishers send messages to.
+Seamless Distribution: Publishers can produce messages asynchronously without worrying about where or how the message is delivered.
+Examples of Publishers: Microservices, EC2 instances, or application components that need to send real-time updates or notifications.
+2.Subscribers:Receiving and Acting on Messages
+Subscribers like web servers, email addresses, Amazon SQS queues, and AWS Lambda functions receive the notification over one of the supported protocols like Amazon SQS, HTTP/S, email, SMS, Lambda) when they are subscribed to the topic. Amazon SNS matches the topic to a list of subscribers who have subscribed to that topic and delivers the message to each of those subscribers. Amazon SNS categorized into Application-to-application (A2A) or Application-to-person (A2P) subscribers.
+
+A2A Subscribers: These are services like Amazon SQS, AWS Lambda, and HTTPS endpoints that subscribe to a topic and process incoming messages automatically.
+Amazon SQS: Acts as a message queue, enabling decoupled and durable message storage.
+AWS Lambda: Processes events in real-time, executing code based on incoming messages.
+HTTPS: Web servers or services that receive messages through HTTP/S endpoints.
+A2P Subscribers: These include individual users who receive notifications via email, SMS, or push notifications.
+Email: Sends notifications via email to subscribers.
+Mobile text (SMS): Sends text alerts directly to users.
+Mobile push: Pushes notifications to mobile devices.
+
+🔑 What is a Subscription Filter in SNS?
+SNS subscription filter allows filtering messages based on attributes, so only relevant messages are delivered to a particular subscriber.
+It lets you control which subscribers get which messages, reducing unnecessary message processing.
+✅ How It Works:
+Publisher sends a message to an SNS Topic and includes message attributes.
+Subscribers (e.g., SQS, Lambda, Email) define filter policies based on those attributes.
+SNS only delivers messages that match the filter policy to that subscriber.

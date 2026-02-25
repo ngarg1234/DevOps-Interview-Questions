@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-read-pods-binding
+subjects:
+- kind: ServiceAccount
+  name: my-service-account         # Name of ServiceAccount
+  namespace: my-namespace 
+- kind: User
+  name: alice          # User to bind
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: pod-reader     # ClusterRole defined above
+  apiGroup: rbac.authorization.k8s.io

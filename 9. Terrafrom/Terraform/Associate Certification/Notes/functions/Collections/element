@@ -1,0 +1,10 @@
+element() finction return a element of a list based on the index provided 
+
+element(list_name, index)
+
+
+variable "mylist" {
+    default = ["one", "two", "three"]
+}
+
+element(var.mylist, 2) => o/p = three

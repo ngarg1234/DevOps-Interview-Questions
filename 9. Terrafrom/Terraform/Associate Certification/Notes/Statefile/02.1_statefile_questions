@@ -1,0 +1,12 @@
+What if i delete the statefile
+
+When you delete the resource from statefile and resource is present on the cloud
+
+        ANS: terraform plan will show 1 to add but when you run terraform apply, it will throw error saying resource with the same name already exists
+        in this case, you have to import the resource to your statefile
+
+when the resource info is present inside statefile, but resource is not present on the cloud
+
+    ANS: plan will show 1 to add and inn the terraform apply, it will create the resource 
+
+

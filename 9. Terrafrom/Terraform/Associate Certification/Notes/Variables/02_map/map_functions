@@ -1,0 +1,82 @@
+<--------------------------->
+
+keys()
+
+variable "example_map" {
+  type = map(string)
+  default = {
+    key1 = "value1"
+    key2 = "value2"
+    key3 = "value3"
+  }
+}
+
+map_keys = keys(var.example_map)  # ["key1", "key2", "key3"]
+
+<--------------------------->
+
+values()
+
+variable "example_map" {
+  type = map(string)
+  default = {
+    key1 = "value1"
+    key2 = "value2"
+    key3 = "value3"
+  }
+}
+
+map_values = values(var.example_map)  # ["value1", "value2", "value3"]
+
+<--------------------------->
+
+length()
+
+map_length = length(var.example_map)  # 3
+
+
+<--------------------------->
+
+map()
+
+variable "example_list" {
+  type    = list(string)
+  default = ["apple", "banana", "orange"]
+}
+
+transformed_map = map(var.example_list, index(key), upper(value))
+# Result: {"apple" = "APPLE", "banana" = "BANANA", "orange" = "ORANGE"}
+
+
+
+<--------------------------->
+
+lookup()
+
+variable "example_map" {
+  type = map(string)
+  default = {
+    key1 = "value1"
+    key2 = "value2"
+    key3 = "value3"
+  }
+}
+
+value1 = lookup(var.example_map, "key1", "default_value")  # "value1"
+value4 = lookup(var.example_map, "key4", "default_value")  # "default_value"
+
+
+<--------------------------->
+
+containskey
+
+variable "example_map" {
+  type = map(string)
+  default = {
+    key1 = "value1"
+    key2 = "value2"
+    key3 = "value3"
+  }
+}
+
+has_key = containskey(var.example_map, "key2")  # true

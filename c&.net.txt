@@ -1,0 +1,128 @@
+-> In a CI/CD pipeline, MSBuild is used to compile C++ and .NET applications, and NuGet is used for package management and testing. Below are the relevant commands:
+
+1️⃣ NuGet Workflow (Step-by-Step Mechanism)
+🔹 Step 1: Creating a NuGet Package
+-- Developers write code and create a .nuspec file, which defines package metadata (ID, version, dependencies, etc.).
+-- They use the NuGet CLI or .NET CLI to package the library into a .nupkg file.
+
+🔹 Step 2: Publishing the Package
+The .nupkg file is uploaded to a NuGet feed, which can be:
+Public (NuGet.org)
+Private (Azure Artifacts, JFrog Artifactory, GitHub Packages)
+Local (internal network storage)
+
+🔹 Step 3: Consuming the Package
+A project needing the package adds it as a dependency via:
+NuGet Package Manager (Visual Studio)
+CLI commands (nuget, dotnet)
+Package references in .csproj
+
+🔹 Step 4: Package Restore & Version Management
+When building a project, NuGet ensures the correct dependencies are installed.
+It resolves package versions and downloads missing dependencies automatically.
+
+🔹 Step 5: Package Update & Removal
+Developers can update or remove packages as needed.
+
+2️⃣ NuGet Key Components
+Component	Description
+NuGet CLI	Command-line tool to create, publish, install, and manage NuGet packages.
+NuGet Server	Stores and serves NuGet packages (NuGet.org, Azure Artifacts, Artifactory, etc.).
+NuGet Package (.nupkg)	A compressed archive with compiled libraries, metadata, and dependencies.
+NuGet Configuration (NuGet.config)	Configures package sources, API keys, and caching policies.
+NuGet Restore	Downloads missing dependencies before building the project.
+
+
+
+
+
+🔹 C++ Application - Build & Test using MSBuild
+1️⃣ Restore NuGet Packages (if needed)
+nuget restore MyCppProject.sln
+
+2️⃣ Build C++ Application using MSBuild
+msbuild MyCppProject.sln /p:Configuration=Release /p:Platform=x64 /m
+/p:Configuration=Release → Builds in Release mode.
+/p:Platform=x64 → Targets 64-bit architecture.
+/m → Enables parallel builds.
+
+3️⃣ Run Tests (Google Test, Catch2, etc.)
+MyCppProjectTests.exe --gtest_output=xml:test_results.xml
+
+
+🔹 .NET Application - Build & Test using MSBuild & NuGet
+1️⃣ Restore NuGet Packages
+nuget restore MyDotNetApp.sln
+
+2️⃣ Build .NET Application using MSBuild
+msbuild MyDotNetApp.sln /p:Configuration=Release /p:Platform="Any CPU" /m
+
+3️⃣ Run Unit Tests using NUnit/xUnit
+nunit3-console MyDotNetTests.dll --result=test_results.xml
+
+
+📌 Commands in a CI/CD Pipeline (Jenkins, GitHub Actions, Azure DevOps)
+Here’s how they fit into a pipeline:
+
+Jenkins Pipeline (Declarative)
+pipeline {
+    agent any
+    stages {
+        stage('Restore Packages') {
+            steps {
+                bat 'nuget restore MyDotNetApp.sln'
+            }
+        }
+        stage('Build') {
+            steps {
+                bat 'msbuild MyDotNetApp.sln /p:Configuration=Release'
+            }
+        }
+        stage('Test') {
+            steps {
+                bat 'dotnet test MyDotNetApp.sln --logger trx --results-directory TestResults/'
+            }
+        }
+    }
+}
+
+GitHub Actions (CI Pipeline)
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup NuGet
+        run: nuget restore MyDotNetApp.sln
+
+      - name: Build Project
+        run: msbuild MyDotNetApp.sln /p:Configuration=Release
+
+      - name: Run Tests
+        run: dotnet test MyDotNetApp.sln --logger trx --results-directory TestResults/
+
+Azure DevOps Pipeline (YAML)
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    restoreSolution: 'MyDotNetApp.sln'
+
+- task: VSBuild@1
+  inputs:
+    solution: 'MyDotNetApp.sln'
+    configuration: 'Release'
+
+- task: VSTest@2
+  inputs:
+    testSelector: 'testAssemblies'
+    testAssemblyVer2: '**\*Tests.dll'
+    searchFolder: '$(Build.SourcesDirectory)'

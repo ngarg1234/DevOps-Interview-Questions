@@ -1,0 +1,190 @@
+#A Pod is the smallest deployable unit in Kubernetes. It represents a running instance of a container (or multiple containers). A Pod is ephemeral and doesn’t provide features like scaling or self-healing.
+#Purpose:
+#Defines the container(s) to run.
+#Specifies the container image, ports, environment variables, etc.
+#Pods are not ideal for direct use in production because they are not resilient; if a Pod crashes, Kubernetes will not automatically replace it.
+
+#Limitations:
+#Pods don’t support scaling (like Deployments do).
+#Pods don’t automatically restart if they fail.
+#Not ideal for production usage alone.
+
+#1. Single-Container Pod: This is the simplest type of Pod that contains a single container. It is the most basic unit of deployment in Kubernetes.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: Single-Container Pod
+spec:
+  containers:
+    - name: my-node-container
+      image: my-node-app:latest
+      ports:
+        - containerPort: 3000  # Container listens on port 3000
+
+
+# ----------------------------------------------------------
+#2. Multi-Container Pod: A Pod can have multiple containers that share the same storage and network resources. These containers work closely together. 
+#For example, one container might act as a sidecar for logging or monitoring.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-container-pod
+spec:
+  containers:
+    - name: app-container
+      image: nginx:latest
+    - name: sidecar-container
+      image: busybox
+      command: ["sh", "-c", "while true; do echo Hello; sleep 5; done"]
+    
+    
+# ------------------------------------------------------------------
+#3. Static Pod: Static Pods are managed directly by the kubelet on a specific node, rather than by the Kubernetes control plane. These are useful for critical system components like logging or monitoring agents that should always run on specific nodes.
+#Manifest Example (Usually placed directly on the node, not applied via kubectl):
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: static-pod
+spec:
+  containers:
+    - name: static-container
+      image: busybox
+      command: ["sh", "-c", "echo Static Pod; sleep 3600"]
+
+
+# ----------------------------------------------------------------------------
+#4. Init Containers: Init containers are run before the main containers in a Pod. They are often used for setup tasks like waiting for a service to be available or initializing some data before the main app container starts.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-init-container
+spec:
+  initContainers:
+    - name: init-container
+      image: busybox
+      command: ['sh', '-c', 'echo Init container executed; sleep 5;']
+  containers:
+    - name: main-app-container
+      image: nginx:latest
+
+#Use Case: When your application requires setup work before the main container can start, such as fetching data or ensuring a dependency is available.
+
+
+# --------------------------------------------------------------
+#5. Ephemeral Containers: Ephemeral containers are used for debugging an already running Pod. You can't specify ephemeral containers in the initial Pod spec, but you can add them later with kubectl.
+
+kubectl debug pod-name --image=busybox --target=container-name
+
+
+# ---------------------------------------------------------------------------
+#6. Pod with Volumes: You can attach different types of storage volumes to Pods, such as persistent volumes or emptyDir volumes that can be shared between containers.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-volume
+spec:
+  containers:
+    - name: app-container
+      image: nginx:latest
+      volumeMounts:
+        - name: my-volume
+          mountPath: /usr/share/nginx/html
+  volumes:
+    - name: my-volume
+      emptyDir: {}
+
+#Use Case: When you need a Pod to persist data or share storage between containers, e.g., using a shared filesystem between two containers.
+
+
+
+# -------------------------------------------------------------------------
+#7. DaemonSet Pod: DaemonSet ensures that a Pod runs on every node (or selected nodes) in a cluster. It's typically used for cluster-wide services like log collectors or monitoring agents.
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: daemonset-pod
+spec:
+  selector:
+    matchLabels:
+      app: logging-agent
+  template:
+    metadata:
+      labels:
+        app: logging-agent
+    spec:
+      containers:
+        - name: logging-agent-container
+          image: fluentd:latest
+
+
+#Use Case: Running a Pod on every node, such as for logging, monitoring, or security tools.
+
+
+# ------------------------------------------------------------------------------------------------
+#8. Pod with Tolerations and Affinity: This type of Pod has configurations that control where it will be scheduled based on node labels (affinity) or tolerates node conditions (tolerations). These configurations are used to influence which nodes the Pod can run on.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-affinity
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/e2e-az-name
+                operator: In
+                values: ["e2e-az1", "e2e-az2"]
+  tolerations:
+    - key: "key1"
+      operator: "Exists"
+      effect: "NoSchedule"
+  containers:
+    - name: my-container
+      image: nginx:latest
+
+      #Use Case: Controlling where Pods are scheduled, such as running them only on specific nodes or avoiding nodes with certain taints.
+
+
+      # ---------------------------------------------------------------------------------
+#9. resource-limits-demo
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: resource-limits-demo
+  labels:
+    app: resource-demo
+spec:
+  containers:
+  - name: demo-container
+    image: nginx:latest
+    resources:
+      requests:
+        memory: "256Mi"    # Minimum memory the container requests
+        cpu: "500m"        # Minimum CPU the container requests (500 millicores)
+      limits:
+        memory: "512Mi"    # Maximum memory the container can use
+        cpu: "1"           # Maximum CPU the container can use (1 core)
+
+
+# ---------------------------------------------------------------------------------------
+
+
+    Summary of Different Pod Manifest Types:
+Pod Type	                            Use Case	                                        Key Feature
+Single-Container Pod	    Basic unit of deployment with one container	                    Simplest form of a Pod
+Multi-Container             Pod	Tightly coupled containers that need to work together	    Multiple containers sharing the same resources
+Static Pod	                System-level tasks that need to run directly on a node	        Managed directly by kubelet
+Init Containers	            Containers that run before the main container	                Executes setup tasks before the main application starts
+Ephemeral Containers	    Debugging running Pods without modifying existing ones	          Added dynamically for debugging
+Pod with Volumes	        Sharing storage or persisting data	                            Attached storage volumes like emptyDir, PersistentVolume
+DaemonSet Pods	            Running a Pod on all (or selected) nodes in the cluster	        Ensures Pod runs on each node
+Pod with Tolerations and Affinity	Scheduling Pods on specific nodes based on node labels or tolerating specific conditions	Controls Pod scheduling based on affinities and tolerations

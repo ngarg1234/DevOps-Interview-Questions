@@ -1,0 +1,88 @@
+Web Application Architecture:
+Users Web Server (Appn can be developed in PHP, ASP.NET, Java, Node.js): This can be deployed on Amazon EC2 instances or AWS Elastic Beanstalk (Platform-as-a-Service for easy web app deployment).
+
+Rational Database (SQL databases like Azure SQL Database):
+
+Amazon RDS (Relational Database Service) to handle SQL databases like MySQL, PostgreSQL, MariaDB, Oracle, and SQL Server.
+Private Network / On-Premise Network (Azure Virtual Network equivalent):
+
+Amazon VPC (Virtual Private Cloud) – Isolated network for your AWS resources.
+3-Tier Architecture:
+Web Server:
+
+EC2 instances running web applications (Angular, HTML/CSS).
+App Server:
+
+EC2 instances running APIs or backend logic (such as Node.js, Java, or .NET APIs).
+RDBMS (SQL Server, Oracle) Database:
+
+Amazon RDS for managing relational databases, such as SQL Server, MySQL, PostgreSQL, and Oracle.
+Scaling:
+Horizontal Scaling (Add new servers):
+Auto Scaling Groups: Automatically add or remove EC2 instances based on traffic or load.
+Vertical Scaling (Increase CPU, Memory, Storage):
+Modify EC2 instance types to scale vertically (e.g., change instance type to a larger one).
+For RDS, Amazon Aurora, or DynamoDB, you can modify instance types or storage.
+Load Balancer:
+AWS Elastic Load Balancer (ELB): Distributes incoming traffic across multiple EC2 instances.
+DNS:
+Amazon Route 53: Provides domain name system (DNS) services, for mapping domain names (e.g., facebook.com) to the corresponding IP addresses of servers.
+External Storage for Large Files (Images, Videos):
+Amazon S3 (Simple Storage Service): Store and serve large files like videos, images, etc.
+AWS Lambda (Serverless compute) to trigger functions (e.g., image resizing, content filtering, etc.).
+Content Filtering (AI for Filtering Objectionable Content):
+Amazon Rekognition: AWS service to detect inappropriate or unwanted content in images and videos.
+NoSQL Database for Big Data (Likes, Comments, etc.):
+Amazon DynamoDB: Managed NoSQL database for scalable and low-latency operations, perfect for high-velocity data like likes, comments, etc.
+Clickstream Analysis and Big Data Processing:
+Clickstream Data Storage:
+Amazon S3 for storing raw clickstream data.
+Big Data Analysis:
+Amazon EMR (Elastic MapReduce) for Hadoop-based big data analysis.
+Data Warehouse:
+Amazon Redshift for storing and querying large amounts of data in a data warehouse.
+Business Intelligence:
+Amazon QuickSight: Business Intelligence (BI) service to create interactive visualizations and reports from your data.
+Image Resizing for Mobile Devices:
+AWS Lambda: Serverless function to resize images for mobile devices (e.g., compress and resize large images before serving them).
+Content Delivery Network (CDN):
+Amazon CloudFront: Global CDN to deliver low-latency content (images, videos, etc.) to users across the world.
+Messaging Queue for Fast Notifications:
+Amazon SQS (Simple Queue Service): Asynchronous message queue service for decoupling components and handling fast messaging/notification delivery.
+Monitoring & Health Check:
+Amazon CloudWatch: Monitors the health of all AWS resources (EC2, RDS, Lambda, etc.) in real time.
+
+AWS CloudTrail: Tracks API calls and user activity across the AWS environment.
+
+Security & Networking:
+Virtual Network:
+
+Amazon VPC (Virtual Private Cloud): Creates isolated networks for security and privacy.
+Authentication & Authorization:
+
+AWS IAM (Identity and Access Management): Manages user access and permissions for AWS resources.
+Amazon Cognito: Provides authentication and authorization for mobile/web applications.
+Key Management and Secret Storage:
+
+AWS KMS (Key Management Service): Manages and encrypts keys for your application.
+AWS Secrets Manager: Stores and retrieves database credentials, API keys, and other secrets.
+Web Application Firewall (WAF):
+
+AWS WAF: Protects your web applications from common web exploits and attacks.
+Threat Protection:
+
+AWS Shield: Provides DDoS protection.
+Amazon GuardDuty: Continuous security monitoring for malicious activity and unauthorized behavior.
+Server and Data Protection:
+
+AWS Security Hub: Comprehensive view of security alerts and compliance status across AWS accounts.
+AWS Inspector: Security assessment service to help improve security and compliance of applications.
+Resource Manager:
+
+AWS CloudFormation: Manages AWS resources using infrastructure-as-code.
+AWS Elastic Beanstalk: Simplified service for deploying and managing applications.
+CI/CD (Continuous Integration/Continuous Deployment):
+
+AWS CodePipeline: Automates build, test, and deploy stages for applications.
+AWS CodeBuild: Fully managed build service.
+AWS CodeDeploy: Automates deployment to EC2 instances or Lambda.

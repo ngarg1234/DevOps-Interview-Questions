@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kube-apiserver
+  namespace: kube-system
+spec:
+  containers:
+  - name: kube-apiserver
+    image: k8s.gcr.io/kube-apiserver:v1.21.0
+    command:
+      - kube-apiserver
+      - --advertise-address=192.168.0.1
+      - --allow-privileged=true
+      - --etcd-servers=https://localhost:2379
+      - --insecure-port=0
+      - --secure-port=6443
+      - --service-account-lookup=true
+    volumeMounts:
+    - mountPath: /etc/kubernetes/pki
+      name: certs
+  volumes:
+  - name: certs
+    hostPath:
+      path: /etc/kubernetes/pki
+      type: DirectoryOrCreate

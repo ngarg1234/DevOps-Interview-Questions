@@ -1,0 +1,32 @@
+Superblock:
+-> In Shell (sh, bash, etc.), the term superblock usually refers to the filesystem metadata structure used in Linux and UNIX-based systems. 
+The superblock contains essential information about the filesystem, such as its size, block size, free blocks, and inode information.
+
+Viewing the Superblock in Shell:
+-------------------------------
+df -ht   :will give all the file syste with detaiuled info
+sudo dumpe2fs /dev/sdX: all infor about all metadata of filesyatem "/dev/sdX"
+sudo tune2fs -l /dev/sdX: all detailed infor about all metadata of filesyatem "/dev/sdX"
+
+
+-> You can use commands like dumpe2fs, tune2fs, or debugfs to inspect the superblock on an ext filesystem.
+
+1. Check the Superblock with dumpe2fs
+$$ sudo dumpe2fs /dev/sdX | grep -i superblock
+
+2. View Superblock with tune2fs
+$$ sudo tune2fs -l /dev/sdX | grep -i superblock
+
+3. Using debugfs to Inspect the Superblock
+$$ sudo debugfs /dev/sdX
+-- Then, inside debugfs, run:
+$$ stats
+
+
+Recovering a Corrupt Superblock:
+================================
+-> If the primary superblock is damaged, you can restore it from a backup superblock. Run:
+$$ sudo fsck.ext4 -b <backup_superblock> /dev/sdX
+
+-> To find backup superblocks, use:
+$$ sudo mke2fs -n /dev/sdX

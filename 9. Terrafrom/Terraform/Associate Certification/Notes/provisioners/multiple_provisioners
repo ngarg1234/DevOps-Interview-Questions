@@ -1,0 +1,6 @@
+
+
+Multiple Provisioners
+
+
+Multiple provisioners can be specified within a resource. Multiple provisioners are executed in the order they're defined in the configuration file.

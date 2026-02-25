@@ -1,0 +1,95 @@
+Here’s a categorized list of interview prep questions and key points to guide your answers. Let’s break this down topic by topic:
+
+---
+
+### 🔁 **Python Recursive Function**
+**Q: Write a recursive function in Python to reverse a string like `hello` → `olleh`.**
+```python
+def reverse_string(s):
+    if len(s) == 0:
+        return s
+    return reverse_string(s[1:]) + s[0]
+
+print(reverse_string("hello"))
+```
+
+---
+
+### 📈 **New Relic Interview Questions**
+- How does New Relic monitor application performance?
+- What is an APM and how is it integrated?
+- How would you use New Relic to trace a performance issue?
+- How do you set custom events or alerts?
+
+---
+
+### ☁️ **CloudFormation**
+- **How to create stacks?**
+  - Use AWS Console, CLI (`aws cloudformation create-stack`), or CDK.
+- **How to trigger a function?**
+  - Use `AWS::Lambda::Function` with an event source like `S3`, `CloudWatch`, etc.
+- **How to write files in CloudFormation?**
+  - CloudFormation can’t directly write files, but use Lambda or EC2 user data to write during provisioning.
+- **How to handle failure jobs?**
+  - Use `DependsOn`, `CreationPolicy`, `RollbackConfiguration`, or handle in CI/CD pipeline.
+
+---
+
+### ⚙️ **CI/CD - Artifact Storage and Environment Management**
+- Store artifacts in **S3**, **CodeArtifact**, **JFrog**, etc.
+- Use environment-specific folders or tagging (`dev/`, `prod/`).
+- Use CodePipeline or GitHub Actions environments with variable secrets per environment.
+
+---
+
+### 🔐 **Secret Management in CFT**
+- Use `AWS::SecretsManager::Secret` or fetch secrets using Lambda or SSM Parameter Store.
+- Parameterize secrets using `Mappings` or `Parameters`.
+- Use IAM roles to restrict access per environment (Dev/Prod).
+
+---
+
+### 🔒 **AWS WAF & Shield**
+- **AWS WAF**:
+  - Layer 7 protection, custom rules, IP blocking, SQL injection protection.
+- **AWS Shield**:
+  - Shield Standard (default), Shield Advanced for DDoS protection.
+  - Integrated with Route 53, CloudFront, ELB.
+
+---
+
+### 🌍 **CloudFront + S3 Restrictions**
+- Restrict access to S3 using:
+  - **Origin Access Identity (OAI)** or **Origin Access Control (OAC)**.
+- CloudFront + S3 for secure static site hosting.
+- Invalidate cache to clear updated files:  
+  `aws cloudfront create-invalidation --distribution-id YOUR_ID --paths "/*"`
+
+---
+
+### 🌐 **CloudFront & OSI Model**
+- Operates on **Layer 7 (Application Layer)**.
+- Caching at edge locations.
+- Supports compression, TLS, request/response handling.
+
+---
+
+### 🧱 **Terraform**
+- **Move State File**:
+  - Use `terraform state pull` & `terraform state push`, or configure remote backend like S3 + DynamoDB.
+- **Lock.hcl file**:
+  - Defines provider constraints (e.g., version lock for modules).
+- **Import**:
+  - `terraform import aws_instance.my_instance i-12345678`
+
+---
+
+### 🛠️ **AWS CodeBuild with GitHub**
+- Create a CodeBuild project.
+- Configure source provider as GitHub.
+- Add OAuth token/connection via CodeBuild settings.
+- Use `buildspec.yml` to define build steps.
+
+---
+
+Let me know if you want example YAMLs, Terraform/CFT snippets, or mock answers for any of these!

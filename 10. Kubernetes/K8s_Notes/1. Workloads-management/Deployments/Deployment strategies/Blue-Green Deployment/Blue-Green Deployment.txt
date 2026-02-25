@@ -1,0 +1,28 @@
+Blue-Green Deployment:
+-------------------------
+💡 Blue-Green Deployment is a strategy where two identical environments (Blue and Green) are maintained — one is live (production) and one is staging/testing.
+-> When a new version is ready, it is deployed to the Green environment and traffic is switched to Green once verified.
+
+✅ How Blue-Green Deployment Works:
+1. Blue environment: Active production environment serving users.
+2. Green environment: New version is deployed and tested without affecting live users.
+3. After testing, switch traffic from Blue to Green.
+4. If issues occur, rollback is easy — switch traffic back to Blue.
+
+✅ Key Benefits of Blue-Green:
+-- Zero downtime (if properly designed).
+-- Easy rollback by switching back to Blue.
+-- Full testing in real production-like environment before going live.
+
+Step 1: 
+Live Traffic --> Blue (v1) [Live]
+
+Step 2: 
+Deploy v2 to Green, test it
+
+Step 3:
+Switch Traffic --> Green (v2) [Live]
+
+If failed:
+Switch back Traffic --> Blue (v1)
+

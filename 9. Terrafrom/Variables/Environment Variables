@@ -1,0 +1,13 @@
+-> Terraform automatically picks up environment variables with the "TF_VAR_" prefix and uses them as input variables. This allows you to set variable values from the shell environment.
+-> It will store exported value in terraform console and it will override the value provided in your main file. And it will be override until you unset it.
+Example:
+export TF_VAR_instance_type="t2.micro"
+export TF_VAR_ami_id="ami-0c55b159cbfafe1f0"  # Update with your own AMI ID
+export AWS_ACCESS_KEY_ID="your-access-key-id"
+export AWS_SECRET_ACCESS_KEY="your-secret-access-key"
+export AWS_DEFAULT_REGION="us-west-2"
+
+unset AWS_ACCESS_KEY_ID
+unset AWS_SECRET_ACCESS_KEY
+unset TF_VAR_instance_type
+unset TF_VAR_ami_id

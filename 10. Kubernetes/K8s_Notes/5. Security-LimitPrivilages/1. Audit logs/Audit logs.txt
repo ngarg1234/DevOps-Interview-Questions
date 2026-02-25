@@ -1,0 +1,109 @@
+🔐 Audit logs in Kubernetes are critical for security and compliance, as they record all API requests made to the Kubernetes API server, including who did what and when — essential for incident investigation, monitoring, and compliance auditing.
+
+🚀 What Are Kubernetes Audit Logs?
+-> Audit logs capture detailed information about API calls, including:
+1. User identity (who)
+2. Action taken (what)
+3. Target resource (object)
+4. Timestamp
+5. Source IP
+
+✅ They are crucial for:
+-> Detecting suspicious activities
+-> Tracking misconfigurations
+-> Compliance reporting (e.g., SOC2, HIPAA, PCI-DSS)
+
+✅ How to Enable Audit Logs in Kubernetes
+-> Audit logging is configured via the API server using two components:
+1. Audit Policy File — defines what to log and at what level.
+2. API Server Flags — enables audit logging and points to the audit policy file.
+
+🔹 Step 1: Create an Audit Policy File
+Example: audit-policy.yaml
+apiVersion: audit.k8s.io/v1
+kind: Policy
+rules:
+  # Log all requests at the metadata level
+  - level: Metadata
+    resources:
+    - group: ""
+      resources: ["pods", "secrets", "configmaps"]
+  # Log all write (create, update, delete) at the request/response level
+  - level: RequestResponse
+    verbs: ["create", "update", "patch", "delete"]
+  # Log "get", "list", "watch" as metadata
+  - level: Metadata
+    verbs: ["get", "list", "watch"]
+  # Catch-all rule to log other requests at metadata level
+  - level: Metadata
+
+🧠 Explanation:
+-- Logs all metadata for pod/secret/configmap access.
+-- Logs full request/response for any write operation.
+-- Logs get/list/watch as metadata.
+
+
+🔹 Step 2: Configure API Server with Audit Flags
+-> When running kube-apiserver (as static pod or service), add these flags:
+--audit-policy-file=/etc/kubernetes/audit-policy.yaml
+--audit-log-path=/var/log/kubernetes/audit.log
+--audit-log-maxage=30
+--audit-log-maxbackup=10
+--audit-log-maxsize=100
+
+Flag				Purpose
+audit-policy-file	Path to audit policy YAML
+audit-log-path		Path to store audit logs
+audit-log-maxage	Retain logs for X days
+audit-log-maxbackup	Max number of log backups
+audit-log-maxsize	Max size (MB) before rotation
+
+
+✅ Step 3: Deploy the Audit Policy File on Master Nodes
+1. Place audit-policy.yaml on master nodes (e.g., /etc/kubernetes/audit-policy.yaml).
+2. Ensure API server manifest points to it (if using static pods, check /etc/kubernetes/manifests/kube-apiserver.yaml).
+
+Example snippet in kube-apiserver.yaml:
+spec:
+  containers:
+  - name: kube-apiserver
+    image: k8s.gcr.io/kube-apiserver:v1.26.0
+    command:
+    - kube-apiserver
+    - --audit-policy-file=/etc/kubernetes/audit-policy.yaml
+    - --audit-log-path=/var/log/kubernetes/audit.log
+
+
+✅ Step 4: Accessing and Reviewing Logs
+-> Logs will be stored at:    /var/log/kubernetes/audit.log
+
+-> View logs:
+$$ cat /var/log/kubernetes/audit.log
+
+➡️ You can parse them or ship them to centralized logging systems like ELK, Loki, Splunk, or SIEMs for analysis and alerting.
+
+
+
+🚨 Best Practices for Kubernetes Audit Logs
+	Best Practice							Reason
+Use RequestResponse level for sensitive actions		See actual content of write requests
+Ship logs to secure, centralized log storage		Prevent tampering and enable analysis
+Enable log rotation and set retention policies		Manage disk space and compliance
+Monitor for suspicious patterns (e.g., exec, privileged pod creation)	Detect breaches early
+Periodically review and adjust audit policy		Match evolving security requirements
+
+
+
+🎯 Final Recommendations for Secure Audit Logging:
+✅ Enforce "Restricted" Pod Security Standards in combination.
+✅ Enable Role-Based Access Control (RBAC) to restrict who can perform sensitive actions.
+✅ Use Network Policies to limit communications.
+✅ Enable audit logs to monitor and track all sensitive API activities
+
+
+
+
+
+
+
+

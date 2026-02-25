@@ -1,0 +1,12 @@
+/* 
+-> Data sources are used to retrieve information about resources that already exist outside of Terraform. You can use data sources to set variable values based on the attributes of those resources.
+-> We are trying to pull existing security group ID [We are pulling value of SG present in AWS] by filtering the tags.
+*/
+
+Example:
+data "aws_security_group" "example" {
+  filter {
+    name   = "tag:Name"  # Tag key
+    values = ["terraform1"]     # Tag value
+  }
+}

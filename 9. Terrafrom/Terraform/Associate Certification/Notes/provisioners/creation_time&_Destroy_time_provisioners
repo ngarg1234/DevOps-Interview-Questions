@@ -1,0 +1,23 @@
+
+
+Creation time provisioner runs only during creation of the resource not during update or any other life cycle 
+
+    if a creation time provisioner fails, the resource is marked as tainted 
+
+    you can verify it by checking the statefile, the status will be marked as tainted 
+
+
+destroy time provisioners are run before the resource is destroyed 
+
+
+ resource "aws_instance" "demo"
+    {
+        ami = "dsdfcs"
+        instance_type = t2.micros
+        provisioners "local-exec" {
+            when = destroy
+            command = "echo ${aws_instance.demo.public_ip} >> publlic_ip.txt"
+        }
+    }
+
+

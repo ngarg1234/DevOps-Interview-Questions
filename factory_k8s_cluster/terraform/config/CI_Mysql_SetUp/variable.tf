@@ -1,0 +1,3 @@
+variable "dbpass" {
+  type = string
+}

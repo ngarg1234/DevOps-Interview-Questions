@@ -1,0 +1,26 @@
+{
+    "kind": "Event",
+    "apiVersion": "audit.k8s.io/v1",
+    "level": "Metadata",
+    "user": {
+      "username": "admin",
+      "groups": ["system:masters"]
+    },
+    "verb": "create",
+    "objectRef": {
+      "resource": "pods",
+      "namespace": "default",
+      "name": "my-app"
+    },
+    "sourceIPs": ["192.168.1.10"],
+    "stage": "ResponseComplete",
+    "requestReceivedTimestamp": "2023-03-10T10:12:34Z",
+    "responseStatus": {
+      "metadata": {},
+      "code": 201
+    }
+  }
+  
+
+
+//  Shows who created a pod, when, from where, and response status.

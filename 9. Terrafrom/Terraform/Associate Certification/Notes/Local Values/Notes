@@ -1,0 +1,75 @@
+local values are defined inside locals {} block
+
+example: 
+
+    locals{
+        common_tags = {
+        env: "dev"
+        app: "demo"
+        }
+    aws_region = "eu-west-1"
+
+    access_key  = {
+        dev = "devkey"
+        prod = "prodkey"
+    }
+    }
+
+    Accessing loacal values 
+
+        resource "aws_instance" "dev-test" {
+            ami = "adfsdf"
+            instance_type = "t2.micro"
+            key_pair = local.access_key["dev"]
+            tags = {
+                local.common_tags
+            }
+
+        }
+
+
+        NOTE: The main difference between locals and variables 
+
+        1, while using locals, you can use expressions to determine the value of a particular feild 
+
+            example: 
+                    
+                locals {
+                    name_prefix = "${var.name != "" ? var.name : var.deafult }"
+                }
+
+        2, Another important use is with modules
+
+                in terraform modules, if you define a variable inside a module, developers can override the default value of that variable while 
+                calling that module(ie while calling a module in the main.tf, you can also pass the values to variable and that variable value will override the default value)
+
+                But,
+
+                    if you use locals to define a values inside module, those values cannot be overriden while calling the module
+
+
+                example:
+
+                    module/ec2.tf
+
+                        locals {
+                            instance_type = "t2.micro" 
+                        }
+
+                        variable "ami" {
+                            type = string
+                            default = "a1234" # this can be overriden
+                        }
+
+                        resource "aws_instance" "test"{
+                            ami = var.ami
+                            instance_type = local.instance_type #this cannot be overriden while module is called 
+                        }
+                
+                    config/main.tf
+
+                        module "ec2_module" {
+                            source = "../module/ec2.tf"
+                            ami = "b246" ==> This will override the variable defined inside the module 
+                            instance_type = "t2.large"  -XX This does't work, you can't pass value to override locals
+                        }

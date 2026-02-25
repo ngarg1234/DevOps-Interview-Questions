@@ -1,0 +1,25 @@
+# Update the pod red to use an initContainer that uses the busybox image and sleeps for 20 seconds
+
+
+# Delete and re-create the pod if necessary. But make sure no other configurations change.
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: red
+  namespace: default
+spec:
+  containers:
+  - command:
+    - sh
+    - -c
+    - echo The app is running! && sleep 3600
+    image: busybox:1.28
+    name: red-container
+  initContainers:
+  - image: busybox
+    name: red-initcontainer
+    command: 
+      - "sleep"
+      - "20"

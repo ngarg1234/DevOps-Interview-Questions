@@ -1,0 +1,60 @@
+🔹 Synchronous Execution (Default)
+✅ Ansible waits for each task to complete before moving to the next task.
+✅ Tasks run sequentially on each host.
+
+- name: Install Nginx
+  ansible.builtin.yum:
+    name: nginx
+    state: present
+📌 Ansible waits for this task to finish before moving on.
+
+
+🔹 Asynchronous Execution (async Mode)
+✅ Ansible starts a task and moves on without waiting for it to finish.
+✅ Useful for long-running tasks like backups, database migrations, or large file copies.
+
+Example: Run a Task in the Background
+- name: Run a script asynchronously
+  ansible.builtin.command: /path/to/long_script.sh
+  async: 300    # Task will be allowed to run for 300 seconds
+  poll: 10      # Check every 10 seconds for completion
+  register: async_task
+📌 Ansible starts the script and checks its status every 10 seconds.
+
+
+🔹 Fire-and-Forget (No Waiting)
+✅ If you don’t want to check status, set poll: 0
+✅ Ansible will start the task and move on immediately
+
+- name: Run script without waiting
+  ansible.builtin.command: /path/to/long_script.sh
+  async: 300
+  poll: 0  # Fire and forget
+
+📌 Use case: When the task is independent and doesn’t affect other tasks.
+
+
+🔹 Checking Status of Asynchronous Tasks
+If a task is running asynchronously, you can later check its status using async_status.
+
+- name: Check async task status
+  ansible.builtin.async_status:
+    jid: "{{ async_task.ansible_job_id }}"
+  register: job_result
+  until: job_result.finished
+  retries: 10
+
+📌 Ensures the task completes before continuing.
+
+
+Difference Between Asynchronous Execution and Fire-and-Forget in Ansible:
+-------------------------------------------------------------------------
+🔹 1️⃣ Asynchronous Execution (async with polling)
+✅ Starts a task and periodically checks its status
+✅ Ansible ensures completion before moving on
+📌 Ansible keeps checking the status every 10 seconds until the task finishes.
+
+🔹 2️⃣ Fire-and-Forget (async with poll: 0)
+✅ Starts a task and moves on immediately
+❌ Ansible does NOT check if the task completed successfully
+📌 Ansible starts the task and moves on without checking if it completes.

@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: myapp
+    type: front-end
+spec:
+  containers:
+  - command:
+    - kube-scheduler
+    - --address=127.0.0.1
+    - --kubeconfig=/etc/Kubernetes/scheduler.conf
+    - --config=/etc/Kubernetes/my-scheduler-confid.yaml
+
+    image: nginx
+    name: nginx-container
+
+# my-scheduler-config.yaml      
+# apiVersion: kubescheduler.config.k8s.io/v1
+# kind: KubeSchedulerConfiguration
+# profile:
+# - schedulerName: my-scheduler-1
+# leaderElection:
+#   leaderElect: true
+#   resourceNamespace: kube-system
+#   resourceName: lock-object-my-scheduler

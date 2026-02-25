@@ -1,0 +1,12 @@
+Terraform state file maps the existing real world resource to the terraform configuration(ie code)
+Statefile holds information about the resources present on the provider side (eg aws)
+
+When you destory a resource, the state or entry of the resource details will also be removed from the statefile
+
+NOTE- when you check a statefile for a resource, you can see many other information other than the spec you have provided inside the configuration
+    example, IP adrerss, volume data etc..
+
+NOTE: What will happen if you delete a statsfile?
+
+        error: when tried to create github repo
+        Error: POST https://api.github.com/user/repos: 422 Repository creation failed. [{Resource:Repository Field:name Code:custom Message:name already exists on this account}]

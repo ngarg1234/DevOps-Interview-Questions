@@ -1,0 +1,8 @@
+1. Application Name: {{ .Values.app.name }}
+2. Service URL:
+   {{- if .Values.ingress.enabled }}
+   http://{{ (index .Values.ingress.hosts 0).host }}
+   {{- else }}
+   ClusterIP: {{ .Release.Name }}-service
+   {{- end }}
+3. Namespace: {{ .Release.Namespace }}

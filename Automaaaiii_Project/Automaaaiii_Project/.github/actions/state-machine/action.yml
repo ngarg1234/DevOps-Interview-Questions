@@ -1,0 +1,56 @@
+name: 'trigger-step-function'
+description: 'Trigger Step Function'
+author: 'Ramesh'
+inputs:
+  director-number:
+    description: 'Automai Director Instance Number'
+    required: true
+  operation-type:
+    description: 'Operation Type'
+    required: true
+  number-of-machines:
+    description: 'Enter Number of Machines to Scale Up/Down. Leave blank for Terminate-All'
+    required: true
+    default: "0"
+  hostnames:
+    description: 'Replace BotManagers, enter hostnames seperated by comma'
+    required: true
+  aws-access-key-id:
+    description: 'AWS Token'
+    required: true
+  aws-secret-access-key:
+    description: 'AWS Secret'
+    required: true
+  ms-teams-hook:
+    description: 'MS teams hook'
+    required: true 
+  github-token:
+    description: 'GH token'
+    required: true   
+runs:
+  using: 'composite'    
+  steps:
+ 
+    - name: Trigger Step Functions
+      id: trigger
+      env:
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
+        AWS_DEFAULT_REGION: "us-west-2"
+      working-directory: ./.github/actions/state-machine
+      shell: pwsh
+      run: |
+        pwsh ./script.ps1 -OperationType "${{ inputs.operation-type }}" -DirectorNumber "${{ inputs.director-number }}" -NumberOfMachines "${{ inputs.number-of-machines }}" -GithubRunId "${{ github.run_id }}" -HostNames "${{ inputs.hostnames }}"
+    - name: MS Teams Notify
+      uses: tr/cicd_gh-actions-notification/teams@v1.5
+      if: fals/e
+      with:
+        NOTIFICATION_NAME: "Automai# ${{ inputs.director-number }}: BOT Manager State Machine"
+        WEBHOOK_URL1: "${{ inputs.ms-teams-hook }}"
+        LINK1_NAME: "View Automai Director"
+        LINK1_URL: "https://automai-director-${{ inputs.director-number }}.0667.aws-int.company.com/#/botmanagers"
+        LINK1_TOOLTIP: "Click here for Automai Director Console - BOT Managers Tab"
+        FACT1_LABEL: "Operation Type"
+        FACT1_VALUE: "${{ inputs.operation-type }}"
+        FACT2_LABEL: "Number of Machines ${{ inputs.operation-type }}"
+        FACT2_VALUE: "${{ inputs.number-of-machines }}"

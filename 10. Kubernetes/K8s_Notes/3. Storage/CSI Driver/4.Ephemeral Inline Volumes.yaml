@@ -1,0 +1,22 @@
+# Ephemeral Inline Volumes
+# Temporary storage that is created when pod starts and deleted when pod stops.
+# Useful for scratch space, caches.
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-app
+spec:
+  containers:
+  - name: app
+    image: busybox
+    volumeMounts:
+    - mountPath: "/mnt/inline"
+      name: inline-volume
+  volumes:
+  - name: inline-volume
+    csi:
+      driver: secrets-store.csi.k8s.io
+      volumeAttributes:
+        secretProviderClass: my-secret

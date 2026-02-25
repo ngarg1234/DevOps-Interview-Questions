@@ -1,0 +1,21 @@
+1 how to pass output to another configuration
+2 how to pass output to a different module
+3 how to store output to a file 
+terrform apply -target a specific module
+learn about element and lookup function
+data source template_file in terraform -> https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file
+data source local file - > https://registry.terraform.io/providers/hashicorp/local/latest/docs/data-sources/file
+lifecycle block in terraform 
+filter conditions
+precondition
+depends_on
+
+
+
+
+resource "aws_lambda_function" "test_lambda" {
+  # If the file is not in the current working directory you will need to include a
+  # path.module in the filename.
+  filename      = "lambda_function_payload.zip"
+
+  terraform apply -refresh-only

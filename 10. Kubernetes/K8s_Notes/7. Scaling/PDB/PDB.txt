@@ -1,0 +1,29 @@
+Q. what is pdb in k8? PodDisruptionBudget
+-> A PodDisruptionBudget (PDB) defines the number of replicas of a pod that must be available at any given time for 
+   some reason such as upgrades or routine maintenance work on the Kubernetes nodes.
+-> PDB (PodDisruptionBudget) to ensure that your pods are not terminated or evicted unless it's absolutely necessary. 
+-> ECK manages a default PDB per Elasticsearch resource.
+
+** A Pod Disruption Budget (PDB) ensures that a minimum number of pods remain available during voluntary disruptions like:
+-- Node maintenance/drain (e.g., kubectl drain)
+-- Rolling updates
+-- Cluster upgrades
+-- Pod eviction during deployments or scaling events.
+-> PDB prevents too many pods from being evicted simultaneously, ensuring high availability of critical applications.
+
+⚠️ Note:
+-> PDB does NOT protect against involuntary disruptions (e.g., node crashes, out-of-memory kills).
+
+⚙️ PDB Configuration Options:
+1. minAvailable: Minimum number of pods that must be available (absolute number or percentage).
+2. maxUnavailable: Maximum number of pods that can be unavailable (absolute number or percentage).
+-> You can use either minAvailable or maxUnavailable, but not both at the same time.
+
+🚦 When PDB is Triggered:
+-> During kubectl drain, if PDB constraints are violated, Kubernetes will block eviction.
+-> Kubernetes respects PDB during rolling updates, ensuring desired availability.
+
+✅ Key Takeaways:
+-> Use PDB for critical workloads that require high uptime.
+-> Define minAvailable or maxUnavailable based on your app's redundancy.
+-> Helps maintain business continuity during cluster operations.

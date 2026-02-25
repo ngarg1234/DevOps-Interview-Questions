@@ -1,0 +1,76 @@
+trigger:
+  branches:
+    include:
+      - master
+
+parameters:
+  - name: db_database_name
+    type: string
+    default: "your_database_name"
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  VERSION: "1.0.0-$(Build.SourceVersionShort)"
+  DB_HOST: $(DB_HOST)
+  DB_USER: $(DB_USER)
+  DB_PASS: $(DB_PASS)
+  SONAR_TOKEN: $(SONAR_TOKEN)
+  SONAR_HOST_URL: $(SONAR_HOST_URL)
+  JFROG_USER: $(JFROG_USER)
+  JFROG_PASS: $(JFROG_PASS)
+  AWS_REGION: "us-west-2"
+  AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+  AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+  ECR_REGISTRY: $(AWS_ECR_REGISTRY)
+  ECR_REPOSITORY: $(AWS_ECR_REPO)
+
+stages:
+  - stage: Build
+    jobs:
+      - job: Build_Artifact
+        steps:
+          - checkout: self
+
+          - task: UseJavaVersion@1
+            inputs:
+              versionSpec: "17"
+              jdkArchitecture: "x64"
+
+          - script: |
+              cd project_code
+              mvn clean install
+              ls target
+              echo "Database: ${{ parameters.db_database_name }}"
+            displayName: "Build with Maven"
+
+          - script: |
+              sonar-scanner -Dsonar.projectKey=shyam -Dsonar.host.url=$(SONAR_HOST_URL) -Dsonar.login=$(SONAR_TOKEN)
+            displayName: "Run SonarQube Scan"
+
+          - script: |
+              curl -u $(JFROG_USER):$(JFROG_PASS) -X PUT "http://18.116.72.114:8081/artifactory/generic-local/Ramesh/debitcard/debitcardapp.$(VERSION).war" -T project_code/target/*.war
+            displayName: "Upload to JFrog Artifactory"
+
+          - task: AmazonWebServices.aws-cli-task.AWSCli@1
+            inputs:
+              awsCredentials: "AWS_Credentials"
+              regionName: "$(AWS_REGION)"
+              scriptType: "bash"
+              script: |
+                aws s3 cp project_code/target/*.war s3://pipeline-shyam/Github_Pipeline/debitcardapp-$(VERSION).war
+            displayName: "Upload Artifact to S3"
+
+  - stage: Docker_Build
+    jobs:
+      - job: Docker_Build_And_Push
+        steps:
+          - script: |
+              TIMESTAMP=$(date +'%Y-%m-%d-%H-%M')
+              IMAGE_TAG=$(Build.SourceVersionShort)-$TIMESTAMP
+              aws ecr get-login-password --region $(AWS_REGION) | docker login --username AWS --password-stdin $(ECR_REGISTRY)
+              docker build -t debitcardapp:$IMAGE_TAG .
+              docker tag debitcardapp:$IMAGE_TAG $(ECR_REGISTRY)/$(ECR_REPOSITORY):$IMAGE_TAG
+              docker push $(ECR_REGISTRY)/$(ECR_REPOSITORY):$IMAGE_TAG
+            displayName: "Docker Build & Push to AWS ECR"

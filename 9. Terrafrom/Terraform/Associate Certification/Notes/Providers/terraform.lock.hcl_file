@@ -1,0 +1,16 @@
+
+the terraforl.lock.hcl file stores information about the terraform provider which got installed during first init
+
+terraforl.lock.hcl file helps to maintain a specific version of terraform providr for your configuration 
+
+if terraform doesn't lock the statefile, when new provider version releases, it will get downloaded and your terraform code might not work,
+
+to avoid above mentioned situaton, terraform lock the provider version and download same  version during every terraform init
+
+
+to upgrade the provider, you have to change the version in code and run the following code,
+
+terraform init -upgrade 
+
+NOTE: for downgrade also, you can use the same command -> terraform init -upgrade 
+

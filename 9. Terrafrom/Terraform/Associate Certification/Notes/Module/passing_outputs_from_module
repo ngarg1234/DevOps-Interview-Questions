@@ -1,0 +1,42 @@
+
+
+inorder to print an output while using module,
+
+1st you have to defined the output block inside the module 
+2nd you have to refer to that output block while usig the module example shown below
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+## Module
+
+resource "aws_instance" "module_test" {
+    instance_type = var.instance_type
+    ami         = local.ami # since you used local here, this value cannot be overriden while using this module
+    tags = {
+        Name = "Test"
+    }
+}
+
+output "publicip"{
+    value = aws_instance.module_test.private_ip
+}
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+## Config
+
+module "test_module"{
+    source = "../../module/ec2"
+    instance_type = "t2.medium" #this will override the default value given inside the module
+}
+
+output "instance_ip"{
+    value = module.test_module.publicip
+}
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+

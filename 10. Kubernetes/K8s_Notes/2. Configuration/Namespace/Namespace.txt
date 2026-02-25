@@ -1,0 +1,76 @@
+==========================================================================================================================================
+
+ If project has 20-25 worker nodes it is required to create namespace.
+
+==========================================================================================================================================
+Q. What is control group/ C-group?
+-> It allows for resource management and isolation of processes & to specify limits and constraints on system resources.(CPU, memory, and I/O)
+-> Kubernetes, where it is used to ensure that containers are given the resources they need to run, without overloading the host system. 
+-> In this context, each container runs in its own cgroup, and K8s can set limits and constraints on the resources used by the container.
+
+
+Namespaces: [Isolation]
+--------------------
+->  Kubernetes namespace is an abstraction to support multiple virtual clusters of k8s objects on the same physical cluster.  
+-> Each namespace has its own set of resources, such as pods and services, and can be used to isolate resources within a cluster. 
+-> Namespaces can also be used to control access to resources, by assigning different roles and permissions to users and groups within each namespace.
+	
+-> Whenever namespace is created is DNS is also created.
+-> If you want to create a db-service in other namespace, we can do it using below command.
+	- mysql.connect("db-service.dev.svc.cluster.local")
+	- db-service: Service name
+	- dev: Namespace
+	- svc: Service
+	- cluster.local: domain
+
+** Namespaces main functionalities.
+1. Namespaces are virtual cluster on top of physical cluster.		
+2. Namespaces work at cluster level.
+3. Within same namespace by default a pod can communicate with other pod.
+4. Namespaces provides a logical separation between environments.
+5. Namespaces are only hidden from each other but are not fully isolated, one service in a NS can talk to another service in another NS using full name like service/object name followed by namespace name 
+		
+->  Every time you try to create/get pods, it will create/list from default namespace.
+->  To list from particular name space:  
+$$ kubectl get pods --namespace=kube-system
+
+-> To permanently move to other namespace than defult:
+$$ kubectl config set-context $(kubectl config current-context) --namespace=dev
+
+$$ kubectl create namespace <name_of_namespace>
+$$ kubectl get ns  (or)  sudo kubectl get namespace
+$$ kubectl get -n <name_of_namespace> <object_type>
+$$ kubectl get -n test pod
+$$ kubectl get pods --all-namespaces
+$$ kubectl apply -f <filename> -n <name_of_namespace>
+
+
+Types of default namespaces
+1. default:
+-> resources will be created under default if we don’t specify any other namespace
+-> if we don’t give namespace then the entire cluster resides in default.
+
+2. kube-system: 
+-> This namespace is for objects created by the Kubernetes system.
+-> To isolate the Kubernetes master/control plane components (API server, ectd, scheduler, and controller). 	
+
+3. kube-public: 
+-> The objects/resources in this namespace are available or accessible by all. 
+-> The objects in this namespace will be public.
+-> We never create resources in this namespace until and unless resource should be visible and readable publicly throughout the cluster.	 
+
+4. kube-node-lease:
+-> In Kubernetes, a kube-node-lease is a Lease object that is created by the kubelet on each node. 
+-> The kube-node-lease is used to indicate that a node is still "alive" and responsive. 
+-> The kube-node-lease is created in the kube-node-lease namespace with the name of the node.
+-> This namespace for the lease objects associated with each node which improves the performance of the node heartbeats as the cluster scales.
+-> This namespace holds Lease objects associated with each node. Node leases allow the kubelet to send heartbeats so that the control plane can detect node failure.  
+
+- To create namespace.yml
+apiVersion: v1
+kind: Namespace
+  metadata:
+    name: dev	
+
+$$ kubectl create -f namespace-dev.yaml
+$$ kubectl create namespace dev	

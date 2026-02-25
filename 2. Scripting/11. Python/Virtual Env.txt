@@ -1,0 +1,45 @@
+o configure your development environment for writing a Python script that uses the requests and BeautifulSoup libraries, you can follow these steps:
+
+Install Python:
+Make sure Python is installed on your system. You can download it from the official Python website: https://www.python.org/downloads/
+Set up a virtual environment (optional but recommended):
+Open your command line interface (CLI).
+Navigate to your project directory.
+Run the following command to create a virtual environment:
+python -m venv myenv
+
+Activate the virtual environment:
+On Windows:
+myenv\Scripts\activate
+
+On macOS and Linux:
+source myenv/bin/activate
+Install required libraries:
+With your virtual environment activated, install the 'requests' and 'BeautifulSoup' libraries using pip:
+pip install requests 
+pip install beautifulsoup4
+Set up your IDE or text editor:
+You can use any text editor or Integrated Development Environment (IDE) that you prefer (e.g., PyCharm, Visual Studio Code, Sublime Text).
+If you're using Visual Studio Code, you can install the Python extension to get features like IntelliSense, linting, debugging, etc.
+Write your Python script:
+You can now start writing your Python script using the installed libraries.
+
+Example of a simple script that uses requests and BeautifulSoup:
+import requests
+from bs4 import BeautifulSoup
+
+def main():
+    url = 'https://example.com'
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    print(soup.prettify())  # print formatted HTML of the page
+
+if __name__ == '__main__':
+    main()
+Run your script:
+Execute your script from the CLI using:
+python script_name.py
+
+Ensure that your script runs without errors and performs the intended tasks.
+By following these steps, you will have a properly configured environment to develop a Python script that uses the requests and BeautifulSoup libraries for downloading and processing web data.

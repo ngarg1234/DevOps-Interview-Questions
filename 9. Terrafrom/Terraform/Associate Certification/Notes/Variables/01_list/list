@@ -1,0 +1,24 @@
+list can be defined as
+
+variable "instance_type" {
+    type = list
+    deafult = ["t2.micro", "t2.nano", "t2.medium"]
+}
+
+accessing list elements
+
+Normal list access
+
+resource "aws_instance" "my_ec2" {
+    ami = "asagha1212"
+    instance_type = var.instance_type[0]
+}
+
+method
+using count indes
+
+resource "aws_instance" "my_ec2" {
+    count= length(var.instance_type)
+    ami = "asagha1212"
+    instance_type = var.instance_type[count.index]
+}

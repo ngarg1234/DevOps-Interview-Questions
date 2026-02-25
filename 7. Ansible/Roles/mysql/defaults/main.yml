@@ -1,0 +1,3 @@
+---
+# defaults/main.yml
+mysql_root_password: "rootpassword"

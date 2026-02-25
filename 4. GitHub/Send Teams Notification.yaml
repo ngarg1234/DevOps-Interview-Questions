@@ -1,0 +1,15 @@
+  notify-teams:
+    needs: build
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Send Teams Notification
+        run: |
+          curl -H 'Content-Type: application/json' -d '{
+            "text": "🚨 Build Failed in GitHub Actions! Please check the logs."
+          }' ${{ secrets.TEAMS_WEBHOOK_URL }}
+
+
+# 🔹 Use if: always() for post-build tasks.
+# 🔹 Use if: failure() to trigger notifications only when the build fails.
+# 🔹 Use Slack, Email, or Teams Webhooks to notify the team.

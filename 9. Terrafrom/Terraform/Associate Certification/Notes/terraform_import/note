@@ -1,0 +1,30 @@
+
+from terraform 1.5 onwards, you can not only import statefile but also configuration for the particular resouce as well
+    
+    this can be done using import block
+
+example 
+
+
+import {
+    to = aws_security_group.mysg
+    id = "copy the resource id from aws"
+}
+
+
+then, 
+
+run the terraform plan with -generate-config-out option
+    
+    example => terraform plan -generate-config-out=mysg.tf   ## configuration will be imported to mysg.tf file
+
+to import the state file, you have to run the terraform apply command after running the terraform plan as mentioned in the above
+
+
+-----
+
+full steps 
+
+1, terraform plan -generate-config-out=mysg.tf
+
+2, terraform apply

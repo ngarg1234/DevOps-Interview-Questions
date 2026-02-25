@@ -1,0 +1,13 @@
+.//Terraform_Backend/02_implemeting_s3_backend/.terraform
+.//terraform_import/.terraform
+.//Providers/.terraform
+.//cross_project_collaboration/practical_example/network_project/.terraform
+.//cross_project_collaboration/practical_example/security_project/.terraform
+.//Local Values/example_code/config/.terraform
+.//zipmap/.terraform
+.//count-&-for_each/count/.terraform
+.//count-&-for_each/for_each/.terraform
+.//StateFile_Locking /State_locking_in_S3/.terraform
+.//StateFile_Locking /Testing_statelock/.terraform
+.//terraform_cloud/cli-driven_workflowOR_remote_backend/example/.terraform
+.//dynamic_block/practical/.terraform

@@ -1,0 +1,157 @@
+Amazon VPC – Introduction to Amazon Virtual Private Cloud
+----------------------------------------------------------
+
+-> Amazon VPC can be referred to as the private cloud inside the cloud. It is a logical grouping of servers in a specified network. 
+-> The servers that you are going to deploy in the Virtual Private Cloud(VPC) will be completely isolated from the other servers that are deployed in the Amazon Web Services. 
+-> You can have complete control of the IP address to the virtual machines and route tables and gateways to the VPC. With the help of security groups and network access control lists, you can protect your application more.
+
+-- We can place the necessary resources and manage access to those resources in the VPC, a private area of Amazon that we control.
+-- A default “VPC” will be generated when we register an AWS account, allowing us to manage the virtual networking environment, the IP address, the construction of subnets, route tables, and gateways.
+
+Amazon VPC (Virtual Private Cloud) Architecture
+-------------------------------------------------
+-> The basic architecture of a properly functioning VPC consists of many distinct services such as Gateway, Load Balancer, Subnets, etc. 
+-> Altogether, these resources are clubbed under a VPC to create an isolated virtual environment. Along with these services, there are also security checks on multiple levels. 
+
+-> It is initially divided into subnets, connected with each other via route tables along with a load balancer.
+
+1. Amazon VPC (Virtual Private Cloud) Fundamentals
+-- If the subnet has internet access then it is called PublicSubnet.
+-- If the subnet doesn’t have internet access then it is called PrivateSubnet.
+-- A subnet must reside entirely within one Availability Zone. 
+-- An entire subnet must be contained within a single Availability Zone.
+-- Access between instances is managed by VPC Security Groups for both inbound and outgoing traffic (EC2 Security Groups can only define inbound rules).
+-- We can specify Subnet IP Routing with the aid of the Route Table.
+-- If a server/instance which is in a private subnet wants to reach the internet then it must have NAT in a public subnet.
+
+2. Subnet
+-- A subnet is a smaller portion of the network that typically includes all the machines in a certain area.
+-- We can add as many as subnets we need in one availability zone. Each subnet must reside entirely within one availability zone.
+-- The public subnets will be attached to Internet Gateway which enables Internet access.
+-- The private subnets will not have internet access.
+-- Each and every subnet which is presented in VPC must be associated with the routing table.  
+
+Internet Gateway:
+-- With the help of IGW (Internet Gateway), the resources present (e.g: EC2) in the VPC will enable to access the Internet.
+-- One VPC can’t have more than one IGW 
+-- If resources are running in a certain VPC then IGW can not be detached from that particular VPC.
+ 
+Route Table:
+-- Route Table contains a set of rules, called route which helps us to route the network traffic.
+-- A single VPC can have as many as route tables it requires.
+-- If the dependencies are attached to the route table then they can’t be deleted. 
+
+NACL Network Access Control Lists
+-- The NACL security layer for VPC serves as a firewall to manage traffic entering and leaving one or more subnets.
+-- The NACL for the default VPC is active and connected to the default subnets.
+
+Classless Inter-Domain Routing (CIDR)
+-- A technique for allocating IP addresses and for IP routing is called classless Inter-Domain Routing (CIDR), and its range is 0-32.
+-- When setting up a VPC, we must specify a set of IPv4 addresses using classless Inter-Domain Routing (CIDR), for (Example:10.0.0.0/16 For our VPC, this will serve as the main CIDR block).
+
+RFC1918 Address(Private address)
+-- An enterprise organization will give an internal host an IP address known as an RFC1918 address. These IP addresses are employed in private networks that cannot be accessed or accessed through the internet.
+-- The following networks are included in the RFC1918 address(Private address) 
+10.0.0.0 -10.255.255.255 (10/8 prefix)
+172.16.0.0 - 172.31.255.255 (172.16/12 prefix)
+192.168.0.0 - 192.168.255.255 (192.168/16 prefix) 
+
+Amazon VPC Network Address Translation (NAT) 
+-- RFC1918 address is a workable solution to IPv4 address exhaustion issues thanks to Network Address Translation (NAT).
+-- An internal host can communicate with an internet server with help of NAT.
+-- The internet and a private network are separated by a NAT device. 
+
+
+Use cases of Amazon VPC
+-- Using VPC, you can host a public-facing website,  a single-tier basic web application, or just a plain old website.
+-- The connectivity between our web servers, application servers, and database can be limited by VPC with the help of VPC peering. 
+-- By managing the inbound and outbound connections, we can restrict the incoming and outcoming security of our application.
+
+-------------------------------------------------------------------------------------
+1. Amazon VPC Traffic Mirroring
+-- You can replicate the traffic from source instance to the target instance for the analysis or troubleshooting. 
+
+
+2. Amazon VPC Lattice
+-- Amazon VPC is fully managed application networking service which streamlines the process of connecting, securing and monitoring application across the multiple AWS accounts and VPC’s which will reduce the efforts developers and can focus on the developing part. 
+
+
+3. Amazon VPC Flow Logs
+-- Amazon VPC flow logs will helps you to monitor carefully the in and out of the traffic through the network the logs will stored in the CloudWatch, Amazon S3 or Amazon Kinesis data firehose.
+ 
+4. VPC Connects
+-> It allows us to establish a private secure connection between your on-premise network and your VPC using VPC technology.
+
+5. Direct Connect
+-> It offers the dedicated network connection between your on-premises data center and AWS providing higher band-width and lower latency compared to the VPC Connections.
+
+=====================================================================================================
+
+🌐 What Are Shared Subnets?
+-> Shared Subnets are subnets that are created in an Amazon VPC (Virtual Private Cloud) owned by one AWS account (called the Owner Account) but are shared with other AWS accounts (called Participant Accounts) using AWS Resource Access Manager (RAM).
+
+➡️ Key Idea:
+-> Multiple AWS accounts can deploy resources (like EC2 instances, RDS, Lambda, etc.) into the same subnet, even though the subnet is owned and managed by a central VPC account.
+
+⚙️ How Do Shared Subnets Work?
+1. Owner Account creates:
+-- VPC
+-- Subnets
+-- Route Tables, Security Groups, NACLs
+
+2. Owner uses AWS RAM (Resource Access Manager) to share subnets with one or more Participant Accounts (must be in same AWS Organization).
+
+3. Participant Accounts can:
+-- Launch and manage resources (EC2, RDS, Lambda, etc.) in shared subnets.
+-- Use private IPs within subnet's CIDR.
+-- Cannot modify the subnet itself (e.g., cannot change route tables or NACLs).
+
+📊 Example Diagram:
++-----------------------------------------+
+|             VPC (Owned by Account A)     |
+| +------------+    +------------+        |
+| | Subnet 1   |    | Subnet 2   |        |
+| | (Shared)   |    | (Shared)   |        |
+| +------------+    +------------+        |
+|                                         |
++------------------+----------------------+
+                     |
+          +----------+-----------+
+          |                      |
++---------+--------+   +----------+---------+
+| Account B        |   | Account C          |
+| - EC2 Instances  |   | - Lambda Functions |
++------------------+   +--------------------+
+
+
+************************************************************************************
+🚀 Service Providers and Consumers
+-----------------------------------------
+
+1. Service Provider
+-> Service providers are the entities that offers the services or resources to the other entities within the system. In Cloud Computing or distributed systems. 
+-> Service providers generally involves cloud service providers ( Such as AWS, Azure or Google Cloud) offering various services compute, storage, networking and more. These providers deploy and manage the infrastructure necessary to deliver their services ensuring the availability, scalability and reliability.
+
+2. Service Consumers
+-> Service Consumers are the entities or users that utilizes the services provided by service providers to meet their business or operational needs. 
+-> It can be individual users, applications or organizations that leverage the capabilities offered by the service providers to accomplish the tasks, run applications, store data or access the resources. 
+-> It act as a interactive with service providers through a well-defined interfaces such as APIs , or protocols by consuming the services offered according to the requirements.
+
+-> What are Private Hosted Zones?
+-- Private Hosted Zones are the DNS Zones that are managed within the Amazon Route53. 
+-- It facilitates with resolving the Domain names to private IP addresses within the VPC. 
+-- It enables the resolution of Domain names to the private IP addresses for the resources within the same VPC or connected networks with providing the seamless and secured way of service access privately. 
+-- It enhances the security and reduces the risk of exposure to the public internet.
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,42 @@
+
+# 🎯 Goal: Capture everything for complete traceability — high verbosity, full auditing.
+
+apiVersion: audit.k8s.io/v1
+kind: Policy
+rules:
+  # Log all writes in full detail
+  - level: RequestResponse
+    verbs: ["create", "update", "patch", "delete"]
+
+  # Log sensitive resources with full details on all access
+  - level: RequestResponse
+    resources:
+    - group: ""
+      resources: ["secrets", "configmaps", "serviceaccounts"]
+    - group: "rbac.authorization.k8s.io"
+    - group: "certificates.k8s.io"
+
+  # Log all exec and port-forward commands (interactive access)
+  - level: RequestResponse
+    verbs: ["create"]
+    resources:
+    - group: ""
+      resources: ["pods/exec", "pods/portforward", "pods/attach"]
+
+  # Log all read actions as metadata for traceability
+  - level: Metadata
+    verbs: ["get", "list", "watch"]
+
+  # Capture system-level events at metadata level
+  - level: Metadata
+    users: ["system:serviceaccount:kube-system:default"]
+
+  # Catch all other actions as metadata
+  - level: Metadata
+
+
+
+# ⚠️ Notes:
+# Detailed: Logs everything with a focus on sensitive data (secrets, RBAC, service accounts).
+# Good for high-compliance environments like HIPAA, PCI DSS.
+# Expect large log volumes — requires proper log management solution (e.g., centralized logging stack).

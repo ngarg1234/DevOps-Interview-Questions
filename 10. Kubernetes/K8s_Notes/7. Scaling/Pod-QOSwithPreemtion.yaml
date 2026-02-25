@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: high-priority-pod
+spec:
+  priorityClassName: high-priority
+  containers:
+  - name: myapp
+    image: nginx
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "500m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+
+
+# Preemption Enabled: This pod will preempt (evict) lower priority pods if needed to get scheduled.
+# QoS Class: Guaranteed (due to equal requests/limits).

@@ -1,0 +1,35 @@
+# 1. Define a ConstraintTemplate (Policy Definition)
+
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdenyroot
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDenyRoot
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sdenyroot
+        violation[{"msg": "Running as root is not allowed"}] {
+          input.review.object.spec.securityContext.runAsUser == 0
+        }
+
+---
+# 2. Create a Constraint (Enforce Policy)
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDenyRoot
+metadata:
+  name: deny-root-pods
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+
+---
+3. Testing the Policy
+# kubectl apply -f pod-running-as-root.yaml
+# If the pod runs as root, Gatekeeper blocks it.

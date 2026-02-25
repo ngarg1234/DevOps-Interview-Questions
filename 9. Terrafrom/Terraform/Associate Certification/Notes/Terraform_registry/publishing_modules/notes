@@ -1,0 +1,65 @@
+Requirements for publishing into registry
+
+1, GitHub           -->     The module must be on github and the repo should be public(this is the requirement for public registry)
+
+2, Name             -->     Module repo must use the 3 part name format => terraform-<Provider>-<Name> Example -> terraform-aws-vpc
+                            terraform-aws-eks
+
+3, Repositiry       -->     The repo description is used to populate the short description of the module  
+    Description
+
+4, x.y.x tags for 
+        releases    -->     Release tag must be a semantic version, which can optionally be prefixed with v
+                                    example -> v1.0.2 or 1.0.2 
+
+5, Standard module  -->     
+        structure 
+
+
+The Standard module structure is a file and directory layout that is recommended for a reusable module distributed in seperate repositories
+
+There are 2 format
+
+1, minimal-module
+2, complete-module 
+
+>> minimal-module structure 
+
+    README.md
+    main.tf
+    variable.tf
+    outputs.tf
+
+>> complete-module structure
+
+    README.md
+    main.tf
+    variable.tf
+    outputs.tf
+    .....
+    .....
+    modules/
+        nestedA/
+            README.md
+            main.tf
+            variable.tf
+            outputs.tf
+        nestedB/
+            README.md
+            main.tf
+            variable.tf
+            outputs.tf
+        ....../
+        ...../
+    examples/
+        exampleA/
+            README.md
+            main.tf
+            variable.tf
+            outputs.tf
+        exampleB/
+            README.md
+            main.tf
+            variable.tf
+            outputs.tf
+        ....../

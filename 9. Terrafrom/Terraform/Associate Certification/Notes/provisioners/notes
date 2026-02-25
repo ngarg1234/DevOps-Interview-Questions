@@ -1,0 +1,71 @@
+
+Provisioners are used to execute scripts on local as well as remote machines
+
+types of Provisioners, local-exec, remote-exec, null-resource, file
+
+
+====>>>> Local-exec
+
+        local-exec provisioners allow us to invoke local executable after resource is created 
+
+example:
+
+    resource "aws_instance" "demo"
+    {
+        ami = "dsdfcs"
+        instance_type = t2.micros
+        provisioners "local-exec" {
+            command = "echo ${aws_instance.demo.public_ip} >> publlic_ip.txt"
+        }
+    }
+
+    one of the best use of local-exec is that, you can run ansible playbook on the newly created instances 
+
+    local-exec and invoke the ansible playbook and it can install tools on the newly created resource 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ====>>>> remote-exec
+
+    executes scripts on remote machines
+
+for remote exec, you have to use connection block from establishing remote connection with the resource
+
+
+resource "aws_instance" "demo"
+{
+    ami = "dsdfcs"
+    instance_type = t2.micros
+    key_name = myec2_key # same key should be used in provisioners 
+
+    connection {
+        type    = "ssh"
+        user    = "ec2-user"
+        private_key = file(./myec2_key.pem)
+        host    = self.public_ip #same resource 
+    }
+    provisioners "remote-exec" {
+        inline = [
+            "sudo amazon-linux-extras install nginx1",
+            "sudo systemctl start nginx"
+        ]
+    }
+}

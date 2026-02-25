@@ -1,0 +1,1096 @@
+NAGUBANDI MAHESH- AWS cloud computing
+
+https://ipwithease.com/saas-vs-paas-vs-iaas/
+https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/RegionsAndAZs.html
+https://aws.amazon.com/ec2/instance-types/
+https://aws.amazon.com/ec2/pricing/
+
+Day2:
+Accessing additional EBS Volume () - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html
+https://kymidd.medium.com/lets-do-devops-eks-k8s-python-fuzzy-staging-with-aws-secrets-manager-k8s-init-disk-secrets-b0d8022f3a5d 
+
+VPC endpoints: nat gaeway, vnet etc
+
+Cloud computing:
+=================
+to save data
+backup easily
+VM
+easily accessible
+
+Diff b/n on premise and Cloud computing:     onpremise: both software and hardware installed in same:  physical 
+1.scalability: 
+	-if resources are on premises, it will be difficult to scale up and scale down.
+    -in terms of infrastructure and maintanace cost, it will add upexpenses in case of on premise.
+	-incase of cloud computing, it'l allow you to pay as per use , depending upon how u use the resources, u l pay based on that.
+	infrastructure cost and maintanance cost both are less for scaling incase of cloud.
+2.server storage: 
+	-cost is high interms of server and storage and it consumes lots of power and maintanace. 
+	-in case of cloud storage, it saves u more money. and it offers u more space. pay as per use. more savings than onpremises.
+	                        storage will be provided and maitained by cloud.    
+3.Data security:  
+	-u need seperate team to secure ur data, u need combination of physical and traditional IT wing to secure data. offers less security compared to cloud.
+	-cloud offers much security.
+			inAWS, There are zones and regions availble.
+4.Data loss: 
+	-it is very difficult to recollect data back if u lost, incase of onpremise.
+	-incase of cloud, recovery is fast and need not worry about data.
+	-data storage service: like S3. storage classes in S3. each'l have replicas. depending upon that it'l store data in different available zones. 
+	 it's easy to get data. when storing data, we've 2 rates(faster recovery reate, time limit to recover data)to be addressed.
+5.Maintanance: on premises: 
+	-needs additional hardware and software teams for maintanance. so this wil also load up ur costs.
+	-in cloud: maintainance provided by cloud service provider.
+	
+------------------------------------------------------------------------------------------------------------------------------------
+Cloud computing: 
+	-Delivery of ur on demand computing system and pay as u use, rather than storing the files on local storage, 
+     storing on internet, in the very cost efficint manner.
+
+2 types of computing model:
+	1:Deployment model: Private, Public, Hybrid, (community and multi cloud)
+	2:Service model:
+
+deployment model of cloud computing:
+
+1. Private: cloud infrastructure is exclusively organized by single organization. only the members of organization only can be accessed(data, operations/performance).
+		access is restricted. one to one env for single user. no need to share ur hardware with anyone. handle hardware by urself,also called as internal cloud. 
+		it refers to the ability to access the systems and services within the given border and organization. offers greater flexibiltiy of control over the cloud resources as well.
+		u can 've the basic restricted firewall for  yaward..resources. data here is very very secure.		 
+		access/permissions are decided by you/organization. 
+     adv: better control of all the resources. u'r the soul owner of ur property(car). u gave complete command over resources. 
+		 data security and privacy: suitalble for storing corporate info, which need ur data  is very secure, not to share with anyone. evne the hardware/software.  
+			so, by segmenting the resources within the same infrastructure, improved access to secure is achieved,   
+		 this approach is designed to work with legacy system.that unable to access with public cloud. 
+		 customizations is also possible. wince, u'e access to everything, u can personalize according to ur requirements.   
+     dis: less scalable: prviate clouds are scaled with certian range. it is less scalbale 
+			 costly compared with public cloud.
+2. Public: every one has the access to data on server. mantaining servers on public cloud is very easy. but data is less secure.
+	adv: 1. minimal investment: pay as per use only, no need of any initial cost. making it excellent for enterprises and immediate access to the resources.
+		no setup cost:entire infrastructure is fully subsidised by cloud service provider. no need setup any hardware. infra structure'l be provided by cloud servicing provider.
+		infra mgmt: no need of infra structure mgmt. since it uses cloud infrastructure. does not required to use infra mgmt.
+		no maintanance : maintanace work is done by service provider.
+		dynamic scalability: depending upon, scale up/down the services as and when required. resources are easily accessable.
+	dis: 1. less secure: as data is available to everyone to access.  there is no guarantee that our data is secure. 
+		 2. Low customization: cannot be customized as er our requirement, as it is made to public, so genrealized.
+3. Hybrid: combintaion on both public and private. with hybrid, u may pose the application in same env by taking the adv of both. 
+		u may have a database and u want to pose web services on internet, in that case, u can go for hybrid. here data base is private cloud. 
+		which data, u want to make it access to public, can make into public.
+		u decide/choose, which data should not be accesible by others and what data u want to make it to public. 
+		adv: 1. flexibility. u've control over the resources. 
+			2. costly: as public cloud provides scalability. only pay for the extra capacity. so cost is bit higher. 
+			3. security: chances of data theft is less, as u decide which data made to public and/or public.
+		dis: 1. difficult to manage as it is combination of both
+			 2. slow data transmission as well,latency level is bit low.
+
+Service model of cloud computing:
+SaaS (software as a service) :when u receive a word document, even though u dont have word software in ur personal computer, 
+		u may have the access to view the document using google docs/gmail. it is providing the software as a service. 
+		here also, u pay as u use it. it allows u to connect to an user cloud base over the internet. it provides highest degree of 
+		vender mgmt.  allows users to run existing online apps. it provides various softwares like word processing and enable design 
+		softwares/collaboration softwares. 
+    Ex: paypal, salesforce.com , google workspace, dropbox, cisco webex, gotomeeting. gmail, zoom.
+		applications, dat, runtime, middleware, o/s, virtualization, servers, storage, networking.
+		u need not to install the software in ur system. but, u can access it over the internet.
+		3rdparty tools. 
+		https://ipwithease.com/saas-vs-paas-vs-iaas/ 
+PaaS ( Platform as a service): u've a software developer. whenever they write a code, they need some platform to run their code, 
+	that platform is called PaaS. a 3rd party provider which delivers both hardware as well as  software tools over internet. 
+	u can create and deploy the services over internet for users. service model for various applications, and provides elastic scaling of the 
+	aplications.  so that developers can build various aplications over the internet.   they need not install and again run . 
+	so,it provides a platform for them to runs and compile their code/deploy the applications as well . it is very common for developers 
+	and who mainly focus on applciation  and script development.  general users are deployers and developers. 
+   Ex: Azure serviceplatform(Microsoft), force.com, AWS elastic beanstock,  
+	google app engine (GCP), openshift.    tools over internet are PaaS.
+	it is a delivery service model for various applications.
+	har/softar tools hich are avialbe over internet.  AWS. heroku, windows, azure.
+IaaS  (infrastructure as service): combination of everything like  computing, storage, networking . ex:  EC2 machine
+		it works very similar to ur computer hardware.   like o/s, networks are extra    only diff is that it operates virtually.
+		once can directly purchase the infrastructure form the infrastructure provider.   
+   Ex: Amazon EC2, GoGrid,Google cloud computing engine, digital ocean.
+		it allows multiple users to use a particualr piece of hardware.multiple users can access it. it also provides dynamic scaling. 
+		
+----------------------------------------------------------------------------------------------------------------------------------------------------
+AWS/Azure/Google Cloud Platform(GCP)/IBM . most of the companies prefer AWS.
+
+Amazon Web Services(AWS): global cloud platform which allows u to manage the services via internet. 80% of the companies uses AWS. 
+	it provides lots of services for users. u can see AWS mgmt console, to see the list of services provided by AWS. 
+	it is basically a hosting provider which gives u larger services where u can run the applications over cloud. 
+	Services provided by AWS:
+	AWS provides IaaS.  no need not manage the backup and power supply as well.  
+	PaaS: Java, Groovy, PhP as a service. u need not to mantain the binaries of these applications. 
+	saas: here we get emial services, simple queuing services in AWS, cloud storage platform (S3). EBS(elastic blast storage), EF.
+why every organisation looks to use AWS?  
+	1. billing is very very transparent in AWS. per hour billing. every service has a micro billing.  
+	2. it provides a simple storage service(s3), u'l be charged as per 1Gb basis only. 
+        3. signup process (details and credit card) is very simple.
+	4. billing dashboard is very clear. u can easily pullout monthly reports. 
+	5. stable as well. no one had complained that AWS is down for sometime.even if it is down, no one faced much difficulty. not affected any 
+	   of the cusotmers. it is assumed as trusted adviso.evry one in the industry, startus to industries/enterprises prefer AWS.
+
+Brief about services: go to AWS console home
+EC2(elastic cloud compute): it gives u bashservers, which will give u machine whihc u can launch and run softwares of those.
+		types of instances.  
+VPC dashboard: we'l ve a pool of IP addresses. u can hold ur own resources on the addresses which u want. u feel like ur resurces are very secure, when u post it on the IP which u require.
+S3: simple storage device. it has different storage classes. pricing also varies depending on the class. 
+API gateway:
+RDS: (relational databse service) database service allow u to manage the database over cloud.   arora, SQL, Oracle
+AWS marketplace Subscription:
+AWS budgets:
+IAM: identity access maangement
+CloudTrail:
+CloudFront:
+Cloud watch: monitoring tool. it monitors AWS as well as it can intagrate other resources  monitored by cloudwatch.	
+
+-> AWS (Amazon Web Services) is a cloud computing platform that provides a wide range of services to help individuals and 
+   organizations build and run their applications and infrastructure in the cloud. Here are some of the most commonly used AWS services:
+1. EC2 (Elastic Compute Cloud): A virtual server that provides scalable computing capacity in the cloud.
+2. S3 (Simple Storage Service): A scalable, highly available, and secure object storage service that provides storage for files, images, videos, and other types of data.
+3. RDS (Relational Database Service): A managed database service that provides easy deployment, scaling, and management of relational databases like Arora, MySQL, Oracle, and PostgreSQL.
+4. Lambda: A serverless compute service that allows developers to run code without provisioning or managing servers.
+5. CloudFront: A content delivery network (CDN) that speeds up the distribution of your static and dynamic web content, such as HTML, CSS, JavaScript, and images.
+6. IAM (Identity and Access Management): A service that provides security and access management for AWS resources, allowing users to manage access to AWS services and resources.
+7. Route 53: A scalable and highly available domain name system (DNS) service that routes internet traffic to AWS resources or external resources.
+8. SNS (Simple Notification Service): A messaging service that enables the sending and receiving of messages to and from other services.
+10. SES (Simple Email Service): A cloud-based email sending service that allows you to send and receive emails using your own email addresses.
+11. CloudWatch: A monitoring service that provides real-time monitoring and logging of AWS resources and applications.
+12. CloudTrail: AWS CloudTrail is a service provided by Amazon Web Services (AWS) that provides detailed monitoring and logging of actions taken within an AWS account. It allows you to track and record account activity and events for governance, compliance, security analysis, and operational auditing purposes.
+--------------------------------------------------------------------------------------------------------------------------------
+
+auto scaling: it makes high availability of service, it ensures that ur server is available all the time.
+load balancing: distribute the traffic among servers. 
+
+https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/RegionsAndAZs.html
+availabilty zone and region : 
+-> Region: Country where your AWS data center is hosted. Clusture of data centeres.
+-> Each AWS Region is a separate geographic area. Each AWS Region has multiple, isolated locations known as Availability Zones.
+
+-> Avaliability zone: Availability Zones are distinct locations within an AWS Region that are engineered to be isolated from failures in other Availability Zones.
+-> The AWS Cloud spans 99 Availability Zones within 31 geographic regions around the world, with announced plans for 12 more Availability Zones 
+   and 4 more AWS Regions in Canada, Israel, New Zealand, and Thailand.
+
+region is something  the country where ur  AWS datacenter is posted.it means it is the cluster of datacentre. so for each and every region, u'l have different availability zones.
+physical locations around the world, where we cluster these  datacentrs  is called region.
+AWS maintains multiple geographical regions.  north America, South America,  Europe, China, Asia, Asia Pacific, south africa, MiddleEast. 
+		location where these datacenters are located.
+ depending upon the sqft of the particualar location, ul be charged accordingly. 
+ availability zones: physical multiple regions where ur data centers are posted.  this is for high avaialability purpose. for each logical datacenter, we call it as availibility zone. nort vergina is the cheapest region.
+ 
+t1.micro	t-storage class/instance type, 
+			1-generation, 
+
+t1.micro	t-storage class/instance type, 
+			1-generation, 
+			nano, micro, small, medium, large, xlarge :how larger the instance is  
+	
+First catagaries:
+-----------------
+Check the usecases of instances.
+differnt instance types:  
+** General purpose : m6in, Mac, T4g, T3, T3a, T2, M6g, M6a, M5, M5a,M5n, M5zn, M4.
+				T2: burstable CPU, Beyond the capacity also it can be operated.
+				Instance, vCPU (virtual), CPU credits/hour, Mem(GiB),storage, Network performance(Gbps).
+** Compute optimized : for high performance Process like ML, batch processing work loads, dedicated gaming servers , high performace web servers., high computing performance
+					C7gn, C7g, C6in, C6g, C6gn, C6a. C5, C5a, C5n, C4
+** storage optimize : when u need to setup a storage server, its great for storage intensive tasks.  when u take a database, where  u need high read/write access that time u gor for storage optimize.  use cases: for high performance online trxn Processing system(OLTP), relational database, 
+	I,D,H
+** memory optimized : where u want to do greater with memory cache, for faster performance like workload which require large datasets, in that case, u can go for memory optimized.   
+			use cases: high performance relatioanl and non relational databases, distriubutional webscale stores aplication performance . real time data processing of highly unstructural data,  busineess intelligence  
+	R,X,Z
+accelerated computing
+GPU optimized  :for gaming applications, M/c Learning
+   P,G,F
+HPC optimized :
+
+General purpose :
+  when everything is equally balanced, we call this as general purpose. it is greater for diversity of work loads such as web servers, code repositories, 
+  use cases: web sizes and web applications, development env, bill servers, staging environments. 
+  A,T,M
+
+
+second category:
+----------------
+instances types based on cost:
+==============================
+1. On demand: pay as how much u use. when ever u use for short period of time, u can prefer this. for a particular time perios, u fix it u, u can go for on demand, hourly basis costing.  even if it crosses a second, it csts u hour price. when the isntance is in running state, then only billing cycle starts and ends as u stop the instance. 		   
+-> it is not charged like per month/per year. its charges based  on per hour usage.
+
+2. Reserved instance: 
+	1. convertible: for the long term work loads. if u wnat to use it for a year, then prefer this. cost is less when u compared to ondemand.
+	   You ve to give commitment for a year/for 3 years. and we can ve 3 payment options. full/partial upfront. savings is bit higher than ondemand. 
+           it gives a capacity guarantee.  if, non eof the resources are being used, like, u purcahsed for a year and in case u dont use it for yaear, u can resell it to AWS (convertable)
+	2. scheduled: it is available for 3 frequencies, u use the instances b/n 91m -5pm and pay only for that. use b/n monday to friday, pay only for the scheduled period.				
+3. Spot instances:  unused AWS resources,  who ever with highest price, they will be given that resource. butm, if someone gives higher than u, 
+   ur serices will be stoed within 2mins of notice period. 
+-> It is much riskier to go for this. use for testing purposes/ if u r sure that u can retrieve data. if u think there is no loss of data 
+   by using spot instance, then only use it. cost is very less than above 2.
+4. dedicated hosts: u can book entire physics server for urseles. pay for the full service u r using. w.r.t the no instances running, 
+   u pay for the full service.  inspite of how many instances u r running, u pay for the entire service. 
+-> It is suitable when u want to use hardware env. and the underlined pos doesnot change when u stop/start ur insance.
+5. dedicated instance: cost is higher than ondemand. in adition to that, charge per hour basis. You ve like complete control, where u can actually place ur instances. 
+
+==================================================================
+-----------day-2-------------
+we'l see capacitive reservations later
+
+EBS(Elastic blast store): 
+	Is used to store our data/volume.  Once u create EC2 instance, You can see volumes attached to each and  every instance. 
+	it can enable persistently to keep the data.  even if EC2 stops, ur data remains. u can use it for persistant storaage. 
+	once u create an EC2 , u can see a volume attached to it. and u stop ur instance and come back and see. u always ve volumes attached to it. 
+	n no of volumes can be attached to single instance. but single volume cannot be attached to multiple instances.
+	the reason is , u will not loose the data no matter what. usually, u can copy the data wihtin the same availability zone as well.
+	u can also take the snapshot of volumes. 
+ 
+AMI vs snapshot
+snapshot: 
+	back up of ur volume, u can store it in same /different availbaility zone.
+	using that snapshot, u create another instance. 
+	so the volume of this particular instance will be attached to another instance which u create.
+	snapshot is like taking a backup at that point of time. 
+
+4 types of EBS volumes:  SSD(solid state drive) , HDD(hard disk drive)
+
+	*General purpose SSD, Provisioned IOPS SDD, cold HDD , Throughput Optimized HDD, magnetic.
+	*cold HDD:offers low IOPS for volume,for not frequent access, cheapest
+	*through put:offers high throughut values,has large amount of size,   ideal for dataware housing and log processing.
+    *general purpose: defult, offers high IOPS for volumes, and very low cost.  
+    *Provisioned IOPS SDD :high IOPS for volume , and has max throughput value. 
+			depending upon neeed, u can choose type of volumes u require..
+ 
+ Instance store vs EBS volume:
+ 1. EBS volume: to store persistent data.
+ 2. Instance store: meant for inpersistant data. if instances are being stopped, u may loose ur data. u've start/termination options only. 
+                 no stop option. u cannot stop ur instance.
+    u cannot ve the replication/snap shot. if u r working on ad-hoc, then use instance store.
+ 
+AMI(Amazon machine Images):  Virtual appliance used to create VM. 
+	reconfigure package which comes with OS, software bundles and other config settings. 
+	u can use the default AMI's given by AWS.  or 
+	if u ve any instance, and u installed pre required softwares over ther, form that particualr instance also u can create AMI and launch a instance as well.
+	while studying autoscaling, we can see how to launch AMI. and new instance from that AMI.
+ 
+ while launching an instance, u can see no of AMI's. 
+  u can also create AMI from
+  how can u take an AMI instance? 
+  how can u launch an instance?
+ 
+AMI consists of 3 things  
+  1.template for root volume, 
+  2.launch permissions, who can use this AMI to launch this instance.
+  3.block device matching, specifies the volume to attach to the instance when it is launching.
+  
+------------------------------------------------------------------------------------------------------------------------------------------------------------------    
+  create an extra volume and mount that volume to a particular dir in that... instance?
+      11min???????????????
+  launch an instance: name:demo
+					  instance type: t2.micro
+					  key-pair:mahi.demo					  
+		network seetings....after VPC, how we can we launch an instance on the particular ip which u require.
+		auto assign public ip:is like when ever u create an instance, it will get a public IP. u can disable it, if u dont want.
+					  configure storage:  root volume is already there	
+										  add new volume,  more 8gb, general purpose.   ////////
+					 launch instance
+  -----------------------
+	ssh -i demo.pem ec2-user@IP    //mahesh.pem  ///did it in gitbash similar to putty.  download and install. right click anywhere to launch gitbash. u've to be in , where the pem file is . ther only launch the gitbash
+	sudo yum update
+	 
+			list out all the volumes  
+	sudo lsblk		//list the block devices in linux.  //maj:min, RM, size, RO, type, mountpoint
+		u can see 2 volumes are attached to this instance.
+		create a directory and attach that dir to 2nd mount point which we have created.
+	sudo file -s /dev/xvdb	//which type of file system  -> (Determine type of FILEs.)
+		/dev/xvdb: data   //data type of file attached to it.
+		create a linux file system on the device (hard disk partition) and attach that file system to the volume which we ve created in the EC2 instance.
+	sudo mkfs -t ext4 /dev/xvda  (mkfs is used to build a Linux file system on a device, usually a hard disk partition)
+	
+	sudo mkdir /devops_demo		//create a new dir
+	sudo mount /dev/xvdb  /devops_demo/   //mount this dir to the volume/to the root device.
+	sudo lsblk		//check  the mountpoint by listing the block devices.
+		u can see, volume xvdb is attached to the /devops_demo directory.
+		initially, there was no mount point for this.    data in the directory will be mounted to this volume.
+  --------------------------------------------------------------------------------------
+  Task1:unmount dir from root volume 
+  sudo unmount .....?????
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ 
+Elastic Load balancing:
+Load balancing: 
+	it'l enable u to distribute ur traffic to the target groups among multiple servers and nodes . u can distributed in cloud computing env.
+    if u ve single instance,and u keep everything in single instance. incase, u ve particular application, initially, 5/6 users r using that. as the app becomes more popular, more no of users will use that app. 
+		say, if ur app is hosted in one particular instance when 100/1000 users r come up. ur application cannot handle traffic. 
+		so, u need a load balancer, which will enable u to distribute the traffic.
+	app may not handle much traffic.  u can ve 5/10 instnaces and distribute the traffic among n no of instances. so that users will not wait for longer timeto use ur applicatio.
+	u can distribute the traffic among IP addrdess, instance or ur containers as well.
+	u can go up with multiple availability zones, u can ve n no of instances in multiple availability zones. 
+	u can use it internally if u want to. or
+	u can create own VPC and create load balancer on that particulat VPC, and make it operate on that VPC alone. 
+	it offers u high availability. make sure no user waits for longer time.
+
+categories of load balancers: app(ALB), network(NLB), classic Load balancers/gateway(GwLB)
+
+-> Features of load balancers:
+	it only routes the traffic to only those instances which are healthy(up and running).
+-> Techniques to route: 
+	*Round rabin method:  when the request comes, 1st request goes to 1st instance...  
+	*Latency based/geographiccly based: u ve app one running in US and one running in uk. depending upon geographical location, u can route the traffic.
+	*Waited routing: 70% traffic should  reach server1. 30% traffic to server2... 
+
+Application load balancer (ALB) : works on http and https traffic. it works on the layer7.  when the load balancer receives the request, 
+        it evaluates the listing rules which are in the listed in the  target group.
+	and determine which rule to apply. ans select the target group.  depending upon that, it 'l route the traffic accordingly.  these targets are nothing but the EC2 instances.
+	create a a target, attach a EC2 instances to it. and attach the particular target to load balancer
+
+Gateway load balancer(GWLB): when you need to deploy and manage a fleet of third-party virtual appliances 
+   that support GENEVE. These appliances enable you to improve security, compliance, and policy controls.
+
+Network  load balancer (NLB):  TCP, UD, TLS. ALB,   VPC.
+	introduced by AWS in 2018. before that only application and classsic load balancers.  
+	this ideal to handle TCP traffic.
+
+Classic load balancer: (depricated). it'll route the traffic to EC2 instance directly. 
+		incase of network/application load balancers, u've to create the target group and route the traffic to target group.
+		works on both Pv4, Ipv6 addresses.
+
+--------------------------------------------------------------	
+demo on how to install httpd.put some content in html and accees it from browser.
+	sudo yum install httpd
+	sudo service httpd start
+	cd /var
+	ll
+	cd www
+	cd html/
+	ll
+	sudo vi index.html
+		<h1>hello</h1>  esc:wq!
+go to instance-->security-->edit inbound rules-->all traffic
+go to brower: ip   : u can see 'hello' in the browser.
+-----------------------------------------------------------
+before creating load balancer, create 3 instances -->select existing security group-->  //////
+		advanced details->  rather than going inside instance and install httpd , i do it in advanced settings. 
+				startup script
+				=========			
+				#!/bin/bash
+				yum update -y
+				yum install httpd -y
+				service httpd start		
+				chkconfig httpd on		//check httpd is up and running
+				cd /var/www/html
+				echo "<html><h1>This is server1</h1></html>" > index.html
+	no of instances: 3
+go to instance , change their names.
+get into the 1st instance
+----------------------------------
+	exit
+	ssh -i demo.pem ec2-user@IP_instance2  //lly instance3 also
+	cd /var/www/html
+	ll	
+	vi index.html
+	<html><h1>This is server2></h1><html>  
+go to web browser and IP:   this is server2
+--------------------------------------
+ make sure all 3 are up and running and now create load balancer and route/distribute the traffic among these 3 instances.
+
+AWS console-->Load balancers--> create load balancer--> select application load balancer
+	Name: my-demo-alb
+	scheme: internet-facing(to browse from internet)/internal
+	mappings: select all the availabiity zones.   so from instances among different availbale zones, u can choose only that available zone and route the traffic.
+	security groups:   add from existing/ create   ////choose from existing 
+	Listeners and routing:  listerner https:80
+		
+	Ip addres type: IPv4/Dualstack 
+	Network mapping:
+ 
+		----------------
+		 create a target groups in new tab.
+		 we r going to route the traffic among available instance.
+	            targetgroups:  
+				choose a target type:Instances/ip addresses/lambda function/ALB.  ///
+				Target group name: tg-my-alb
+				specify group details
+				health checks:  /index.html   health check path (or) leave blanck
+				advanced health settings:  trafficport/override
+					healthy threshold: 5, 	///    it checks ateast 5 times and then it goes to healthy state
+					unhealthy threshold: 2, wether the instance is unhealthy/not.
+					Timeout: 5sec, it will wait for the repsonse , wether  the instance is healthy/not.
+					interval:   30 ,  it l keep ur instnce checking.
+					success codes: 200-299   -->next
+				   --->save.	
+			register targets: 
+				 available instances: choose one from them to route the trafiic to it.  
+				 select include as pending below --->create the target group.
+		-----------------------------------
+	go back to create LB
+	refrest it to see the target group: choose the target group, --> create LB.
+		now, the load balancer is created.
+	once the status is active, copy the DNS name and paste it in web browser.
+		refresh: goes to server1
+		referesh: goes to server2
+		refersh: goes to server3.
+			
+now, purpose fully, stop any one instance and referesh it. load balancerwill route the traffic among the available instances only. 
+      go to target group--see total targets,  healthy, unheathy instances, unused,  initial, draining.
+
+==============================================================================================\
+------------day3------------demo,  and 
+
+## Auto scaling ##
+ Capacity reservations (in EC2):
+we ve 4 instances, 4 users are working. Total 16Gb of data/memory is there. each instance is taking 4Gb of memory. 
+1st person is using $gb, 2nd person is using 3Gb,  3rd person needs 4Gb and extra 1Gb. let, 4th person is using 2gb.  
+remaining 3Gb of data is unused. CR does is unused data can be used by 3rd user. this will enable to reserve the compute 
+capacity for amazon EC2 instances for specific availability zone and the specific duration.  
+
+while specifying, while creating EC2 instance, u ve to specify 3 things, 
+	1. avaiblaity zone 
+	2. no of instances for which u want ro reserve the capacity
+	3. Include attributes: instance type, OS 
+	    what happens, only wiht the instances  which r meeting this particular attributes only to that instances, CR/capacity can be taken. for other instances, u cannot reserve the capacity. and unless until u launch the instance with this specific attributes, only  instance will be getting created. u can use the unused capacity.
+
+placement groups( under Network security): 
+when ever u launch an EC2 instance, this EC2 service'l attempt u to place all the instances in such a way that, the instances are spread along on the hardware. undrlined hardware.. this is to minimise the correlated failures.
+
+3 types of Placement groups: 
+	1.cluster : this'l pack all ur instances close to the particular availability zone. this'l enable u the workload to achieve the low latency network performance.  so the instances'l be operated  in  much faster  manner. this can be used for high performance computational appliances 
+	2. partition: this'l spread ur instances across  logical partitions. so that instances in 1 particular partition, they cannot communicate with the other partition.  
+          one particular partition sharing with one specific hardware thing. other partition'l be sharing different hardware. this strategy can be used for replicated workloads, when u r working database realted stuffs,  u can gor for partition placement groups
+	3.spread: by default, when u launch a EC2 instances, this'l be created in the spread placement groups. for low correlation divisons , we can place it in the spread placement groups.  
+
+user data and meta data: 
+	user data: is basically the config data, this we'l use it to setup while creating EC2 instance. lik which we did  bootstrap script to install somethig....this l be executed only on boot time
+		u can edit the user data.  we can also call it a s bootstrap script.  user data is limited to 64kb only. more than that u cannot specify to user data to an EC2 instance.
+	meta data: data about the instance. data u used to get from instance like AMI ID,hostname, security groups, public keys, availabiity zone. 
+		what ever the info u want about ur instance, u go with metadata.  we'l see example of meta data, while we see autoscaling. we'l  see a script where u ve given metadata and how we can fetch metadata.     
+		usullay, metadata can be accessed by using this particular URL. who ever ve access they can. u cannot place password related details here. only instance related stuff details can be kept in this  url.
+		http://169.254.169.254/latest/metadata
+
+http://instance_IP/latest/metadata
+
+Launch tempalte vs Launch configuration:
+Launch tempalte (under instances): 
+	it is nothing but, these r the opiton, that u used to see while launching instance. template in the sense, we create it prior to that, so that , 
+	ex: people who r working with development team,  they may not ve access to create EC2 instance. they l not miss any config, they'l be given access to 
+	    launch template.from this they may ve access tocreate EC2 instance.
+		this is becoz, they'l not miss any config related stuffs. we ve specific config to be met for different specific teams, in that 
+		particular situation,they'l not miss the config. it is very easy for them to create EC2 instances. 
+		they ve details like,  AMI, OS, key-pair, security-vpc,  subnet, what type of storage volumes to be there.  all such details'l be given
+  what u wnat to create, what type of storage volume,u create.,
+launch config : is same as launch template. but, this is the previous version. in the launch template , u can ve different versions. 
+                with one version can ve a key pair and other version can ve other key-pair values .
+    
+key pairs (under network & security): combination of both public and private key.
+-----------------------------------------------------------------------------------------------------------------------------------------------  
+ Autoscaling:  this l maintain high availability of ur appliction, depending upon the traffic, it'l increase/decrease the no of instances for u.
+  incase if traffic is high , more no of users coming to access ur app,  it l increase the no of instances for u. 
+  incase if traffic is less, itl decrease the no of  instances. u pay only, when the users r accesing, at that time only, instances 'l be creadted and u'l be charged. 
+  it make sure that app is up and running all the time.  u ve to specify the desired capacity. depending on that, ur app is up and running. cost is being reduced. 
+  
+how autoscaling exactly works: demo
+  
+ before that, we see, how to create AMI out of an instance. then we'l see auto scaling.
+  
+  launch a new instance: 
+	name: demo   
+	key-pair: create a  key-pair.
+	select existing esecurity.
+	advance settings: startup data with link for metadata
+	launch.
+  git bash/ options--> text--> font--> increase font.
+  
+  ssh -i demo1.pem ec2-user@IP  //will take u to the launched instance from git bash.
+    cd /var/ww/html
+  cat index.html
+  go to browser and check with IP of the instance.
+  sudo yum install maven	//  install maven,
+  
+  
+  go to instance--> create AMI (Amazaon machine image)out of it. 
+  when u launch an instance from that specific AMI, that u'l ve this particular web page and also maven in that.
+   
+  create image--> image name: image1  -->create image
+   we'l create another AMI: first modify the nstance and create another AMI form that instance.
+   sudo vi index.html
+     <h1> updated AMI </h1> esc:wq!
+
+	ssh -i demo.pem ec2-user@ip_image
+	
+create an instance out of this AMI.
+goto images-->AMI--> Select an image--> click on launch instance from AMI
+	name: instance_from_image -->keypair->launch.  -->success.
+u can see that an instance is created from that image :instance_from_image
+go to browser and check with IP.
+	
+	go to gitbash: get into demo instance and modify the web page as below.
+	cd /var/www/html
+	sudi vi index.html
+	<h1>HELLO</h1>
+after modifictions, create an AMI from that instance. 
+	name: hello_im
+	no reboot: enable
+
+create an instance out of this image: 
+	 launch instance: name:helloimage, pem file, select existing security group,launch.
+	  
+	 go to web browser:  Ip //u can see HELLO.
+	    when ever u takeN an AMI out of it, it is created with default config which is in ur instance. this is like complete back up of instance.
+		for one specific, instance itself, u can create n no of AMI. it is timely backup/snapshot of the instance.
+		
+		
+		try launching instances from AMI:
+		
+		If u want to do it with timely thing, u can go with volume.
+	create an instance with metadata, launch AMi out of it (it is the backup of ur instance).and launch instance from that AMI. u can ve an instance like original instance. 
+	if u want to go with timely thing, u ve to backup of volume alone and save it to S3.
+----------------------------------------------------------------------------------------------------------
+-> Lifecycle hook of auto scaling:
+	the feature of auto scaling is it maintains the high availability of server.   whenever the server goes down, it does the process of creating a new instance. 
+        there it follows the life cycle. 	
+	it has 5 stages: paas-vs-ia
+1. pending : when the scaleup event is triggered. then a new instance request is initiated by the auto scaling group. 
+   then it'll take some time to launch instance. that is called pending state.
+2. pending wait : once the instance is available, instance state'l be pending wait. in this state, we can perform the 
+   pre-prodcution task: instance'l not be passed to the elastic load balancer until this lifecycle state occurs.
+3. Inservice : it is completley come into picture, to do all service. all the operation can be done here.
+4. Terminating wait : when the scale down event is triggered. instance'l chosen from auto scaling group.
+5. terminating proceed: once it is completely removed, then it goes to terminationg proceed.
+	 	 
+==================================================================
+----------day4--------  Auto scaling demo
+error in deepikas's///  sudo apt-get install apache2
+
+todays task in class: create an instance,  we r going to take 2 AMIS'sout of an instance.
+
+1.Launch an instance (demo,amazon linux,free tier ) with startup commands in advanced settings, and modify inbound rules (all traffic, anywhere ipv4)
+ ==================================
+#!/bin/bash
+yum update -y
+yum install httpd -y
+service httpd start
+chkconfig httpd on
+EC2_AVAIL_ZONE=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)
+echo "<h1> Hello from $(hostname -f) in AZ $EC2_AVAIL_ZONE </h1>" > /var/www/html/index.html
+=============================================
+	go to browser and see the content. 
+	go to git bash and 
+	ssh -i demo.pem ec2-user@IP_instance  //gitbash///putty/mobextreme
+    
+2.create an AMI out of this instance,                                             ///deregister AMI, if u use this, u cannot see AMI , and cannot create instances from it.
+	select the instance-->actions-->images and template->create image: 				//types of images: created by me, private, public
+		name:image1
+		Image description(optional): image1
+		no reboot: enable
+	go to Images-->AMI-->let this AMI be in running state.
+	
+3.update the instance
+		cd /var/www/html		//in gitbash
+		ll		//u can see index.html file
+		sudo vi index.html
+			<hl>Updated Image </hl>
+	go to browser and refresh to see the content changed.
+		
+4.now, lets's create another AMI out of the same instance (modified index.html).
+	select the instance-->actions-->images and template->create image: 
+		create image: image name:updated_image
+		image desription: updated_image
+		no reboot: enable
+	go to Images-->AMI-->let this new AMI be in running state.	
+	let this image also come to available state and then create template.
+	
+5.create a template with image1:       ////launch template:AMI,instance type, key pair, security groups
+		create launch template:
+		launch template name: auto-scaling 
+		template version description:v1
+		my AMI: choose  image //image shoud be up and running.
+		instance type: t1.micro -free tier 
+		choose key pair 
+		edit network settings:  
+		select existing security group (from instacne security): launch-wizard- sg-02ff1.... VPC  //u can also create ur own VPC. we'l see it later
+	go to launch template-->create launch template. 
+	
+   6.u can also add another new version. default version is v1. u can also modify the version.
+	launch template-->select template-->click on actions-> modify template: give version2 and select the updated image in AMI'S.
+		template version:v2	  
+		AMI: select the updated_image. -->create template version	  
+		 
+		in launch template i, click on the template u can see 2 versions , default(v1),v2.
+	
+7.now, we r going to create auto scaling.
+	AWS-->auto scaling--> Auto scaling group-->create auto scaling group	  
+		auto scaling group name: my-scaling
+		here, u can choose either launch template/launch configuration.	       we 'l use launch template.
+		we r going to launch to default version and then switch to other version.  next
+		now, choose vpc: we'l come to this later.
+		 choose the availability zone: click on all the availability zones. next
+		 u can also attach the existing load balancer. right now, use default settings..next
+		desired capacity:   2, how much capacity , min no of instances u want to keep u and running. is , how much , in free teir, more than 2 wont work.
+		group size: optional: how many instances u  want to create and how many instances u wnat tp keep up and running.
+			desired capacity and min capacity : should be teh same : 2
+			max capacity: , if the traffic is high, how many instances u want to run. in free tier, only 2 will work. next
+			add notifications-->  if ur instances r not running. if autoscaling is creating new isntances. next, 
+			tags  next,  
+		////u can've review of autoscaling group: template, version, network(VPC), AZ(Availability zone), LB(load balancer), Group size and scaling policy, notifications, tags
+			create autoscaling group.
+		
+		once u create the auto scaling group, click on it and see the activity. -->activity history. 
+			   the 5 stages, u can see in activity history.       once after u sees successful notification in activity history
+	now, go to EC2 instances, u can see it creates 2 instances and both are running.
+	go to browser, and see which version it is running. both are running with first version.
+			   
+8.now, update the auto scaling group.
+	AWS-->auto scaling--> Auto scaling group-->click on my-scaling.->edit, in the template ersion, change it to v2 and upadte it. 
+	go to EC2.  terminate the instance with id...
+	now, u can see, auto scaling'l create/launch a new instance for u. # instance refresh. copy the public key and check the version. u can see 2nd version.
+		    
+	u ve an option "instance refresh" in autoscaling groups-->my-scaling. it'l automatically update instance to the new version.
+	when there r 100 instances, if u wnat to modify them to new version. u can use this isntance refresh. instead if doing it manually.
+		u can see the progress in instance refresh history.
+		it terminated the instance with version1 and launched new instance with update version.  check with instance id's. check the versions in web browser.
+			u can check the version in auto scaling groups.
+			
+overview of todays class:	
+	created an instance
+	ami out of it  , its the first AMI
+	updated the instance.
+	AMI updated
+	launch template (for 2 AMI's)
+	create auto scaling group with v1
+	check the versions of created intances and update auto scaling groups to v2
+	delete an instance 
+	Instance refresh,     and check, it creates instances with new version.
+			   
+			    
+9.IAM: Identity Access Management.
+	when ever u login to AWS console, it'l ask u 2 options, root/user
+		restricting the access to users.
+		being the root user, u can create n no of instances in ur account. and restrict the access to each and every user.
+		in the organization, u cannot give access to all resources to everyone due to security issues.
+		it's a global service.     S3 and IAM are global.
+			   lets go to VPC and check, it shows the regions, whereas for IAM & S3, it shows global.
+	IAM: 
+		Access mgmt: user groups: u can add specific users to a group.  developers/testers groups. give access few permissions to few groups based on their..
+						users, 
+						roles, 
+						policies, 
+						identity providers
+						account settings
+		Access reports: access analyzer
+						archieve rules
+						Analyzers
+
+10. demo on creating a user and giving access permissions.
+	IAM->users-> adduser->
+		user name: demo
+		there r 2 types of access u can give to users.  
+			1.console access (user can've entire access to AWS console)
+			2.programmatical access ( u can generate acess key after creating user, usign access key login to console.using CLI in the linux terminal only  u can get all the details of instance)
+										 will give u access key, u ve to login to console, 
+
+		click on enable console access.-> custom password.--> disable must create passwd in next sign in , otherwise, it l ask u to change for every login.
+										select custom password:   welcome@123					
+		set permissions->  add user to group
+						   copy permissions
+						   attach policies directly.
+						    
+						   pemission policies:  there r differnt policies.   
+								AWS mange policies: are by default, u can choose from them. ex:AmazonEC2FullAccess. policies should be in Json format.
+								user manage policies.
+		set permissions: policies should be in Json format.
+			select EC2Fullaccess policy  ->next.  we l also see how to create our own policies.
+				-->create user   
+					copy the console sign-in URL(under security credentails), copy it and paste it in web browser (incognito mode:). login using custom passwd.
+							u can see the instances. u can also launch instances and terminate etc. as allpermissions are given
+								goto IAM: u can see access denied.  except EC2, u cannot ve any other services to access.
+			in this way, u can restrict the access to specific users.
+	overview: created a user from IAM with policy:AmazonEC2Fullaccess. so that user can login and luanch/terminate instances from user account.
+		user cannt access IAM, S3 and other services. he can access only EC2.
+11.Policies:
+	1.aws managed  : one example we've seen
+	2.custom managed: u can restrict the access to a specific instance to specific user.
+	3.inline policy: u create a user, u create custom defined policy and attach to that policy. this inline polices dies with that specific user.
+		if u attach that policy, u cannot use for another user. i.e it created and dies with the user. 
+			when the user gets deleted, this policy gets deleted along with user.
+		
+12.how to give a specific access to specific instacnce. 
+		create a new user and give access to this particular EC2 instance. we'l see how we can define a custom defined policy.
+		Tag the previos instance first.  enter key value pair:  owner: mahesh
+		create user  IAM-->USER-->add user>>name:demo1>>custom passwd.
+			permission policeies: type=Customer managed  ///  if u r using that policy, change the region and tag
+								  type: AWS managed
+								  Type: AWS managed-job function
+				attach policy/create policy
+				create policy: choose the service: EC2
+							   Actions: Manual actions/ access level: all/list/read/tagging/write/permission mgmt.
+							   u can choose ur resources: click on a particular resource and 
+							   choose launch template: to which launcth template u want to give acces.   ARN (u can see in launch template), for the identification purose.
+								u ve  search for an instance and give specific permissions to the instance.  next:tages--> it creates a policy for u, u need not to type Json 
+				once after creating a policy, u can attach this policy  to a new user ( create user). copy the URL 
+			go to incognito mode: paste it here. login with demo1 user. and check for the access permissions.
+			  only the instance, for which u gave permissions, that can be stopped. 
+			  other instances cannot be stopped. it gives error: failed to stop , not authiorized to stop.
+so, this is giving specific permission to a specific instance
+		
+-------------------------------------------------------------------------------------------------------------------
+	AmazonEC2FullAccess: Json format:	"Version": "2012-10-17",
+										"statement": [
+											{
+												"Action": "ec2:*",
+												"Effect": "Allow",
+												"Resource": "*"				all access i.e create/delete/stop instance
+											},
+											{	"Effect": "Allow",  		/delay
+												"Action": "elasticloadbalancing:*",
+												"Resource": "*"
+											},
+											{
+												"Effect": "Allow",  		/delay
+												"Action": "cloudwatch:*",
+												"Resource": "*"
+											},
+											{
+												"Effect": "Allow",  		/delay
+												"Action": "autoscaling:*",
+												"Resource": "*"
+											},
+											{
+												"Effect": "Allow",  		/delay
+												"Action": "iam:CreateServceLinkedRole:*",
+												"Resource": "*"
+												"Condition": {
+													"StringEquals":  {
+														"iam:AWSServiceName":  [
+															"autoscaling.amazonaws.com",
+															"ec2scheduled.amazonaws.com",
+															"elsticloadbalancing.amazonaws.com",
+															"spot.amazonaws.com",
+															"spotleaf.amazonaws.com",
+															"transitgateway.amazonaws.com",
+															]   }
+															}
+												}
+											]
+											}
+---------------------------------------------------------------------------------------
+in some organizations, they dont give a console acces. u ve to learn AWS CLI commands also.
+Task: create  a user, with access to all the resources, create a policy for him. give access to him in  a spcific region only, so he cannot access form other regions.
+below is the Json file for that.
+-----------------------------------------------------------------------------------------
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:StartInstances",
+                "ec2:StopInstances"
+            ],
+            "Resource": "arn:aws:ec2:ap-south-1:044466250063:instance/i-0439fe666532c5302"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeInstances",
+                "ec2:DescribeRegions",
+                "ec2:DescribeInstanceStatus"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "VisualEditor2",
+            "Effect": "Allow",
+            "Action": "ec2:StopInstances",
+            "Resource": "arn:aws:ec2:ap-south-1:044466250063:instance/i-0ccac3756401b186d"
+        }
+    ]
+}
+ARN: Amazon resource name:
+-------------------------------------------------------------------------------------------
+next class: roles,programmatic
+ 
+Q: diff b/n scaling in k8s, scaling in aws.
+Q: AWS vs Azure
+=========================================================================================================
+-----------day5-------------------   in the previos class, we ve seen console access. now we'l see Programmatic access.
+Programmatica access :
+1.create a user and we'l giv complete admin acccess
+	user name: devops_demo	
+	attach polivcies directly
+	AdministrationAccess  next//to givee complete admin access
+	review and create:  create user at end
+2.go to that user, prevoiusly, when we create user,  security credentials are automatically generated.
+	now,     create access key, -->command line interface(CLI)-->next -->create access key--> retrieve access keys--->download  csv file (only once it'l be shown)-->
+ 
+3.create an instance:  demo, amazonLinux, key-pair, select existing security group-->launch
+	git bash:   ssh -i demo.pem ec2-user@Instance_IP
+			 aws
+			 aws --version//to check wether AWS CLI is installed or not  //aws-cli/1.18.147 Python/2.7.18 Linucx/5.10.162-141.675.amzn.x86_64 botocore/1.18.6  //updated version
+			 aws configure 
+			------------------------------------------			
+			how to install AWS CLI:    https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+-------------------------------------------------------------------------------------------------------------------
+			aws --version
+			
+			aws configure	//configure the user which u ve created:
+			  AWS access key id: copy the access key id from the user and paste it here freom step2.
+			  AWS secret access key: copy from user and paste it here.
+			  dafualt region name:   		//mention region wher eu createed the instance.
+			  default output format:       //default will be Json. press enter
+		now, u can run AWS CLI commands.	    /////https://aws.amazon.com/cli/		//cli command refernce-->ec2-->
+			aws iam list-users 		//what r the users in console
+			aws ec2 describe-instances \
+				--instance-ids ___________  //this'l give entire deatails of the instance. up and running, public,private IP, security group name, group id, subnet id, ..
+	we can also filter out the command using grep etc.
+			aws ec2 describe-instacnes \
+				--filters "Name=tag-key,value=owner"
+			   
+Task: get some instance id and check wether the instance is up and running using shellscript.
+-------------------------------------------------------------------------------------------------------------------------
+IAM Roles: 
+	what ever the service ur launching, we need to perform actions on behalf of account. 
+	if ec2 instance wants to access S3  (one resource want to access another resource) that time u cannot go and create user for that.  
+	in that case we create Roles. we need to give permissions to aws services , we go for IAM Roles.
+		just like user, but they r intended not to be used by physical people, but instead it'l be used by aws services.
+	ec2 wants to  perform some action , u want to dwonlaod /upload a file to some s3, ur  ec2 shoud ve access. in that case we'l go for IAM Roles. 
+	later, we l create IAM Roles for EC2 to  access S3. lly, cloud formtaion servcices, ec2, s3 if u want to sink up with that. u can create Roles.   
+
+	cloud formation service: to ger all those permsission , u go for roles.
+
+cloud shell: 
+	available only in specific regions.  u can run all those CLI commands.  no need to configure a user in cloud shell.
+	aws iam list-users,  without configuring aws, u can use AWS CLI with cloud shell.
+	u can also download/upload files from cloud shell.
+		vi js.txt
+		pwd
+	we can download this file-->go to actions--download-->give the path.    lly uploasd the file also.
+creating a user is global// this option is in IAM,. IAM is global.
+-------------------------------------------------------------------------------------------------------------------------------
+IAM: 
+   Security tools: 
+		1.IAM credential report:     IAM-->Access reports--> Credentail report.one can download this report.
+			account level details. it'l show all the account details.  be shown.account user details and status of 
+			root account credentials, from that, we ve created users.
+				arn,password, passwd last used, multi factor auth, 
+				access keys, secret keys. 
+		2.IAM access advisor:   IAM-->user--> click on any user--> AccesAdvisor.
+			this l show only about the user. which permsission u've granted. those details u can track. 
+
+	Shat responisbility model of IAM: u ve responsibity to maintain ur own resources. AAWS'l not do everything for u. 
+		AWS is manage ur infra, u ve 2 create some policies to maintain ur resources. 
+		u ve to know , when to rotate keys, to whom give access to, u've to maintain the password policy.  
+-----------------------------------------------------------------------------------------------------------------------------------
+S3: Simple Storge Service of AWS.
+	 distribute and manage ur data is very challenging task. 
+	in case u r running lots of applications, suppose u r delivering lots of content2users , hosting a very high traffic appl of websites,
+	backing up data,  all these activities needs a lot of storage. storage require r increasingly weighted .
+	cost l also be high. if u take care of all these storage systems.
+	if u mantian ur own data center,  u need2ve ur own  storage, uve 2estimate the cost of that, for that u need to buy storage racks,  u need some one to manitnain that, u ve to hire a person for that. 
+	very tidious task. if u want to add  the capacity to the existing racks/data centers. 
+	which not only require huge amount of investments and also takes longer itme. ul not be clear, wehte this storage is sufficient/ u may end up with more storage/less storage. sometime, u may end yup with more cost.
+	
+	solution is AWS S3. 
+	its basically a web serveice for bulk storage  where u can access all ur resoources from anywhere, wherever u r there, u can access ur resources.
+	store any amount of data , upto to 5Tb in a single bucket. u've permission to create 100 buckets.
+	bucket: folder like that.
+	inside ebucket, u can ve n no of objects(files) objects can be tex file, audio/vedio/any sort of files. u can retreive  any amount of data. 
+	mobile applications, corporate app, from lots of devices u can store n no f data into S3.
+	it is designed to ve 99.99% durability. no chance to lose the data. it's replications. in multible availabiity zones u can store the replications.
+	more security and comprehensive capabilities.
+	
+	use cases of S3: 
+		unlimited storages capacity. easily integrated with other services.
+		backup of data is easy
+		recovery of data is easy.
+		copy of data is also stored in s3. so that u cannot lose data.
+			
+		u can use for static web hosting. we'l see it later.
+		
+storage classes in S3:
+	major clients: netflix:stores huge amount vedio content), 
+					airhub:hospitality company.provides their members short term lodging based on various options. for that they nedd large amout of info abour apprt/houses. 
+					thomson routers:financial company.
+					zillow:real estate company in US.
+					
+AWS supports 2 types of storage: 1.box storage(EBS): we ve seen it before.
+				2.object storage: we can organize/classify the things and store it in S3.u can create ur own package on ur own name, inside that also we can do modifications.
+		each object contains 3 major components:
+			user data: data itself, text,photo docs,vedio,audio
+			metadata:(info about the data) name of the storage, type of storgae, content type, security requ , attribute, URL of that objects.
+			unique identifiers: address given to the objects, whihc can be easily found in distributed systems.
+		 
+different storge classes in S3: ***
+	  s3 standard: default storage. u can check how much  durability and availabilty it offers.  everyting is object based. costly. if u need to retrieve/use data regularly then go for this.
+	  S3 Intelligent-Tiering: designed to automatically optimize the cost of storing data in S3. It was introduced to help customers save costs by automatically moving objects between two access tiers: Frequent Access and Infrequent Access, based on their access patterns.
+	  S3 Standard-IA(Infrequent access): if u dont use data frequently, govt , once the project is completed, u need ur data for 5 yrs.  but dont access frequently. less costly than standard. req: 33% should be stored... HRdept, payslips, 
+					dat l be stored in 3 different availabiltiy zones.
+	  S3 One Zone-IA: data l be store only in a particular available zone.	u may lose the data, if something happens in that region data center..  u can archieve the data and keep it there. cst varies depending upon the retrieval time period.
+	  S3 Glacier instant retrieval: fast manner, mins2hours
+	  S3 Glacier flexible retrieval: 1-2 days
+	  S3 Glacier deep Archive: more tieme retreive data. data l be archieved and stored here.
+		
+life cycle policy of s3:***
+	 S3-->BUCKET-->create bucket: specific criteria to create a bucket: name should be unique globally(not only for ur account). if the bucket is already present, u cannot create a bucket with same name.
+
+next class:static web hosting/versioning/how 2enable encryption/
+===============================================================================================================================================================================
+-----------day-6------------	 
+companies need a simply and secure collect, store and analyze ther data at a massive scale. AWS provide S3 with unmatchability, availability and scalability.wth a reliable infrastructure tools 
+bucket: is like creating a folder. uploading objects(files) into that.
+ 
+S3: is called object storgae: classify the things and arrange  the objects accordingly as per ur requirements.
+	max of 5Tb can be uploaded into a single bucket.
+
+	1.partial upload: 
+	2.full upload: max 5Gb of data can be uploaded. for more than that go for partial upload.
+
+security to follow: 1.bucket policy, which u'l attach to a bucket while creating,  who want to access this bucket. what particular objects can a user access. u can generte ur own policy.
+					2.ACL (Access control list):
+1.How we'l create a bucket and adding objects to a bucket. how can we access a particular website using static web hosting.
+	S3-> create Bucket--> general configuration: name: my-aws-bucket-01-jan31    ////
+						aws region: wher u want to create     /////
+						copy settings from existing bucket (optional)
+					      object ownership:  ACL disabled (recommanded)  ( objects in the bucket can be owned by this accounts, access to this bucket and its objects is specified using only policies)
+						ACL enabled( objects in the bucket can be owned by other AWS accounts, access to this bucket and its objects can be specified using ACL's)
+						  Block Public access settings to this bucket:
+						  Bucket versioning: disable/enable
+						  Tags: optional
+						  default encryption:   encryption key type: amazon s2 managed keys(SSE-S3)
+						AWS key mgmt (SSE-KME)
+						bucket key: disable/enable   //disable
+						  advanced settings:				 -->create a bucket
+						  
+	how to upload objects:  click on the bucket:  objects/properties/permissions/metrics/mgmt/access points			
+										  copy S3 URL copy URL/ download/open/delete/actions
+										  create folder/upload  --> add files/add folders
+							properties: aws resion, ARN, creation date. bucket versioing-edit...., static web hosting-->edit-->enable/disable
+			
+we'l see how to do static web hosting:
+	https://www.free-css.com/free-css-templates 
+		free CSS template-->download cakezone Free Website Template -->extract
+now, upload all these folders to ur S3 bucket.
+	add folder/add files --> uploading -->
+	once uploaded, go to bucket
+--> go to properties-->enable static website hosting-->  save changes.		////1.properties-enable-index.html
+			index document: give path as: index.html	////
+						error document: optional, this's returned when an error occurs.
+			redirectional rules: written in Json	-->save
+	now, ul get an URL for this. try to access this from browser. u'l get error (access denied, 403 forbidden) as the  bucket is not public.
+	go and make it to public.  
+		bucket-->permissions--> Clear Block all public access -->save changes.    now, check in browser.  again error
+	attach a bucket polciy for S3, for website accees.     https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html
+				edit bucket policy-->copy and paste the policy (Json) form aws docs.-->save changes. and check in browser to check the website is up and running.		//////
+				
+		imp: 1.enable static web hosting 2.make bucket as oublic and 3.add the bucket policy.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+				{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::Bucket-Name/*"    /modify the bucket name as nmk-aws-bukcet-01-jan31
+            ]
+        }
+    ]
+}
+----------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------
+error-->policy has invald resource.if name is wrong.
+
+this is how  u can use S3 for static web hosting. this is also called "Serverless connection". we ve nohting enabled here and no platform to run. but still we'r able to access our website.this is one use case of S3.
+
+2.How versioning can be done with S3:   //////Enable the versioning and upload the modified file.
+	S3-->bucket-->create bucket--> name:my-aws-bucket-02-jan31
+								   region: 
+								   bucket versioning:enable 
+								   bucket key: disable  (KMS)  -->create bucket
+	upload a file.
+	make changes to the original file in host. and again upload the file in the bucket.
+	lets go to bucket and see. u can see only single file with the versions . starting with latest version along with times. 
+
+3.how can we replicate objects in the buckets:  
+	replication:is nothing but synchronization of the bucket. u can also copy the existing object to the other bucket and what ever the operations perfomred in one  specific bucket will be replicated in other bucket. 
+lets create bucket in other region.
+	create bucket: name:, region:, enable versioning, 
+take one bucket(source bucket) and synhronise with other bucket.
+lets go to source bucket--> mgmt-->life cycle rules and replication rules
+								   create replication rule-> name: replica01
+															 status:enabled
+															 source bucket:  name, region, choose a rule scope, prefix.,tags.
+									///////					 destination: choose a bucket in this account/specify in other a/c.  browse this, select the bucket which is created in other region.
+								   u can've cross region replication and cross account replication.
+									/////					 IAM role: choose from existing/enter IAM role ARN   create a new role
+															 additional replication options.
+															 encryption
+															 destination storage class
+															 additional replication options: RTC(time control)/metrics and notifications/delete marker replication/replica modification sync
+									aws create a rule for u. u can also create . u need not to attach a rule. 
+															replication exisitng objects: yes, to replicate for existing  objects.
+															job settings: completion reports: destination bucket path
+																		  permissions.  		-->save.
+														batch operations--> takes sometime. for newly added object, it'l be fast.
+lets upload new object in bucket2 and check wether it is uploaded in bucket3
+
+we did cross region replication. create buckets in 2 regions, enable replication rule in mgmt(in source bucket), specify the destination bucket, specify wethe only existing file to be replicated or upcoming files also to be replicated.
+=================================================================================================================================================================================================================================		
+Task: create 2 users in IAM . in 1 account create 2 buckets. frame a policy such that user1 should ve access to bucket1 and user2 should ve access2 bucket2.
+
+1. create bucket named "nmk-bucket4-01-02-2023". get ready with arn of bucket to copy in policy generator in IAM users
+2. goto policy generator,   select type of policy: IAM policy
+							effect:allow
+							AWS  service:Amazon S3
+							actions:all
+							ARN: paste arn of bucket nmk-bucket4-01-02-2023-->add stmt-->generate
+  copy and paste this policy generated in user while creating user2
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1675247159179",
+            "Action": "s3:*",
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:s3:::nmk-bucket5-01-02-2023",		//which gives access to create
+                "arn:aws:s3:::nmk-bucket5-01-02-2023/*"    //working even without this line.  //which gives access to upload files.
+            ]
+        }
+    ]
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+3.IAM-->policy-->create new policy>select Json-->paste the above policy here-> next:tags->next review-->name:"user1_bucket1_policy"
+								discription: optional-->create policy
+4.IAM-->user-->add user--> user name:u1
+						 enable console access: password, untick user..-->next
+						 attach policy--> search for policy "user1_bucket1_policy" and attach -->next--> create user. 
+						 copy the url of this url.
+5. go to incognito modeof chrome--> paste the url of user "u1"--> login into the user1
+6. add a tab in incognito mode and paste the url of bucket named "nmk-bucket4-01-02-2023" (open the bucket and copy url), user1 can access this bucket.
+	lly, repeat this step for "nmk-bucket5-01-02-2023".  user1 cannot access this bucket.
+7. repeat the setps 1-6 for user2 with policy2 and for bucket "nmk-bucket5-01-02-2023". u can observe, user2 cannot access bucket "nmk-bucket4-01-02-2023", but can access "nmk-bucket5-01-02-2023".
+=============================================================================================================================================================================================================================
+-----------day-7------------	we'l do it for objects. 
+project link: you tube:
+			
+logging and motoring 
+
+A kubectl top is a command used to list all the running nodes and pods along with their resource utilization. It provides you a snapshot of resource utilization metrics like CPU, memory, and storage on each running node
+
+Task: using AWS CLI create an instance .
+Calls the Amazon Elastic Compute Cloud (EC2) DescribeInstanceStatus API operation.
+Syntax
+Get-EC2InstanceStatus
+-InstanceId <Object[]>
+-Filter <Filter[]>
+-IncludeAllInstance <Boolean>
+-MaxResult <Int32>
+-NextToken <String>
+-Select <String>
+-PassThru <SwitchParameter>
+-NoAutoIteration <SwitchParameter>
+-ClientConfig <AmazonEC2Config>
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

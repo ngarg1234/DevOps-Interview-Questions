@@ -1,0 +1,21 @@
+provider "aws" {
+  region = "us-east-2"
+  access_key = " "
+  secret_key = " "
+  }
+  
+  resource "aws_instance" "myec2" {
+    ami = "
+    instance_type = "t2.micro"
+    }
+    
+  resource "aws_eip" "lb" {
+    vpc = true
+    }
+    
+  output "instanceID" {
+    value = aws_instance.myec2.id
+    }
+    output "eip" {
+    value = aws_eip.lb.public_ip
+    }

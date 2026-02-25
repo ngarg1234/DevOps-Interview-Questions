@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-node-service
+spec:
+  selector:
+    app: my-node-app
+  ports:
+    - protocol: TCP
+      port: 80         # External access on port 80
+      targetPort: 3000 # Redirect traffic to container port 3000
+  type: LoadBalancer   # Service type to expose externally
+
+
+# A Service is an abstraction that defines a logical set of Pods and a policy by which to access them. It provides a stable IP address and DNS name for accessing the Pods, even as Pods are dynamically created or destroyed (via Deployment).
+
+# Purpose:
+# Exposes your Pods internally or externally.
+# Acts as a load balancer to distribute traffic to the Pods.
+# Provides stable networking between Pods and other services.
+# Keeps track of the Pods via a selector (based on labels).

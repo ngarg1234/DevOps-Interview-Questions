@@ -1,0 +1,9 @@
+
+module "test_module"{
+    source = "module"
+}
+
+
+output "instance_ip"{
+    value = module.test_module.publicip
+}

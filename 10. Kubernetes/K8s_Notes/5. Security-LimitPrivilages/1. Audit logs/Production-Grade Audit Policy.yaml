@@ -1,0 +1,42 @@
+# (Balanced for Security & Performance)
+# ⚙️ Goal: Capture all sensitive actions (create/update/delete), log metadata for reads (get/list/watch), avoid flooding logs with system noise.
+
+apiVersion: audit.k8s.io/v1
+kind: Policy
+rules:
+  # Log all critical changes with full request/response data
+  - level: RequestResponse
+    verbs: ["create", "update", "patch", "delete"]
+    resources:
+    - group: ""  # Core API (pods, services, etc.)
+    - group: "apps"  # Deployments, StatefulSets
+    - group: "rbac.authorization.k8s.io"  # Roles, RoleBindings
+    - group: "networking.k8s.io"  # NetworkPolicies
+    - group: "policy"  # PodSecurityPolicies (deprecated but may be used)
+
+  # Log secrets and configmaps access
+  - level: Metadata
+    resources:
+    - group: ""
+      resources: ["secrets", "configmaps"]
+
+  # Log all "get", "list", "watch" as metadata (avoid excessive size)
+  - level: Metadata
+    verbs: ["get", "list", "watch"]
+
+  # System components like kube-proxy (skip noisy system requests)
+  - level: None
+    users: ["system:kube-proxy"]
+
+  # System health checks (skip logging kubelet's frequent checks)
+  - level: None
+    users: ["system:serviceaccount:kube-system:default"]
+
+  # Catch all other requests with metadata
+  - level: Metadata
+
+
+# 🚨 Purpose:
+# Full logs of resource modifications.
+# Metadata of read actions for visibility without log bloat.
+# Ignore system noise from kube-proxy and kubelet health checks.

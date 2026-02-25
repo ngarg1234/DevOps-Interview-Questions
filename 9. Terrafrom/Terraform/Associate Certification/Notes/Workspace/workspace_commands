@@ -1,0 +1,9 @@
+list -> list all workspace -> terraform workspace list
+
+new  -> creates new workspace -> terraform workspace new dev
+
+show -> show current workspace -> terraform workspace show
+
+del -> delete a workspace -> terraform workspace delete prod 
+
+select -> allows you to select a workspace -> terraform workspace select prod

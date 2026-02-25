@@ -1,0 +1,98 @@
+AWS CloudWatch
+==============
+
+-> AWS CloudWatch is a powerful monitoring and observability service in AWS.
+-> It collects and tracks metrics, monitors log files, and sets alarms to help you manage and optimize AWS resources and applications. 
+
+
+💡 Summary:
+Metric Type	        Collected by Default?	        Reason
+CPU Utilization	       ✅ Yes	        Hypervisor-level, AWS can see without entering the OS.
+Memory Utilization	   ❌ No	            OS-level, AWS needs agent inside the VM to report this.
+Disk Usage	           ❌ No	            OS-level, requires agent to gather and send data.
+Network (in/out)	   ✅ Yes	        Hypervisor-level, AWS tracks packets to/from instance.
+
+-> Below is a detailed breakdown:
+
+1. CloudWatch Components
+-- Metrics: Collects and stores time-series data from AWS services like EC2, RDS, Lambda, and custom applications.
+-- Logs: Aggregates and stores logs from AWS services and applications.
+-- Alarms: Triggers notifications or automated actions based on metric thresholds.
+-- Events (EventBridge): Responds to system changes in real-time with rules and automated actions.
+-- Dashboards: Visualizes metrics and logs in a single panel.
+-- ServiceLens: Provides insights into application performance, integrated with X-Ray.
+
+2. CloudWatch Metrics
+-> AWS services automatically send metrics to CloudWatch. Key metrics include:
+-- EC2: CPUUtilization, NetworkIn, NetworkOut, DiskReadOps, DiskWriteOps.
+-- ECS/EKS: TaskCount, CPUReservation, MemoryReservation.
+-- RDS: CPUUtilization, DatabaseConnections.
+-- Lambda: Invocations, Duration, Errors, Throttles.
+-- Custom Metrics: Can be published using the AWS SDK.
+Example: Sending a custom metric:
+$$ aws cloudwatch put-metric-data --metric-name MyMetric --namespace MyNamespace --value 10
+
+3. CloudWatch Logs
+-- Centralized logging: Aggregates logs from AWS services and applications.
+-- Log groups & streams: Organized into logical groups.
+-- Log retention: Default is indefinite; can be customized.
+-- CloudWatch Logs Insights: Query logs using a SQL-like language.
+
+-> Example: Querying logs in CloudWatch Logs Insights:
+fields @timestamp, @message
+| sort @timestamp desc
+| limit 10
+
+
+4. CloudWatch Alarms
+1. Threshold-based alerts: Triggers actions when a metric breaches a threshold.
+2. Integrated with SNS: Sends notifications via email, SMS, or Lambda.
+
+-> Example: Create an alarm for high CPU usage:
+aws cloudwatch put-metric-alarm --alarm-name HighCPUUsage \
+  --metric-name CPUUtilization --namespace AWS/EC2 \
+  --statistic Average --period 60 --threshold 80 \
+  --comparison-operator GreaterThanThreshold \
+  --evaluation-periods 2 --alarm-actions arn:aws:sns:region:account-id:topic-name
+
+
+5. CloudWatch Events (EventBridge)
+1. Event-driven automation: Responds to AWS resource state changes.
+2. Targets: Triggers Lambda, SNS, Step Functions, etc.
+3. Scheduled Rules: Runs periodic tasks using cron expressions.
+
+-> Example: Schedule a Lambda function every day at 6 AM:
+{
+  "ScheduleExpression": "cron(0 6 * * ? *)",
+  "Targets": [
+    {
+      "Arn": "arn:aws:lambda:region:account-id:function:MyFunction",
+      "Id": "MyTargetId"
+    }
+  ]
+}
+
+
+6. CloudWatch Dashboards
+1. Custom visualizations: Create personalized dashboards with metrics and logs.
+2. Cross-account visibility: View resources across multiple AWS accounts.
+
+-> Example: Creating a simple dashboard:
+$$ aws cloudwatch put-dashboard --dashboard-name MyDashboard --dashboard-body file://dashboard.json
+
+
+7. CloudWatch Logs Agent & Unified Agent
+1. CloudWatch Logs Agent: Used for log collection.
+2. Unified CloudWatch Agent: Collects both logs and system-level metrics.
+Installation:
+$$ sudo yum install amazon-cloudwatch-agent
+$$ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-config-wizard
+
+-> Configuration Example (amazon-cloudwatch-agent.json):
+{
+  "metrics": {
+    "metrics_collected": {
+      "cpu": { "measurement": ["cpu_usage_idle"], "metrics_collection_interval": 60 }
+    }
+  }
+}
