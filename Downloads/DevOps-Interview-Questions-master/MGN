@@ -1,0 +1,1019 @@
+AWS Application Migration Service (MGN) is a highly automated lift-and-shift (rehost) solution that simplifies, expedites, and reduces the cost of migrating applications to AWS. It allows companies to lift-and-shift a large number of physical, virtual, or cloud servers without compatibility issues, performance disruption, or long cutover windows. Application Migration Service replicates source servers into your AWS account. When you’re ready, it automatically converts and launches your servers on AWS so you can quickly benefit from the cost savings, productivity, resilience, and agility of the cloud. Once your applications are running on AWS, you can leverage AWS services and capabilities to quickly and easily replatform or refactor those applications – which makes lift-and-shift a fast route to modernization.
+
+AWS Application Migration Service - Accelerates and simplifies migration by converting source servers to run natively on AWS.
+AWS native services = Fully managed cloud services provided by AWS that require no manual installation, infrastructure management, or patching.
+
+Steps:
+Identify the Physical, Virtual and Cloud Servers that needs to be migrated to AWS.
+Install Agents - Install AWS Replication Agent on your source servers
+Create Replication Template.. usually public subnet
+Replicate to AWS - Continue normal business operations while servers are replicated
+Perform tests - Perform non-dsruptive tests
+Execute Cutover - Your server are launched on AWS within minutes..
+
+Advantages: Highly automated solution, Cutover windows of minutes and no data loss, Large scale migrations with no performance impact, Reduce the cost of migrating and modernizing applications..
+
+Wave 1 -  we do migrations wave by wave..
+
+MGN replication subnet - public subnet , MGN replication instance that takes care of replication..
+
+it can be non aws servers, physical on prem, hypervisors.. 
+
+TCP - 443 for authentication, TCP - 1500 for replication.. data all encrypted during migration.
+
+Creation of Replication Instance and Conversion Instance taken care by AWS MGN service.
+
+Least Privileage model..
+
+Migration LifecylceStages: Notready,readyfortesting,testinprogress,readyforcutover,CutoverinProgress,Cutovercomplete.
+
+Here is a **clear + simple** explanation of **Replication Instance** and **Conversion Instance** in **AWS MGN (Application Migration Service)** — explained the way AWS interviewers expect.
+I’ll also give the explanation in **easy language**.
+
+---
+
+# ✅ **AWS MGN Architecture: Simple Overview**
+
+AWS MGN helps migrate physical/virtual/on-prem servers to AWS using a process called **Block-level Replication**.
+
+When migrating a server using MGN, AWS automatically creates:
+
+### 1️⃣ **Replication Instance**
+
+### 2️⃣ **Conversion Server / Conversion Instance**
+
+Both are temporary AWS-managed machines to help transfer and convert your VM.
+
+---
+
+# 🟦 **1. Replication Instance (AWS MGN Replication Server)**
+
+### **Simple Meaning:**
+
+A small EC2 machine AWS creates to **receive data** from your source machine and **write it into EBS volumes** in AWS.
+
+### **What it does:**
+
+* Handles **continuous block-level replication**
+* Stores replicated data in **Staging EBS volumes**
+* Manages **snapshots**
+* Maintains “sync” state with your source server
+
+### **Why it is needed:**
+
+Your source machine cannot directly write into AWS EBS storage.
+So AWS creates this middle-layer instance to receive and process the data.
+
+### **You do NOT manage it.**
+
+AWS creates it automatically inside **Staging Area**.
+
+---
+
+# 🟦 **2. Conversion Instance (AWS MGN Conversion Server)**
+
+### **Simple Meaning:**
+
+A temporary EC2 machine used to **convert the replicated disks** into a bootable AWS AMI.
+
+### **What it does:**
+
+* Converts your machine’s OS → AWS-compatible OS
+
+  * Adjusts drivers
+  * Modifies boot loader
+  * Injects AWS drivers for ENA, NVMe, etc.
+  * Removes hypervisor-specific agents (VMware, Hyper-V)
+* Creates a **launch-ready EC2 instance template**
+* Deletes itself automatically after completion
+
+### **Why it is needed:**
+
+Your on-prem VM disk cannot directly boot as EC2 because:
+
+* EC2 uses different virtualization
+* Needs AWS drivers
+* Needs correct Disk → Device mapping
+* Needs metadata service support
+
+The conversion server performs these transformations.
+
+---
+
+# 🟩 **Easy Analogy for Both (Simple Language)**
+
+| AWS Component            | Easy Meaning                          | Real-life Analogy                                                    |
+| ------------------------ | ------------------------------------- | -------------------------------------------------------------------- |
+| **Replication Instance** | Transfers your server’s data into AWS | Delivery person bringing boxes to warehouse                          |
+| **Conversion Instance**  | Converts your machine into AWS format | Technician unpacking boxes, rearranging them so they fit AWS shelves |
+`
+---
+
+# 🟧 **Which Languages Do They Use? (As You Asked “asy languages”)**
+
+These are *not programming-language functions*.
+But internally, AWS MGN components are built using:
+
+* **Go**
+* **Python**
+* **Rust**
+* **C/C++ for drivers**
+* **AWS Systems Manager agents**
+* **EC2 Image Builder components**
+* **Linux shell scripts & PowerShell** for OS adjustments
+
+AWS does **not** expose their internal code — but these technologies are typical in AWS internal tools.
+
+If you meant **“explain in easy language”**, the explanation above covers it.
+
+---
+
+# 🟦 Summary Table
+
+| Component                | Purpose                             | Lifecycle                   |
+| ------------------------ | ----------------------------------- | --------------------------- |
+| **Replication Instance** | Continuously replicate disks to AWS | Runs until cutover          |
+| **Conversion Instance**  | Converts disks to AWS-ready AMI     | Runs briefly → Auto deletes |
+
+---
+
+# ⭐ If you want, I can also explain:
+
+✅ How staging area works
+✅ How cutover happens
+✅ How failback replication works
+✅ How replication instance scales (multi-threading, disk queue)
+✅ Diagram of MGN workflow
+
+Just tell me: **"Explain MGN workflow"** or **"Give architecture diagram"**.
+
+Cloudtrail for monitoring .. progesss may be..
+
+AWS MGN is the primary migration service to Lift and Shift Migrations.
+
+Benefits:
+
+Easiest and Fastest with least disruptions and minimal downtimes, Reduced Migration efforts,Available pver aws console, allowed to test the server before the cutover,,
+
+Free period is 2160 hours or 90 days after you install the AWS Replication agent on your server..
+
+
+Below is a **very easy explanation first**, and then a **proper AWS-architect explanation** (for interviews).
+
+---
+
+# ✅ **Easy Language Explanation (Beginner-Friendly)**
+
+When you set up AWS MGN, you create **3 templates**.
+Think of them like *predefined settings* that AWS will use during the migration.
+
+---
+
+## **1️⃣ Replication Template (Must Configure) — “How to copy my server into AWS”**
+
+This template tells AWS:
+
+* Where to store the copied data
+* What VPC/subnet to use
+* What size replication server to create
+* What encryption to use
+* How disks should be copied
+
+**Simple meaning:**
+👉 *“These are the settings AWS should use when copying my machine into the cloud.”*
+
+---
+
+## **2️⃣ Launch Template (Optional) — “How my EC2 should look when it launches”**
+
+This defines how the migrated machine (EC2 instance) should be created in AWS:
+
+* Instance type
+* Security groups
+* Subnet
+* Tags
+* IAM role
+* Whether to use public IP
+* Volumes configuration
+
+**Simple meaning:**
+👉 *“When I turn my migrated machine ON in AWS, this is how the EC2 should be created.”*
+
+---
+
+## **3️⃣ Post-Launch Template (Optional) — “Automation after the EC2 is launched”**
+
+This defines which actions AWS should take **after** the migrated instance starts.
+
+Examples:
+
+* Install SSM agent
+* Update OS
+* Run scripts
+* Change hostname
+* Join Active Directory
+* Install CloudWatch agent
+* Patch the machine
+
+**Simple meaning:**
+👉 *“After the server boots in AWS, do these tasks automatically.”*
+
+---
+
+# 🟦 **AWS / Technical Explanation (Interview-Ready)**
+
+---
+
+# **1️⃣ Replication Template (mandatory)**
+
+This template controls the **data replication process** from source servers to the AWS MGN **staging area**.
+
+### Key settings include:
+
+* Replication server instance type
+* Staging area subnet
+* EBS volume type for replication
+* Encryption keys (KMS)
+* Data routing (private IP / public IP)
+* Bandwidth throttling
+* Tags for replication resources
+
+👉 Controls the **backend replication pipeline**.
+
+---
+
+# **2️⃣ Launch Template (optional)**
+
+This template defines the **EC2 launch configuration** for *test* and *cutover* instances.
+
+### Key settings:
+
+* EC2 instance type
+* VPC, subnet, SG
+* Placement groups
+* Licensing model
+* Tenancy
+* EBS optimization
+* Tags & metadata options
+
+👉 Controls the **runtime configuration** of the converted EC2 instance.
+
+---
+
+# **3️⃣ Post-Launch Template (optional)**
+
+Uses **AWS Systems Manager** to run predefined **post-launch actions** on the migrated server.
+
+### Actions can include:
+
+* Install/update agents (SSM, CloudWatch)
+* OS configuration changes
+* Disk initialization
+* Application reconfiguration
+* Join directory services
+* Execute SSM automation documents
+
+👉 Controls **automation** after the instance is created.
+
+---
+
+# ⭐ Super-Simple 1-Line Summary (Best for interview)
+
+> **Replication template** manages *how the machine is copied to AWS*.
+> **Launch template** manages *how the EC2 instance is created*.
+> **Post-launch template** manages *what happens after the EC2 instance starts*.
+
+---
+
+If you want, I can also give:
+
+✔ A visual diagram
+✔ Real-world example (e.g., migrating 100 servers)
+✔ 30-second interview-style answer
+
+Just tell me **"give diagram"** or **"give short answer"**.
+
+
+Steps:
+When you start off with MGN service
+use dafult/create replication template in target region,
+create MGN user in target region,
+in the source resgion, do weget, py with target region and install the script.. it will ask for creds, give step 2 one.
+then you will see source added in target region in mgn service.
+As aprt of first step, it confgures security group, reuired iam roles for migration ource server. creating staging disks
+
+We can optional update the lanuch rtemplate/. that defines the sizing of the source server, by default it is basic only.. if you want to define the custom one, select None, and give the desired instance..
+
+it will launch the instance, you can test it. 
+
+if all okay
+
+
+then  do cutover, it will ask you want to keep the test instance or not.. launch the instance final one..
+
+Then Replication server and conversion server will go down..
+
+Using the AWS Migration Hub with AWS MGN
+
+AWS Application Migration Service works with the AWS Migration Hub (MGH), allowing you to organize your servers into applications and then to track the progress of all your MGN at the server and app level, even as you move servers into multiple AWS Regions.
+
+You must choose a Migration Hub Home Region for AWS MGN to work with the Migration Hub. Learn more about choosing a Migration Hub Home Region.
+
+You can access the AWS Migration Hub from the AWS MGN navigation menu.
+
+AWS Application Migration Service supports auto tagging in MGH. Migrated resources (Amazon EC2 instances or Amazon Machine Images (AMIs)) reported to Migration Hub by AWS MGN are automatically tagged with Application Discovery Service server IDs. If you turn on cost allocation tagging, you can view the cost of the AWS resources that are tagged by Migration Hub in the AWS Cost Explorer Service. Resource tagging by Migration Hub can’t be turned off. This tagging is implemented automatically..
+
+Choose Get started on the AWS Application Migration Service landing page.
+
+You will automatically be prompted to initialize the service the first time you log into AWS Application Migration Service.
+
+Initializing the service will create a replication template. This template will determine how data replication will work for each newly added source server.
+
+The configured replication settings can be changed at any time for any individual source server or group of source servers.
+
+After you have added your source servers to the AWS Application Migration Service console, you will need to configure the launch settings for each server. The launch settings are a set of instructions that determine how a test or cutover instance will be launched for each source server on AWS. You must configure the launch settings prior to launching test or cutover instances. You can use the default settings or configure the settings to fit your requirements.
+
+Here you can see your General launch settings and EC2 launch template. Click the Edit button to edit your Launch settings or Modify to change your EC2 launch template.
+
+Launch settings are composed of the following:
+
+Instance type right-sizing – The Instance type right-sizing feature allows AWS Application Migration Service to launch a test or cutover instance type that best matches the hardware configuration of the source server. When activated, this feature overrides the instance type selected in the EC2 launch template.
+
+Start instance upon launch – Choose whether you want to start your test and cutover instances automatically upon launch or whether you want to start them manually through the Amazon EC2 Console.
+
+Copy private IP – Choose whether you want Application Migration Service to verify that the private IP used by the test or cutover instance matches the private IP used by the source server (not supported for IPv6).
+
+Transfer server tags – Choose whether you want AWS Application Migration Service to transfer any user-configured custom tags from your source servers to your test or cutover instance.
+
+OS Licensing – Choose whether you want to Bring Your Own Licenses (BYOL) from the source server to the test or cutover instance.
+
+AWS Application Migration Service automatically creates an EC2 launch template for each new source server. AWS Application Migration Service bases the majority of the instance launch settings on this template. You can edit this template to fit your needs.
+
+You can cutover one source server at a time, or simultaneously cutover multiple source servers. For each source server, you will be informed of the success or failure of the cutover. For each new cutover, AWS Application Migration Service first deletes any previously launched Test instance and dependent resources. Then, it launches a new cutover instance which reflects the most up-to-date state of the source server. After the cutover, data replication continues as before. The new and modified data on the source server is transferred to the Staging Area Subnet, and not to the cutover instances that were launched during the cutover.
+
+The general process is:
+
+Initialize AWS Application Migration Service in the target region. Refer to the list of supported AWS regions.
+
+Install the AWS Replication Agent on the source server. Learn more about agent installation .
+
+Note
+If you are using the agentless replication for vCenter feature, then you will need to add your source servers by installing the AWS MGN vCenter Client. Learn more about agentless replication.
+
+Wait until the initial sync is finished. After installing the agent, you need to wait for the initial synchronization process to complete. This process performs block level replication from the source server to the replication server in staging area.
+
+Launch test instances. Once the initial sync is finished, you can launch a target machine in Test Mode. This allows you to perform acceptance testing and verify that the migrated environment is functioning correctly.
+
+Perform acceptance tests on the servers. After the test instance is tested successfully, finalize the test and delete the test instance.
+
+Configure Post-launch actions (if needed). Learn more about Post-launch settings .
+
+Wait for the cutover window.
+
+Confirm that there is no lag.
+
+Stop all operational services on the source server.
+
+Launch a cutover instance. Launch the target machine in Cutover Mode, which initiates the final migration process.
+
+Confirm that the cutover instance was launched successfully and then finalize the cutover.
+
+Archive the source server.
+
+As part of the initialization of AWS Application Migration Service, you have the opportunity to configure three templates.
+
+Replication template (mandatory)
+
+Launch template (optional)
+
+Post-launch template (optional)
+
+Configuring your replication template
+
+To initialize AWS Application Migration Service, you must first create and configure a replication template. If you initialize Application Migration Service with the console, the initialization process creates the template for you. If you initialize Application Migration Service with the API, you create the template. For more information, see Initializing AWS Application Migration Service with the API
+
+The replication template determines how data replication will work for each new server you add. The settings configured in this template will be applied to each newly added source server. Learn more about the replication template.
+
+Configuring your launch template
+
+As part of the AWS MGN initialization process, you can configure your launch template. Every source server added to AWS MGN has launch settings that control actions performed after the server is launched in AWS. These settings are created automatically based on this default launch template, which can be modified at any time. You can also choose to modify the launch template for an individual source server.
+
+Learn more about the launch template.
+
+Configuring a post-launch template
+
+As part of the AWS MGN initialization process, you can configure your post-launch template. The post-launch template controls which post-launch actions will be executed when launching new instances. These settings are created automatically for each server based on the post-launch template and can be modified at any time. You can also modify the post-launch settings for any individual source server.
+
+To configure the post-launch actions, complete the following steps:
+
+Activate post-launch actions.
+
+Configure predefined post-launch actions according to your preferences.
+
+Create custom post-launch actions according to your preferences.
+
+During the phases of your migration project, review these best practices to help you to a successful outcome.
+
+Plan your Migration project prior to installing the AWS Replication Agent on your source servers.
+
+Do not perform any reboots on the source servers prior to a cutover.
+
+Do not archive or disconnect the source server from AWS until your launched cutover instance in AWS is working as expected.
+
+Testing
+
+Perform test at least two weeks before you plan to migrate your source servers. This time frame is intended for identifying potential problems and solving them, before the actual cutover takes place. After performing the test launch, validate connectivity to your test instances (using SSH for Linux or RDP for Windows), and perform acceptance tests for your application.
+
+Ensure that you perform a Test prior to performing a cutover.
+
+Successful implementation
+
+The following are the required steps to complete a successful migration implementation with AWS Application Migration Service:
+
+Deploy the AWS Replication Agent on your source servers.
+
+Confirm that the data replication status is Healthy.
+
+Test the launch of Test instances a week before the actual cutover.
+
+Address any issues that come up, such as Launch setting misconfiguration and potential AWS limits.
+
+Launch cutover instances for the servers on the planned date.
+
+Ensuring project success
+
+Train a field technical team & assign an AWS Application Migration Service SME.
+
+Share project timelines with AWS Application Migration Service.
+
+Monitor data replication progress and report any issues in advance.
+
+Perform a test for every server in advance, and report issues to AWS Application Migration Service.
+
+Coordinate cutover windows with AWS Application Migration Service in advance.
+
+Choose your agent-based vs agentless migration approach
+
+When planning your migration with AWS Application Migration Service (MGN), review which approach best suits your environment and goals. MGN offers agentless and agent-based replication to migrate your workloads into AWS EC2. Agent-based replication is supported for both VMware and non-VMware environments, while agentless replication is supported only for VMware environments.
+
+Consider agentless replication if your security policies restrict installing agents at the OS level of your Virtual Machines.
+
+Review the network requirements for both, agentless replication and agent-based replication, to determine the best approach for your needs.
+
+Before beginning your migration, ensure your planned operating systems are supported by your chosen replication method.
+
+We recommend reviewing AWS Prescriptive Guidance for a rehost migration approach with MGN to ensure it meets your business needs.
+
+Cost planning
+
+Before migrating, review the associated costs of using the service. For full pricing details, see the MGN pricing page.
+
+For each migrated server, MGN can be used free of MGN service charge, for 2,160 hours, which is 90 days when used continuously. Resources that are provisioned in the replication and migration processes, such as EC2 and EBS volumes, incur charges according to your account rates.
+
+Servers with high-volume workloads may require higher-performance replication resources, potentially increasing costs. Conduct network and storage benchmarking to determine the necessary staging area resources and estimate associated expenses.
+
+Plan your software licensing strategy when migrating servers. Discuss licensing terms with your operating system (OS) and software vendors as needed.
+
+When servers fail to launch, the Support team may request permission to run diagnostics. This iterative process helps the service team address edge cases causing launch failures. Diagnostic launches will incur charges based on the source and conversion server settings. Begin testing at least two weeks before your migration deadline. This allows time to resolve unexpected issues before the final cutover.
+
+Import/Export
+
+When performing large-scale migrations, you can use the Import/Export feature in AWS Application Migration Service (MGN) to efficiently stage your servers with the correct configurations. This feature uses a CSV template file with predefined columns that map to attributes of Waves, Applications, and Source Servers in MGN. The template includes columns for Launch Template settings, enabling bulk edits of these configuration options. Additionally, you can specify Tags to assist with cost center association, ensuring your cost planning remains accurate. By utilizing the Import/Export feature, you can streamline your migration process and maintain better control over your server configurations and associated costs.
+
+MGN Connector
+
+
+The following are the AWS MGN service quota limits:
+
+Name	Default	Description
+Concurrent jobs in progress
+
+Each supported AWS Region: 20
+
+Launching a test or cutover instance, or a cleanup action is considered a "job". This parameter is the maximum number of Jobs that can be run concurrently. Jobs that are "completed" are not counted against this quota.
+Max active source servers
+
+Each supported AWS Region: 150
+
+The maximum number of servers that can be actively replicating at any time. For larger migrations, contact Support.
+
+Replication servers are lightweight Amazon EC2 instances that are used to replicate data between your source servers and AWS. Replication servers are automa9uijtically launched and terminated as needed. You can modify the behavior of the replication servers by modifying the settings for a single source server or multiple source servers. Alternatively, you can run AWS Application Migration Service with the default replication server settings.
+
+The replication server options, include:
+
+The subnet within which the replication server is launched. The subnet can use both IPv4 and IPv6 CIDRs.
+
+Replication Server instance type
+
+Amazon EBS volume types
+
+Amazon EBS encryption
+
+Security groups
+
+IP Version - you can choose IPv4 or IPv6.
+
+Staging area subnet
+
+Choose the Staging area subnet that you want to allocate as the staging area subnet for all of your replication servers. If you chose to use IPv6, you must choose a subnet that uses IPv6 CIDRs.
+
+The best practice is to create a single dedicated, separate subnet for all of your migration waves using your AWS account. Learn more about creating subnets in this AWS VPC article.
+
+If a default subnet does not exist, select a specific subnet. The drop-down menu contains a list of all subnets that are available in the console's AWS Region.
+
+Note
+Changing the subnet does not significantly interfere with ongoing data replication, although there may be a minor delay of several minutes while the servers are moved from one subnet to another.
+
+The Launch template allows you to control the way AWS Application Migration Service launches instances in AWS. The default configuration defined in the template is automatically applied to every newly added server.
+
+To edit the launch template for your entire account, you need to edit your launch template. Choose Launch template from the left-hand navigation menu.
+
+This opens the account template view. Click Edit to update your account-level launch template.
+
+Note
+Ensure the Account Level EC2 Launch Template is not deleted. If it is, edit and save the launch template page to create a new Account Level Template.
+
+You can change the settings for specific servers without affecting the launch template as described in Edit replication settings for a server .
+
+See Assign an IPv6 address to an instance in the Amazon EC2 User Guide for a list of instance types that do not support IPv6 addresses
+
+Topics
+General launch settings reference
+
+Default EC2 launch template settings
+
+MAP program tagging setting
+
+General launch settings reference
+
+In the General launch settings section, you can define:
+
+Instance type right sizing: If you select this option, AWS Application Migration Service launches a test or cutover AWS instance type that best matches the OS, CPU, and RAM of your source server. Please note that the AWS instance type selected by Application Migration Service when this option is selected overwrites the instance type defined in your EC2 launch template.
+
+Start instance upon launch: Choose whether to start your test and cutover instances automatically upon launch or launch them in a stopped state.
+
+Copy private IP: Select if you want AWS Application Migration Service to ensure that the private IP used by the test or cutover instance matches the private IP used by the source server. If selected, AWS Application Migration Service monitors the source server on an hourly basis to identify the Private IP and uses the private IP of the primary network interface. Make sure that the IP range of the subnet you set in the EC2 Launch Template includes the private IP address for this feature to work. Copy private IP is not supported for IPv6.
+
+Transfer server tags: Select if you want AWS Application Migration Service to transfer user-configured custom tags from your source servers to your test or cutover instance. If selected, server tags are transferred. These tags are attached to all source servers, all launched test and cutover instances, and all of the ephemeral resources that are created on your AWS account during the normal operation of AWS Application Migration Service, such as snapshots, Amazon EBS volumes, replication and conversion servers, and security groups.
+
+Operating system licensing: Select if you want to Bring Your Own Licenses (BYOL) from the source server into the test or cutover instance.
+
+Select the “Bring your own license (BYOL)” option if you are migrating a Linux server. All Linux licenses are BYOL by default. Any RHEL, SUSE or Debian licenses are transferred in their current form to the migrated instance.
+
+For Windows servers choose if you want to BYOL)”. This sets set up a Dedicated Host. All the licenses from the source Windows source server are automatically transferred to the test or cutover instance. Please note that if you use BYOL licensing for Windows you have to change the Placement.tenancy type in the EC2 launch template to Host. Otherwise, instance launch fails.
+
+Before you use Application Migration Service, make sure to prepare your environments. Preparation includes setting correct network settings, defining network requirements, and opening the correct ports.
+
+Topics
+Service and network architecture overview
+
+Network setting preparations
+
+Required connectivity settings
+
+Service and network architecture overview
+
+Watch the AWS Application Migration Service - Service architecture and network architecture video for an in-depth overview of the Application Migration Service architecture.
+A
+This is the Application Migration Service network diagram:
+
+Application Migration Service network architecture modernization diagram
+
+Network setting preparations
+
+As part of network setting preparations, set up a staging area and operational subnets.
+
+Topics
+Staging area subnet
+
+Staging area subnet network requirements
+
+Operational subnets
+
+Staging area subnet
+Before setting up Application Migration Service you should create a subnet which will be used by the service as a staging area for data replicated from your source servers to AWS.
+
+You must specify this subnet in the replication settings template. While you can use an existing subnet in your AWS account, the best practice is to create a new dedicated subnet for this purpose. Learn more about replication settings.
+
+You can override this subnet for specific source servers in the replication settings.
+
+Note
+When planning to migrate to an AWS Local Zone, we recommend setting the staging area subnet within the AWS Region, and not the Local Zone. This ensures optimal launch conditions for the replication servers and conversion servers involved in the migration process. However, if you have specific requirements to use the Local Zone for the staging area subnet, we recommend performing thorough testing and validation to ensure you can successfully replicate and cut over your workloads without any issues.
+
+Staging area subnet network requirements
+The replication servers launched by Application Migration Service in your staging area subnet need to be able to send data over TCP port 443 to either the
+
+IPv4 compatible Application Migration Service API endpoint at https://mgn.aws-region.amazonaws.com/. Replace aws-region with the AWS Region code you are replicating to, for example “us-east-1”
+
+Dual-stack compatible Application Migration Service API endpoint at https://mgn.aws-region.api.aws. Replace aws-region with the AWS Region code you are replicating to, for example “us-east-1”
+
+The source servers on which the AWS Replication Agent is installed need be able to send data over TCP port 1500 to the replication servers in the staging area subnet. They also need to be able to send data to the Application Migration Service API endpoint at https://mgn.{region}.amazonaws.com/. Replace “{region}” with the AWS Region code you are replicating to, for example “us-east-1” .
+
+Note
+SSL interception should not be applied for communication between replication servers and the Application Migration Service API endpoint, as well as between source servers and the MGN; API endpoint.
+
+Operational subnets
+Test and cutover instances are launched in a subnet you specify in the Amazon EC2 launch template associated with each source server. The Amazon EC2 launch template is created automatically when you add a source server to AWS Application Migration Service.
+
+Learn more about launching test and cutover instances.
+
+Learn more about how Amazon EC2 launch templates are used.
+
+Required connectivity settings
+
+To prepare your network for running AWS Application Migration Service, set these connectivity settings:
+
+Note
+All communication is encrypted with TLS.
+
+Topics
+Communication over TCP port 443
+
+Communication between the source servers and AWS Application Migration Service over TCP port 443
+
+Communication between the staging area subnet and AWS Application Migration Service over TCP port 443
+
+Communication between the source servers and the staging area subnet over TCP port 1500
+
+Communication over TCP port 443
+Add these IP addresses and URLs to your firewall:
+
+The AWS Application Migration Service AWS Region-specific console address:
+
+(mgn.<region>.amazonaws.com example: mgn.eu-west-1.amazonaws.com)
+
+Amazon S3 service URLs (required for downloading AWS Application Migration Service software)
+
+The AWS Replication Agent installer should have access to the Amazon S3 bucket URL of the AWS Region you are using with AWS Application Migration Service.
+
+The staging area subnet should have access to Amazon S3.
+
+Allowlist these Amazon S3 buckets:
+
+
+
+https://aws-mgn-clients-<REGION>.s3.<REGION>.amazonaws.com/
+https://aws-mgn-clients-hashes-<REGION>.s3.<REGION>.amazonaws.com/
+https://aws-mgn-internal-<REGION>.s3.<REGION>.amazonaws.com/
+https://aws-mgn-internal-hashes-<REGION>.s3.<REGION>.amazonaws.com/
+https://aws-application-migration-service-<REGION>.s3.<REGION>.amazonaws.com/
+https://aws-application-migration-service-hashes-<REGION>.s3.<REGION>.amazonaws.com/
+https://amazon-ssm-<REGION>.s3.<REGION>.amazonaws.com/
+     
+Note
+Learn more about S3 dual-stack endpoints in Amazon S3 dual-stack endpoints.
+
+Agent installation and replication server components require Amazon S3 bucket for service functionality.
+
+If you use an Amazon S3 VPC Endpoint, you must provide sufficient permissions for service functionality, as shown in this example policy for replicating to us-east-1:
+
+
+JSON
+
+{
+	"Version":"2012-10-17",		 	 	 
+	 "Statement": [
+		{
+			 "Effect":  "Allow",
+			 "Principal": {
+				 "AWS":  "*"
+			},
+			 "Action":  "s3:GetObject",
+			 "Resource": [
+				 "arn:aws:s3:::aws-mgn-clients-us-east-1/*",
+				 "arn:aws:s3:::aws-mgn-clients-hashes-us-east-1/*",
+				 "arn:aws:s3:::aws-mgn-clients-us-east-1/*",
+				 "arn:aws:s3:::aws-mgn-clients-us-east-1/*",
+				 "arn:aws:s3:::aws-mgn-clients-hashes-us-east-1/*",
+				 "arn:aws:s3:::aws-mgn-internal-us-east-1/*",
+				 "arn:aws:s3:::aws-mgn-internal-hashes-us-east-1/*",
+				 "arn:aws:s3:::aws-application-migration-service-us-east-1/*",
+				 "arn:aws:s3:::aws-application-migration-service-hashes-us-east-1/*",
+				 "arn:aws:s3:::amazon-ssm-us-east-1/*"
+			]
+		}
+	]
+}
+
+
+Provide feedback
+AWS specific
+
+The staging area subnet requires outbound access to the Amazon EC2 endpoint of its AWS Region.
+
+TCP port 443 is used for two communication routes:
+
+1. Between the source servers and AWS Application Migration Service.
+
+2. Between the staging area subnet and AWS Application Migration Service.
+
+Communication between the source servers and AWS Application Migration Service over TCP port 443
+Each source server that is added to Application Migration Service must continuously communicate with Application Migration Service (mgn.<region>.amazonaws.com) over TCP port 443.
+
+These are the main operations performed through TCP port 443:
+
+Downloading the AWS Replication Agent on the source servers.
+
+Upgrading installed agents.
+
+Connecting the source servers to the Application Migration Service console and displaying their replication status.
+
+Monitoring the source servers for internal troubleshooting and the use of resource consumption metrics (such as CPU, RAM).
+
+Reporting source server-related events (for example, a removal of disk, or resizing of a disk).
+
+Transmit source server-related information to the Application Migration Service console (including hardware information, running services, and installed applications and packages).
+
+Preparing the source servers for test or cutover.
+
+Important
+Make sure that your corporate firewall allows connections over TCP port 443.
+
+Solving communication problems over TCP port 443 between the source servers and AWS Application Migration Service
+If there is no connection between your source servers and Application Migration Service, make sure that your corporate firewall enables connectivity from the source servers to Application Migration Service over TCP Port 443. If the connectivity is blocked, enable it.
+
+Enabling Windows Firewall for TCP port 443 connectivity
+Important
+The information provided in this section is for general security and firewall guidance only. The information is provided on "AS IS" basis, with no guarantee of completeness, accuracy or timeliness, and without warranty or representations of any kind, expressed or implied. In no event will AWS and/or its subsidiaries and/or their employees or service providers be liable to you or anyone else for any decision made or action taken in reliance on the information provided here or for any direct, indirect, consequential, special or similar damages (including any kind of loss), even if advised of the possibility of such damages. AWS is not responsible for the update, validation, or support of security and firewall information.
+
+The Waves page lists all the waves that have been added to AWS Application Migration Service (AWS MGN). The Waves page allows you to manage your waves and perform a variety of commands for one or more waves (such as controlling replication and launching test and cutover instances).
+
+Interacting with the Waves page
+
+The Waves page shows a list of waves. Each row on the list represents a single wave.
+
+The Waves page provides key information for each wave under each of the columns on the page.
+
+The columns include:
+
+Selector column – This blank checkbox selector column allows you to select one or more waves. When a wave is selected, you can interact with the wave through the Actions menu, Edit, and Delete buttons. Selected waves are highlighted.
+
+Wave name – This column shows the unique wave name for each wave.
+
+Migration status – This column shows the migration status for each wave.
+
+Not started – If none of the wave's associated servers has started replication yet.
+
+In progress – At least one of the wave's associated applications has started replication and not all of its applications completed migration.
+
+Completed – If all the wave associated applications completed migration (have been cutover).
+
+Alerts – This column shows whether any alerts exist for the wave.
+
+A wave that has at least one application that is experiencing significant issues, such as a stall, will display a Stalled status.
+
+An wave that has at least one application that is experiencing a temporary issue such as lag or backlog will display a Lagging status.
+
+A healthy active wave will display a Healthy status.
+
+Archived waves do not display any alerts.
+
+Number of applications – This column shows the total number of applications associated with each wave.
+
+Topics
+Add wave
+
+Edit wave
+
+Delete wave
+
+Manage selected waves
+
+Filtering migration waves
+
+Application Migration Service connectors enable you to run commands on multiple source servers. Use connectors for large-scale migrations with multiple operating system types and versions, which may be distributed across multiple data centers. A connector can also help:
+
+Verify the prerequisites are met for installation of the MGN replication agent on the source servers.
+
+Install the Application Migration Service replication agents on the source servers.
+
+You can install the AWS MGN connector in your source environment and use it to perform actions on source servers in your data center.
+
+This feature, combined with the post-launch action framework, offers automation across the entire deployment process.
+
+To use MGN connector you must have these required IAM roles for individual accounts and AWS Organizations networks:
+
+MGNConnectorInstallerRole
+
+AWSApplicationMigrationConnectorManagementRole
+
+AWSApplicationMigrationConnectorSharingRole_management-account-id Needed in an individual account. Also needed in an organization, on every account, including the management account.
+
+Individual account: For an MGN connector in an individual account, create these roles as described in Create roles manually.
+
+Multiple accounts: If the MGN connector manages source servers from multiple accounts, set up the global view feature and set up your AWS Organization, as described in Manage large-scale migrations with global view. After you set up your AWS Organization:
+
+Create the MGNConnectorInstallerRole and the AWSApplicationMigrationConnectorManagementRole as described in Create roles manually.
+
+Configure the CloudFormation StackSet to create the AWSApplicationMigrationConnectorSharingRole_management-account-id role per management account. Use the template "Enable Application Migration Service Connector access". Instructions are in Deploy role using a CloudFormation template .
+
+ AWS Application Migration Service (AWS MGN) allows you to launch test and cutover instances in AWS. Prior to launching instances, you must configure your Launch settings. The following documentation explains how to configure Launch settings and how to launch Test and cutover instances using the configured settings.
+
+Launch settings determine how your test and cutover instances are launched in AWS. Through Launch settings, you can fully customize your test and cutover instances by configuring key metrics, such as the subnet within which the instance is launched, the instance type to be used, licence transfers, replication status, and a variety of other settings. AWS MGN ensures that your test and cutover instances constantly abide by the latest AWS security, instance, and other updates by utilizing EC2 launch templates. EC2 launch templates always use the latest EC2 instance and technology. They integrate with Application Migration Service in order to give you full control over every single setting within your test and cutover instance. Once you have configured your instance's launch settings, you can launch them directly through the AWS MGN console. During the launch process, either during test or cutover instance launch, the AWS replication agent is removed from the test or cutover instance, and does not run on it.
+
+You can monitor Application Migration Service using CloudWatch, which collects raw data and processes it into readable, near real-time metrics. These statistics are kept for 15 months, so that you can access historical information and gain a better perspective on how your web application or service is performing. You can also set alarms that watch for certain thresholds, and send notifications or take actions when those thresholds are met. For more information, see the Amazon CloudWatch User Guide.
+
+Application Migration Service supports six CloudWatch metrics in the AWS/MGN namespace.
+
+Application Migration Service includes the following metrics across all Source servers. The following metrics are dimensionless.
+
+Metric name	Description
+ActiveSourceServerCount	Number of Source
+
+When you save a new template version, it is tagged as the latest version. However, for a multitude of reasons, AWS Application Migration Service (AWS MGN) uses the version marked as the default for its purposes. So in order to actually have AWS MGN recognize the changes you make, you need to go into the template itself, and change the default version to the version you have just updated.
+
+Great question — **Waves are one of the most important concepts in AWS migrations**, especially large-scale ones (hundreds or thousands of servers).
+
+Here’s the **real reason** we use **waves**, explained simply and practically.
+
+---
+
+# 🚀 **What are “Waves” in AWS Migration?**
+
+A **Wave** is a *group of servers that you migrate together as a batch* during:
+
+* Testing
+* Cutover
+* Validation
+
+Think of it as a **migration batch**.
+
+---
+
+# 🎯 **Why do we need Waves? (The Real Reasons)**
+
+Here are the **6 critical reasons Waves are necessary**:
+
+---
+
+# 1️⃣ **Applications have dependencies — they must migrate together**
+
+Example:
+
+* App1 Server
+* App1 DB
+* App1 Backend
+* App1 Worker
+* App1 Cache
+* App1 LB
+* App1 API gateway VM
+
+If you migrate **only 1 server**, the app breaks.
+
+So you create a Wave:
+
+```
+Wave 1:
+  - App1-frontend
+  - App1-backend
+  - App1-database
+  - App1-redis
+  - App1-workers
+```
+
+➡️ **Entire application moves together.**
+
+---
+
+# 2️⃣ **Avoid outage of business-critical systems**
+
+You *never* migrate everything in one night.
+
+Instead:
+
+* Wave 1 → Critical but simple
+* Wave 2 → Medium complexity
+* Wave 3 → Low risk apps
+* Wave 10 → Very risky apps (databases, giant ERPs)
+
+This reduces disaster risk.
+
+---
+
+# 3️⃣ **Controlled cutover — you move in phases**
+
+With 1000 servers:
+
+* You cannot test 1000 simultaneously
+* You cannot cutover 1000 simultaneously
+* You cannot validate 1000 simultaneously
+
+Waves allow:
+
+```
+Week 1 → Wave 1 (50 servers)
+Week 2 → Wave 2 (80 servers)
+Week 3 → Wave 3 (120 servers)
+...
+Final → Wave 15 (200 servers)
+```
+
+---
+
+# 4️⃣ **Parallel teams can work independently**
+
+Different teams handle:
+
+* SAP
+* DB
+* Windows
+* Linux
+* Payments
+* Networking
+
+Each team gets their own Wave.
+
+Improves coordination and ownership.
+
+---
+
+# 5️⃣ **MGN automation depends on Waves**
+
+AWS MGN uses waves to:
+
+* Launch test instances
+* Launch cutover instances
+* Track migration progress
+* Perform failback
+* Group logs and reports
+* Set post-launch actions
+
+Without waves, tracking 1000 servers is chaos.
+
+---
+
+# 6️⃣ **Rollback becomes easy**
+
+If something breaks:
+
+* You only rollback Wave 3 (50 servers)
+* Rest of the migration continues
+
+Instead of having to rollback 1000 servers.
+
+This reduces blast radius.
+
+---
+
+# 🧩 **Why not migrate ALL servers at once?**
+
+Because:
+
+❌ Downtime becomes huge
+❌ More failures
+❌ Dependencies break
+❌ Hard to validate
+❌ Hard to coordinate
+❌ No rollback strategy
+❌ No audit trail
+❌ Terrible risk management
+
+This is how migrations fail.
+
+---
+
+# 🏁 **Summary (Your Interview Answer)**
+
+Use this as your final interview response:
+
+> **Waves are logical groups of servers that migrate together.
+> They help us preserve application dependencies, reduce risk, manage cutover in phases, coordinate teams, support automation in AWS MGN, and simplify rollback.
+> For large-scale migrations, waves are mandatory because they provide structure, control, and visibility across hundreds or thousands of servers.**
+
+---
+
+If you want, I can also explain:
+
+📌 Difference between Wave vs Application in AWS MGN
+📌 How to design waves for a real enterprise migration
+📌 Best practices for building wave groups
+
+Just tell me!
+
+
+Yes 👇
+
+You can migrate without a connector IF you:
+
+Install MGN agent manually
+
+Know all server details
+
+Manage server list manually
+
+Configure launch templates manually
+
+This is fine for small migrations (5–20 servers).
+
+But…
+
+❌ Not practical for 500+ servers
+❌ No auto-discovery
+❌ No metadata population
+❌ A lot of manual work
+❌ Higher chances of error
+
+
+We use MGN Connectors for large-scale migrations because they automatically discover on-prem servers, integrate with vCenter, bulk-register machines into AWS MGN, and provide accurate metadata needed for replication and launch template creation.
+
+Without the connector, all this work must be done manually, which does not scale for hundreds or thousands of servers.

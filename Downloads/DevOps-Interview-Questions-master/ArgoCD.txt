@@ -1,0 +1,452 @@
+WITHOUT ArgoCD
+
+Without ArgoCD (GitOps), **Jenkins itself must update the Kubernetes manifest file** (usually `deployment.yaml`) with the new image tag, then apply it to the cluster.
+
+There are 3 common approaches to achieve this.
+
+---
+
+# ✅ **1. Jenkins updates the manifest file using `sed` or yq (Most common)**
+
+### Suppose your deployment.yaml contains:
+
+```yaml
+containers:
+  - name: myapp
+    image: myrepo/myapp:1.0.0
+```
+
+### Jenkins Pipeline:
+
+```groovy
+pipeline {
+  agent any
+
+  stages {
+    stage('Build') {
+      steps {
+        sh 'docker build -t myrepo/myapp:${BUILD_NUMBER} .'
+        sh 'docker push myrepo/myapp:${BUILD_NUMBER}'
+      }
+    }
+
+    stage('Update K8s Manifest') {
+      steps {
+        sh """
+        sed -i 's#image: myrepo/myapp:.*#image: myrepo/myapp:${BUILD_NUMBER}#' k8s/deployment.yaml
+        """
+      }
+    }
+
+    stage('Deploy to K8s') {
+      steps {
+        sh 'kubectl apply -f k8s/deployment.yaml'
+      }
+    }
+  }
+}
+```
+
+✔ **Jenkins builds image**
+✔ **Pushes new tag**
+✔ **Updates deployment YAML**
+✔ **Applies it to Kubernetes**
+
+---
+
+# ✅ **2. Use Helm values update (if using Helm)**
+
+Instead of editing deployment.yaml, Jenkins updates the Helm `values.yaml`:
+
+### values.yaml
+
+```yaml
+image:
+  repository: myrepo/myapp
+  tag: "1.0.0"
+```
+
+### Jenkins Pipeline:
+
+```groovy
+sh """
+yq e '.image.tag = "${BUILD_NUMBER}"' -i helm/values.yaml
+helm upgrade --install myapp ./helm --namespace prod
+"""
+```
+
+---
+
+# ✅ **3. Skip editing YAML — use image override in kubectl (best for simple CI/CD)**
+
+If your image tag is inside a Deployment spec, Kubernetes supports patching the image directly without editing any files:
+
+### Jenkins:
+
+```groovy
+sh """
+kubectl set image deployment/myapp myapp=myrepo/myapp:${BUILD_NUMBER} -n prod
+"""
+```
+
+No YAML modification. No Git update.
+Kubernetes updates the deployment directly.
+
+---
+
+# ⚙️ **Which method is best?**
+
+| Method              | Pros                   | Cons                        |
+| ------------------- | ---------------------- | --------------------------- |
+| Edit YAML (sed/yq)  | Simple, Git-tracked    | Modifies source files       |
+| Update Helm values  | Clean for Helm users   | Requires Helm               |
+| `kubectl set image` | Fastest, no file edits | No Git history (not GitOps) |
+
+---
+
+# 🧩 **What companies typically do (without ArgoCD)**
+
+Most companies do one of these:
+
+### ✔ Jenkins → updates image tag in manifest → `kubectl apply`
+
+(Git stores the updated tag. Good audit.)
+
+or
+
+### ✔ Jenkins → kubectl set image (no Git changes)
+
+(Very fast & simple for small projects.)
+
+---
+
+# 📌 If you want, I can generate:
+
+✅ A complete Jenkinsfile for your project
+✅ Kubernetes manifest with placeholders for image tags
+✅ Helm chart updated by Jenkins
+
+Tell me your repo structure or send your existing YAML.
+
+Summary — Problems with the Jenkins Direct Deployment Approach
+Issue	Why it's bad
+No GitOps	Git not treated as the source of truth
+Drift	K8s and Git get out of sync
+Fragile sed/yq patching	Breaks easily
+No self-healing	Manual tracking needed
+Security risks	Jenkins has too much access
+Hard rollbacks	No history
+Complex promotions	Rebuild or multiple pipelines
+Big compliance gaps	No audit trail
+
+After_ArgoCD
+
+ArgoCD is part of K8s cluster.
+
+ArgoCD Agent pulls the K8s manifest changes and applies them.
+
+Steps:
+
+1) Deploy ArgoCD in K8s cluster
+2) Configure ArgoCD to track Git repository.
+3) ArgoCD monitors for any changes and applies automatically.
+
+
+Best Practice is to have separate repository for application source code and application configuration.
+
+I dont want to trigger the CI pipeline when application code does not chnage... or if do that too, i dont want to set up
+complex logic that checks what changed.
+
+Whenever, k8s manifest file changes and ArgoCD tracks the changes and if found, apply it.
+
+ArgoCD supports Kubernetes Manifest files, helm CHarts.
+
+What if someone do the changes in the cluster directly, without making changes in the git repository.
+
+Argocd checks the desired state in the git hub repo and see the current state in the cluster.. if not matched, then it does the desired state.
+
+so, in this case
+
+changes will be reverted/overwritten with chnages in the git repository.
+
+Easy Rollback, just do git revert.
+
+No need to do helm uninstall or kubectl delete
+
+Cluster Disastor Recovery.. If some region goes down. i can create new cluster in some other region.. 
+
+Disaster recovery (DR) in **ArgoCD** is simpler compared to traditional CI/CD because ArgoCD follows **GitOps principles**—your *actual desired state is stored in Git*, not in ArgoCD itself.
+
+Below is a complete, practical guide on how to perform DR for ArgoCD.
+
+---
+
+# 🧩 **Core Idea: ArgoCD Itself Is NOT Critical — Git Is the Source of Truth**
+
+If your ArgoCD server crashes or is lost:
+
+👉 **You can rebuild it from scratch**
+👉 **It will re-sync everything from Git**
+👉 **Your apps will automatically return to correct state**
+
+This is why ArgoCD-based DR is easier than Jenkins-based deployments.
+
+---
+
+# 🛠️ 1. What Needs to Be Backed Up?
+
+There are only *two* types of data ArgoCD uses:
+
+---
+
+## **A) Stored in Git** (Already Safe)
+
+* All Helm charts
+* All Kubernetes manifests
+* All Kustomize overlays
+* App of Apps definitions
+* Environment configs (values.yaml)
+
+💚 **No need to backup — Git already ensures DR**
+
+---
+
+## **B) Stored in ArgoCD Redis / Kubernetes resources** (Must protect)
+
+These include:
+
+### **1. Application Manifests (Custom Resources)**
+
+* `Application`
+* `AppProject`
+
+These are stored **in Kubernetes**, not Git.
+
+### **2. ArgoCD RBAC & ConfigMaps**
+
+* `argocd-cm`
+* `argocd-rbac-cm`
+* `argocd-secret` (contains admin password, SSO info)
+* repository credentials
+* cluster credentials
+
+### **3. ArgoCD Redis HA data (cache)**
+
+Not required for DR → It rebuilds automatically.
+
+---
+
+# 📦 **2. How to Back Up ArgoCD Properly**
+
+## 🔹 **Option 1 — Backup ArgoCD namespace (recommended)**
+
+Use Velero or Kasten K10 to backup the entire namespace:
+
+```
+velero backup create argocd-backup --include-namespaces argocd
+```
+
+This captures:
+
+* secrets
+* ConfigMaps
+* CRDs
+* Application definitions
+
+✔ Best option
+✔ Fully automated
+✔ Fast restore
+
+---
+
+## 🔹 **Option 2 — Backup only critical resources**
+
+### Backup Applications & Projects
+
+```
+kubectl get applications -n argocd -o yaml > apps.yaml
+kubectl get appprojects -n argocd -o yaml > projects.yaml
+```
+
+### Backup configurations
+
+```
+kubectl get cm -n argocd -o yaml > configmaps.yaml
+kubectl get secrets -n argocd -o yaml > secrets.yaml
+```
+
+### Store these in Git or S3.
+
+---
+
+## 🔹 **Option 3 — Use repo-server + redis HA mode**
+
+Not really for backup, but improves availability.
+
+---
+
+# 🔄 **3. How to Restore ArgoCD After Disaster**
+
+## 💥 Scenario: Entire ArgoCD namespace is deleted
+
+Steps:
+
+### **1. Reinstall ArgoCD**
+
+```
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
+
+### **2. Restore Application CRDs**
+
+```
+kubectl apply -f apps.yaml
+kubectl apply -f projects.yaml
+```
+
+### **3. Restore configurations**
+
+```
+kubectl apply -f configmaps.yaml
+kubectl apply -f secrets.yaml
+```
+
+### **4. ArgoCD automatically:**
+
+* reconnects to Git repos
+* reads Application definitions
+* compares live cluster vs Git
+* re-syncs any missing or outdated resources
+
+Your cluster is fully restored.
+
+---
+
+# 🔄 **4. Multi-Cluster Disaster Recovery (Hub + Spokes)**
+
+If ArgoCD manages multiple clusters:
+
+* ArgoCD can be recreated
+* Re-add cluster credentials (backup secrets)
+* Apps will redeploy again
+
+Many enterprises run:
+
+* **Primary ArgoCD**
+* **Hot-standby ArgoCD in another region**
+
+They restore via:
+
+* syncing Application CRDs
+* re-pointing repo URLs
+* re-syncing apps
+
+---
+
+# ☁️ **5. DR for Clusters Managed by ArgoCD**
+
+If an entire cluster fails:
+
+1. Build new cluster
+2. Install ArgoCD (or use central ArgoCD)
+3. Apply Application CRDs
+4. ArgoCD re-creates all apps
+5. Syncs everything from Git
+6. Traffic switches using DNS / Load balancer
+
+💥 Kubernetes state is rebuilt automatically.
+
+---
+
+# 🚨 **Common Patterns in Enterprises**
+
+### **Pattern 1: Backup the ArgoCD namespace using Velero**
+
+Most common & reliable.
+
+### **Pattern 2: Store all ArgoCD Application YAML in Git**
+
+Then ArgoCD is stateless.
+
+### **Pattern 3: Use App-of-Apps to bootstrap ArgoCD**
+
+Your root application redeploys everything during DR.
+
+✔ ArgoCD can perform DR without Git
+✔ Only if you restore Kubernetes objects from backup (Velero/Kasten)
+✔ Because the cluster stores all workloads in etcd, not Git
+✔ Git is only required for future changes, not DR restore
+
+---
+
+V.V.Imp .. now no need to give access to cluster.. just give access to gitrepo to required people and that give them access.. easy to track too.
+
+ArgoCD extension for montorign..
+
+
+pipeline {
+    agent any
+
+    environment {
+        REGISTRY = "123456789.dkr.ecr.ap-south-1.amazonaws.com"
+        IMAGE = "myapp"
+        GITOPS_REPO = "git@github.com:company/gitops-manifests.git"
+        BRANCH = "main"
+    }
+
+    stages {
+
+        stage('Checkout Application Code') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh """
+                    docker build -t $REGISTRY/$IMAGE:${BUILD_NUMBER} .
+                    """
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    sh """
+                    aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin $REGISTRY
+                    docker push $REGISTRY/$IMAGE:${BUILD_NUMBER}
+                    """
+                }
+            }
+        }
+
+        stage('Update GitOps Repo (Helm values)') {
+            steps {
+                dir('gitops') {
+                    script {
+                        // Clone GitOps repo
+                        sh "git clone -b $BRANCH $GITOPS_REPO ."
+
+                        // Update the image tag in Helm values.yaml
+                        sh """
+                        sed -i 's|tag: .*|tag: ${BUILD_NUMBER}|g' charts/myapp/values.yaml
+                        """
+
+                        sh """
+                        git add .
+                        git commit -m "Update image tag to ${BUILD_NUMBER}"
+                        git push origin $BRANCH
+                        """
+                    }
+                }
+            }
+        }
+
+    }
+}
+
+

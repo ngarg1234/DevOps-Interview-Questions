@@ -1,0 +1,51 @@
+Tell about your career journey
+What is your AWS experience?
+What did you do in AWS migration?
+What are the challenges you faced during migration?
+Once the AWS infra is ready for migration what are the steps you perform in cutover phase?
+Before AWS work, they also asked about architecture question from my past experience which is mentioned in resume.
+Tell me something about yourself.
+What are the biggest challenges you have faced in the past and how did you mitigate it.
+What is AWS CNF & MGN explain the process carried out for large scale server migrations.
+AWS DMS service and how to integrate it.
+Focus on questions related to previous employment and projects.
+Security best practices which needs to be kept in mind while carrying out MGN.
+Focus on STAR methodology while answering every question.
+Overall experience
+Explain end-to-end process of how MS SQL migration works from on-prem to Public Cloud/Private cloud (more based on my experience)
+How would you plan a cutover for MS SQL and how was the storage migrated
+How do you ensure sanity testing after a DB migration
+Explain the experience in Terraform and where i have used it
+Explain on the gitops tools i have used
+Explain one recent scenario where customer was not happy about something and how did you mitigate it?
+How DB backups are taken and how to recover DB in case of failover 
+AWS migration : aws migration service , aws database migration service, 
+how networking differ from aws outspots to parent region
+Eks cluster  upgrade management. 
+Eks cluster  deployment using manifests , rollbacks 
+how to prevent Dataloss during migration,
+how do we handle  stateful apps with db on aws outspots
+how do we approach application discovery and dependency mapping before migration.
+🔹 Migration Strategy
+What is lift-and-shift migration?
+What is the lift-and-shift migration process?
+What are the challenges in lift-and-shift migration?
+🔹 Database Migration
+How to migrate a database to AWS?
+How to map database size correctly and verify it?
+How to size CPU and memory for database migration?
+How to make the database primary during migration?
+How does database cutover and rollback work?
+What is the rollback strategy for database migration?
+🔹 Application & Cutover
+How to handle application deployment during cutover?
+How to identify dependencies between applications?
+How to make sure application dependencies work after migration?
+🔹 Kubernetes / EKS
+How to monitor EKS?
+How to monitor the EKS control plane?
+🔹 Infrastructure as Code
+What should be the Terraform structure in GitLab pipeline for migration?
+How to provision full architecture using Terraform during migration?
+What Is AWS Application Migration Service? - Application Migration Service
+AWS Application Migration Service simplifies and expedites migration of applications from virtual, cloud, and physical servers to AWS.

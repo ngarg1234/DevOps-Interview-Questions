@@ -1,0 +1,524 @@
+## **1️⃣ VPC (Virtual Private Cloud)**
+
+Your own private network inside AWS.
+
+A logically isolated virtual network you create in AWS.
+
+---
+
+## **2️⃣ Subnets**
+
+### Easy:
+
+Different sections inside your VPC (public or private).
+
+### Technical:
+
+A subnet is a range of IP addresses within the VPC.
+Can be:
+
+* **Public subnet** → has route to Internet Gateway
+* **Private subnet** → no direct internet route
+
+---
+
+## **3️⃣ Internet Gateway (IGW)**
+
+### Easy:
+
+Gate that allows resources in public subnet to connect to internet.
+
+### Technical:
+
+Horizontally scaled, redundant gateway that provides one-way and two-way public internet access.
+
+---
+
+## **4️⃣ NAT Gateway / NAT Instance**
+
+### Easy:
+
+Allows **private** EC2 instances to **go OUT** to the internet, but not be reached from internet.
+
+### Technical:
+
+Managed network translation service to allow outbound-only traffic for private subnets.
+
+---
+
+## **5️⃣ Route Tables**
+
+### Easy:
+
+Rules that decide where your traffic should go.
+
+### Technical:
+
+Routing rules applied to subnets to decide destination for traffic.
+
+---
+
+## **6️⃣ Security Groups**
+
+### Easy:
+
+Firewall attached to EC2 (stateful).
+
+### Technical:
+
+Instance-level firewall that remembers connections (inbound ↔ outbound).
+
+---
+
+## **7️⃣ NACL (Network ACL)**
+
+### Easy:
+
+Subnet-level firewall (stateless).
+
+### Technical:
+
+Rule-based traffic control at subnet level.
+
+---
+
+## **8️⃣ VPC Peering**
+
+### Easy:
+
+Connect 2 VPCs like joining two offices with a private cable.
+
+### Technical:
+
+Point-to-point connection allowing private IP communication between VPCs.
+
+---
+
+## **9️⃣ Transit Gateway**
+
+### Easy:
+
+Central router that connects many VPCs and on-prem together.
+
+### Technical:
+
+Scalable hub-and-spoke routing service for large multi-VPC architectures.
+
+---
+
+## **🔟 VPC Endpoints (Gateway + Interface)**
+
+### Easy:
+
+Connect to AWS services privately without internet.
+
+### Technical:
+
+Private ENI or gateway that routes to AWS services over AWS backbone.
+
+---
+
+# 🟩 **VPC Interview Questions + Answers (Short + Clear)**
+
+---
+
+## **Basic**
+
+### 1. What is a VPC?
+
+Virtual Private Cloud — isolated network inside AWS.
+
+### 2. What is the difference between Public and Private Subnet?
+
+Public → route to IGW.
+Private → no route to IGW.
+
+### 3. What is a NAT Gateway used for?
+
+Private instances → go outbound to internet (updates, patches).
+
+### 4. How do Security Groups differ from NACLs?
+
+SG = Stateful, attached to ENI
+NACL = Stateless, attached to subnet
+
+### 5. How does VPC Peering work?
+
+Private, point-to-point, no transitive routing.
+
+### 6. What is Transit Gateway?
+
+Central router for multi-VPC and hybrid networks.
+
+### 7. What are VPC Endpoints?
+
+Private connections to AWS services without internet.
+
+---
+
+## **Intermediate**
+
+### 8. How do you connect on-prem to AWS VPC?
+
+* VPN
+* Direct Connect
+* Transit Gateway + VPN
+* Software VPN
+
+### 9. How do you troubleshoot VPC connectivity issues?
+
+Check:
+
+* Route table
+* SG
+* NACL
+* NACL ephemeral ports
+* DNS
+* IGW / NAT
+* ENI attachment
+* VPC CIDR overlaps
+
+### 10. What is an Elastic Network Interface?
+
+Virtual network card attached to EC2.
+
+### 11. How does DNS work inside VPC?
+
+VPC resolver → `AmazonProvidedDNS`
+Option: enable DNS hostnames & DNS resolution.
+
+---
+
+## **Advanced / Scenario-Based**
+
+### 12. A private instance cannot reach the internet. What do you check?
+
+* NAT Gateway present?
+* Route table for 0.0.0.0/0 → NAT?
+* SG outbound?
+* NACL outbound/inbound?
+* Is NAT in same AZ?
+
+### 13. EC2 cannot access S3 privately. Why?
+
+* Missing S3 VPC Endpoint
+* Route tables misconfigured
+* Endpoint policy blocking traffic
+
+### 14. You created a VPC peering but instances cannot communicate. Why?
+
+Check:
+
+* Routes to peered VPC
+* SG rules
+* NACL rules
+* Overlapping CIDR blocks
+
+---
+
+# 🟧 **How to Connect to VPC / EC2 — Interview Answers**
+
+---
+
+## **1️⃣ How do you access an EC2 instance in a Private Subnet?**
+
+### **Methods:**
+
+1. Bastion Host / Jumpbox (public subnet → SSH into private EC2)
+2. SSM Session Manager (recommended)
+3. VPN connection
+4. Direct Connect
+5. Transit Gateway routing
+
+### Interview answer:
+
+> “I access private EC2 instances using SSM Session Manager which avoids public IP and SSH keys.”
+
+---
+
+## **2️⃣ How to connect to VPC from on-prem?**
+
+### Ways:
+
+* AWS Site-to-Site VPN
+* Direct Connect
+* DX + VPN backup
+* Software VPN (OpenVPN etc.)
+* Transit Gateway over VPN
+
+---
+
+# 🟨 **Private Instance → Internet (Inside VPC)**
+
+### How can a **private EC2** access the internet?
+
+### Requirements:
+
+* Private subnet
+* Route table: `0.0.0.0/0 → NAT Gateway`
+* NAT gateway must be in a **public subnet**
+* SG outbound allowed
+* NACL outbound allowed
+
+### Interview answer:
+
+> “Private instances access the internet via a NAT Gateway. Route tables must point default route to NAT in a public subnet.”
+
+---
+
+# 🔥 **EXTRA: Heavy Load on EC2 or EKS — Troubleshooting Scenarios**
+
+(These are very common interview questions)
+
+---
+
+# 🟥 **Scenario 1: Heavy Load on EC2 — Troubleshooting**
+
+### What you check:
+
+#### 1. CPU load
+
+`top`, CloudWatch metrics
+
+#### 2. Memory usage
+
+`free -m`, `vmstat`, CloudWatch
+
+#### 3. Disk I/O
+
+`iostat`, CloudWatch DiskRead/Write ops
+
+#### 4. Network
+
+Check SG/NACL throttling
+CloudWatch NetworkIn/Out
+
+#### 5. Application logs
+
+Systemd, journald, application-level logs
+
+#### 6. Auto Scaling
+
+Is there ASG configured?
+Should scale horizontally?
+
+### Interview answer:
+
+> “I first checked CloudWatch metrics (CPU, memory, network). Then reviewed system logs and application logs. Verified disk I/O and network bottlenecks. Finally tuned autoscaling policies or resized the instance.”
+
+---
+
+# 🟦 **Scenario 2: Heavy Load on EKS Cluster — Troubleshooting**
+
+### What you check:
+
+1. **Pod Resource Limits**
+
+   * CPU/Memory throttling
+   * Pods evicted?
+
+2. **Node Utilization**
+
+   * Node CPU
+   * Node memory
+   * Node disk pressure
+
+3. **Cluster Autoscaler**
+
+   * Is it increasing node count?
+   * Any POD stuck in Pending?
+
+4. **HPA (Horizontal Pod Autoscaler)**
+
+   * Is it scaling pods?
+
+5. **Network Bottlenecks**
+
+   * CNI issues (AWS VPC CNI)
+   * ENI/IP exhaustion
+
+6. **Logs**
+
+   * Describe pod
+   * Node logs
+   * App logs
+
+### Interview answer:
+
+> “I checked pod CPU/memory limits, node utilization, pending pods, and autoscaler logs. Then validated CNI IP availability and application logs. Increased pod limits, adjusted HPA, or scaled nodes if required.”
+
+---
+
+# 🔥 **BONUS: Access EC2 when something breaks**
+
+If EC2 becomes unreachable:
+
+### Steps:
+
+1. Check SG: inbound rules
+2. Check NACL: inbound/outbound
+3. Check route table
+4. EC2 is in correct subnet
+5. IGW/NAT attached
+6. EC2 is healthy
+7. Console → EC2 → Serial Console (Linux)
+8. Session Manager
+9. Replace root EBS → mount on helper EC2 → fix config
+
+### Interview answer:
+
+> “If SSH fails, I use EC2 Serial Console or SSM Session Manager. If OS is broken, I detach the root disk, attach it to a helper EC2, fix configuration, and reattach.”
+
+---
+
+# ⭐ **Need full diagrams for VPC, NAT, EC2 access, or EKS troubleshooting?**
+
+Just tell me: **"Give diagrams"** or **"Give flowcharts"**.
+
+
+Below is a clear and **interview-friendly explanation of EBS, EFS, and S3**, followed by **how to share an EBS volume across EC2s (best practice)** and **what not to do**.
+
+---
+
+# ✅ **EBS vs EFS vs S3 — Simple & Interview-Ready Explanation**
+
+## **1️⃣ EBS (Elastic Block Store)**
+
+### **Easy language:**
+
+* It is like a hard disk for your EC2 machine.
+* Works at the “block level” like C:/ drive.
+* Can attach to **only ONE EC2 at a time** (except multi-attach for some io2 volumes).
+* Lives inside **one AZ**.
+
+### **AWS terms:**
+
+* Block storage
+* Attached over EBS Fibre Channel
+* Persistent after EC2 shut down
+* Single-AZ
+* High IOPS (Provisioned IOPS available)
+* Supports snapshots for backup/migration
+
+---
+
+## **2️⃣ EFS (Elastic File System)**
+
+### **Easy language:**
+
+* Like a shared folder that multiple EC2s can access at the same time.
+* Auto-scales.
+* Works with Linux.
+
+### **AWS terms:**
+
+* NFS-based network file system
+* Multi-AZ
+* Elastic capacity
+* Can be mounted on many EC2s, Lambda, ECS, EKS
+* Higher latency than EBS
+
+---
+
+## **3️⃣ S3 (Simple Storage Service)**
+
+### **Easy language:**
+
+* Online storage on the internet (“Dropbox of AWS”).
+* Not a drive, not a file system, not a disk.
+* Access via API, not a mountable drive by default.
+
+### **AWS terms:**
+
+* Object storage
+* 11 9’s durability
+* Unlimited capacity
+* Cross-region replication
+* Event-driven integration
+* Not mountable directly (unless using S3FS — NOT recommended in prod)
+
+---
+
+# ⭐ **Interview Question:**
+
+### **Can we attach an EBS volume to multiple EC2 instances?**
+
+### ❌ **Short answer:** No (except io2 Multi-Attach for special cases).
+
+### ❗ Normal EBS volumes = **ONLY ONE EC2** at a time
+
+Because file-system corruption risk.
+
+### ⭐ Exception:
+
+* **io2 Multi-Attach**
+* Up to 16 EC2 instances
+* For cluster-aware file systems (Oracle RAC)
+
+---
+
+# ⭐ **Interview Question:**
+
+### **How to let two EC2 instances share the same data if EBS cannot be attached to multiple servers?**
+
+### **Best-practice approach:**
+
+#### ✔ Use **EFS**
+
+Because it is designed for multiple EC2 connections at the same time.
+
+Example:
+
+* EC2-A mounts EFS → `/mnt/shared`
+* EC2-B mounts EFS → `/mnt/shared`
+* Both see same folder
+
+---
+
+# 🚫 **NOT Recommended (Common mistake in interviews)**
+
+> "Detach EBS from EC2-A and attach to EC2-B"
+
+This is technically possible
+✔ BUT NOT best practice
+❌ Causes downtime
+❌ Manual steps
+❌ File corruption risk if not cleanly unmounted
+
+---
+
+# 🟢 **If you REALLY need to move an EBS volume to another EC2 — SAFE method**
+
+### **Steps (Best Practice):**
+
+1. Stop the application on EC2-A
+2. Unmount the filesystem
+3. Detach the EBS volume
+4. Attach it to EC2-B
+5. Mount it on EC2-B
+6. Start application
+
+### **Even better method:**
+
+✔ Take **Snapshot** of EBS
+✔ Create **new volume**
+✔ Attach to EC2-B
+(No downtime on original EC2)
+
+---
+
+# 🔥 **Interview-perfect summary answer**
+
+> **EBS is block storage for a single EC2. EFS is a shared file system for multiple EC2s. S3 is object storage for long-term data. You cannot attach the same EBS volume to multiple EC2s (except Multi-Attach on io2). If you want multiple EC2 instances to access the same data, use EFS, not EBS. Best practice for sharing EBS data is to create a snapshot and attach a new volume to another EC2.**
+
+---
+
+If you want, I can also provide:
+✅ Deep-dive diagrams
+✅ Sample interview scenario & answers
+✔ "Your application is getting heavy load on EC2—how do you troubleshoot?"
+✔ "How do you connect private EC2 to the internet?"
+✔ VPC tricky interview questions
+
+Just tell me **“continue VPC questions”** or **"EC2 heavy load troubleshooting"**.
+

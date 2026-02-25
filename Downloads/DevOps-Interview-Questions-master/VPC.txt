@@ -1,0 +1,15 @@
+VPC is always in a region, not spread across regions. If we want across regions use VPC peering..
+
+Elastic IP is static IP.. when you stop your instance and start it, IP changes. ENI (Network Card),
+IP is assigned to ENI not to actual EC2.
+
+Elastic IP if not associated with any EC2, then it is chargable..
+
+VPN -- Customer Gateway(customer side), Virtual Private Gateway (AWS side).
+
+ansible jenkins .. aws.... terraform..
+
+VPCs are limited to a region but strechted across Azs.
+
+Subnets can be public or private and are limited to a AZ.
+
