@@ -382,7 +382,7 @@ When you do write operation, terraform would lock the state file..
 
 This is very import as otherwiese during your ongoing terraform apply operations, if others try for the same, it can corrupt your state files..
 
-How terrform knows an operations is performaing using rerraform.tfstate.lock.inform.. This file will be removed once opearyions is compoleted.
+How terrform knows an operations is performaing using terraform.tfstate.lock.inform.. This file will be removed once opearyions is compoleted.
 
 >force-unlock
 
