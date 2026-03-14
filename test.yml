@@ -1,0 +1,2071 @@
+Service Principal
+A **Service Principal (SP)** is an **identity created in Azure AD for applications or automation tools**.
+It allows tools like **Azure DevOps, Terraform, or scripts** to access Azure resources securely without using personal user credentials.
+### Why it is used in CI/CD
+In CI/CD pipelines, automation tools need permission to:
+* Create resources
+* Deploy infrastructure
+* Access services
+Instead of using a developer’s login, we use a **Service Principal**.
+### Example
+Terraform pipeline creating resources:
+Pipeline → Uses **Service Principal credentials** → Authenticates to Azure → Creates resources.
+### Components of Service Principal
+1. Client ID
+2. Client Secret
+3. Tenant ID
+4. Subscription ID
+
+Service Connection
+An **ADO object** that stores credentials for external systems (Azure, AWS, GitHub, DockerHub, etc.).
+*   Ties your pipeline to the target cloud.
+*   For **Azure**, you usually choose **“Service principal (automatic/manual)”** and paste SP details.
+*   For **AWS**, use **Access Key/Secret** or OIDC (recommended).
+
+
+**Best Practices**
+
+*   Least privilege; avoid Owner on subscription.
+*   Use federated credentials (OIDC) where possible to avoid long‑lived secrets.
+*   Rotate secrets; use Azure Key Vault + variable groups.
+
+A **Service Connection** is a secure connection between **Azure DevOps and external services**.
+
+Example services:
+
+* Azure
+* AWS
+* Docker Hub
+* Kubernetes
+* GitHub
+
+### Purpose
+
+It allows pipelines to **authenticate and deploy resources**.
+
+### Flow
+
+```
+Pipeline
+   ↓
+Service Connection
+   ↓
+Service Principal
+   ↓
+Azure Resources
+```
+
+Example:
+
+Pipeline → Service Connection → Azure Subscription → Deploy VM.
+
+
+Here’s a clear and simple comparison of Service Connection vs Service Principal — especially helpful if you’re working with Azure DevOps + Azure.
+________________________________________
+🔵 Service Principal (SP)
+A Service Principal is an identity used by applications or automation to access Azure resources securely (instead of using a real user's account).
+💡 Think of it as:
+➡️ A login identity for apps/scripts to authenticate to Azure.
+Key properties:
+•	Created in Azure Active Directory
+•	Has an App ID, Client Secret, and Tenant ID
+•	Gets RBAC roles like Contributor, Reader, Owner, etc.
+•	Used by CLI, Terraform, scripts, automation tools
+Example use:
+az login --service-principal -u <appId> -p <secret> --tenant <tenantId>
+________________________________________
+🟣 Service Connection (Azure DevOps)
+A Service Connection is a wrapper inside Azure DevOps that uses a Service Principal (or Managed Identity, etc.) to let pipelines access Azure resources.
+💡 Think of it as:
+➡️ A configured gateway in Azure DevOps that uses a Service Principal behind the scenes.
+What it provides:
+•	Secure storage of SP credentials
+•	Simplified authentication for pipelines
+•	RBAC based access to Azure from CI/CD jobs
+•	Supports Azure, GitHub, Bitbucket, Docker, AWS, GCP, etc.
+Example:
+In a pipeline:
+azureSubscription: 'my-service-connection'
+Azure DevOps handles the authentication automatically.
+________________________________________
+✅ Simple Comparison Table
+Feature	Service Principal	Service Connection
+What it is	An identity in Azure AD	A configuration in Azure DevOps
+Purpose	Authenticate apps/scripts	Allow pipelines to access Azure
+Where created	Azure AD	Azure DevOps Project
+Contains	App ID, Secret/Cert, Tenant	SP credentials + permissions rules
+Used by	Terraform, CLI, APIs	YAML pipelines, Classic pipelines
+Scope	Azure-wide	Azure DevOps only
+________________________________________
+🎯 Quick summary (easy to remember)
+Service Principal → identity
+Service Connection → Azure DevOps using that identity
+________________________________________
+If you want, I can show:
+🔐 How to create a Service Principal
+🔗 How to set up a Service Connection
+📄 YAML examples
+🚀 Best practices (least privilege, rotation, managed identity)
+Just tell me!
+
+# 2. ADO Single Stage vs Multi Stage Pipelines
+
+## Single Stage Pipeline
+
+Contains only **one stage with multiple jobs/tasks**.
+
+Example:
+
+```
+Stage
+ ├ Build
+ ├ Test
+ └ Deploy
+```
+
+Used when:
+
+* Simple projects
+* No environment separation
+
+---
+
+## Multi Stage Pipeline
+
+Contains **multiple stages like build, test, deploy**.
+
+Example:
+
+```
+Stage 1 → Build
+Stage 2 → Test
+Stage 3 → Deploy Dev
+Stage 4 → Deploy Prod
+```
+
+Benefits:
+
+* Environment separation
+* Approvals
+* Rollback capability
+
+---
+
+# Deployment Strategy in ADO
+
+### 1. RunOnce
+
+Deploy once to target environment.
+
+Example:
+
+```
+deployment:
+  strategy:
+    runOnce:
+      deploy:
+```
+
+---
+
+### 2. Rolling Deployment
+
+Deploy gradually across multiple servers.
+
+Example:
+
+```
+VM1 → VM2 → VM3
+```
+
+Used for:
+
+* High availability systems.
+
+---
+
+### 3. Canary Deployment
+
+Deploy to **small subset first**.
+
+Example:
+
+```
+10% servers → test
+then → 100% servers
+```
+
+Used in production systems.
+
+---
+
+# 3. Artifact Handling in CI/CD
+
+Artifacts are **files produced by build stage**.
+
+Examples:
+
+* binaries
+* docker images
+* terraform plans
+
+### Artifact Flow
+
+```
+Build Stage
+    ↓
+Publish Artifact
+    ↓
+Stored in Azure DevOps
+    ↓
+Deploy Stage downloads artifact
+```
+
+### Example
+
+```
+PublishBuildArtifacts@1
+DownloadBuildArtifacts@0
+```
+
+Common artifacts:
+
+* .zip
+* Docker images
+* Terraform plan
+
+---
+
+# 4. Git Important Commands
+
+## git reset
+
+Moves HEAD pointer.
+
+Types:
+
+### Soft reset
+
+Keeps changes staged.
+
+```
+git reset --soft HEAD~1
+```
+
+### Mixed reset (default)
+
+Unstages changes.
+
+```
+git reset HEAD~1
+```
+
+### Hard reset
+
+Deletes changes.
+
+```
+git reset --hard HEAD~1
+```
+
+---
+
+## git revert
+
+Creates a **new commit that reverses changes**.
+
+Safe for shared branches.
+
+```
+git revert <commit-id>
+```
+
+---
+
+## git merge
+
+Combines branches.
+
+```
+git merge feature
+```
+
+Creates **merge commit**.
+
+---
+
+## git rebase
+
+Moves commits to new base.
+
+```
+git rebase main
+```
+
+Advantages:
+
+* Cleaner history
+* No merge commits
+
+---
+
+## Other Frequently Asked Git Commands
+
+```
+git clone
+git pull
+git push
+git branch
+git checkout
+git stash
+git log
+git diff
+```
+
+---
+
+# 5. Terraform Module Blocks
+
+A **module** is a reusable Terraform configuration.
+
+Example:
+
+```
+module "ec2" {
+ source = "./modules/ec2"
+ instance_type = "t2.micro"
+}
+```
+
+Benefits:
+
+* Reusability
+* Clean code
+* Multi-environment deployments
+
+---
+
+# Local vs Dynamic Blocks
+
+## Local Block
+
+Used to **store reusable values**.
+
+Example:
+
+```
+locals {
+ instance_type = "t2.micro"
+}
+```
+
+Used when:
+
+* same values used multiple times
+
+---
+
+## Dynamic Block
+
+Used when **nested block needs looping**.
+
+Example:
+
+```
+dynamic "ingress" {
+ for_each = var.ports
+ content {
+   from_port = ingress.value
+ }
+}
+```
+
+Used when:
+
+* multiple security group rules
+
+---
+
+# Terraform Provisioners
+
+Provisioners run **scripts on resources after creation**.
+
+Types:
+
+### Local Exec
+
+Runs command locally.
+
+```
+provisioner "local-exec" {
+ command = "echo hello"
+}
+```
+
+---
+
+### Remote Exec
+
+Runs commands on remote server.
+
+```
+provisioner "remote-exec"
+```
+
+Used for:
+
+* software installation
+
+Note:
+
+Provisioners are **not recommended unless necessary**.
+
+
+Terraform Block Types Cheat Sheet
+Block Type	Use Case	Quick Example
+terraform	Configure Terraform itself (version, backend).	hcl terraform { required_version = ">=1.0.0" }
+provider	Define which cloud/service to use.	hcl provider "aws" { region = "us-east-1" }
+resource	Create/update/delete infrastructure.	hcl resource "aws_instance" "web" { ... }
+variable	Accept input values for configs.	hcl variable "region" { default = "us-east-1" }
+output	Show values after apply (e.g., IPs).	hcl output "ip" { value = aws_instance.web.public_ip }
+module	Reuse grouped resources.	hcl module "vpc" { source = "./vpc" }
+data	Read existing info from provider.	hcl data "aws_ami" "latest" { ... }
+locals	Define constants/computed values.	hcl locals { env = "prod" }
+dynamic	Generate nested blocks programmatically.	hcl dynamic "ingress" { for_each = var.rules ... }
+provisioner	Run scripts/commands on resources.	hcl provisioner "local-exec" { command = "echo hi" }
+connection	Define how to connect (SSH/WinRM).	hcl connection { type = "ssh" user = "ubuntu" }
+lifecycle	Control resource behavior (destroy/create).	hcl lifecycle { prevent_destroy = true }
+depends_on	Explicitly set resource dependencies.	hcl depends_on = [aws_vpc.main]
+count	Create multiple instances of a resource.	hcl resource "aws_instance" "servers" { count = 3 ... }
+for_each	Create resources from a map/set.	hcl resource "aws_instance" "servers" { for_each = var.hosts ... }
+sensitive	Hide sensitive outputs/variables.	hcl output "db_pass" { value = var.pass sensitive = true }
+🧩 How to Use This
+•	Core blocks → define infrastructure (resource, provider, module).
+•	Supporting blocks → make configs flexible (variable, output, locals).
+•	Control blocks → fine tune behavior (dynamic, lifecycle, depends_on).
+•	Meta arguments → scale resources (count, for_each).
+•	Security helpers → protect secrets (sensitive).
+
+
+# Terraform Move Block
+
+Used when **resource name changes but resource already exists**.
+
+Example:
+
+The latest stable Terraform release is v1.14.6 (February 2026). HashiCorp has also published an experimental pre release of v1.15.0 alpha in March 2026, but for production use you should stick with v1.14.6.
+
+Ah, now I see what you’re pointing to — the moved block is indeed a newer feature in Terraform (introduced in v1.1). It’s used inside a module to declare that a resource has been renamed or relocated, so Terraform can update the state automatically without you needing to run terraform state mv manually.
+________________________________________
+🔄 moved Block in Terraform
+📌 Purpose
+•	Tells Terraform that a resource’s address has changed (renamed or moved).
+•	Prevents Terraform from destroying the old resource and creating a new one.
+•	Keeps state consistent when refactoring modules or resource names.
+🧩 Syntax
+moved {
+  from = aws_instance.old
+  to   = aws_instance.new
+}
+✅ Example in a Module
+Suppose you renamed a resource inside a module:
+resource "aws_instance" "new" {
+  ami           = "ami-123456"
+  instance_type = "t2.micro"
+}
+Instead of Terraform planning to destroy aws_instance.old and create aws_instance.new, you add:
+moved {
+  from = aws_instance.old
+  to   = aws_instance.new
+}
+Terraform will then map the old state to the new resource automatically.
+________________________________________
+⚡ Key Notes
+•	moved blocks are only valid inside modules (not at the root level).
+•	They’re especially useful when refactoring large configurations.
+•	You can have multiple moved blocks in a module if you rename several resources.
+•	They replace the need for manual terraform state mv commands in many cases.
+________________________________________
+So yes — Terraform now has a moved block type, and it’s a neat way to handle renames/refactors safely.
+Would you like me to show you a side by side comparison of using moved vs. using terraform state mv, so you can see when each approach makes more sense?
+
+
+```
+moved {
+ from = aws_instance.old
+ to   = aws_instance.new
+}
+```
+
+Prevents resource recreation.
+
+---
+
+# Terraform State File in Blob Storage
+
+Terraform state stores:
+
+* resource metadata
+* resource IDs
+
+For teams, state is stored remotely.
+
+Example:
+
+Azure Blob backend.
+
+```
+terraform {
+ backend "azurerm" {
+   storage_account_name = "tfstate"
+   container_name       = "state"
+ }
+}
+```
+
+Benefits:
+
+* Shared state
+* Locking
+* Security
+
+---
+
+# Multi Environment Deployment Strategy
+
+Typical environments:
+
+```
+Dev → QA → Stage → Production
+```
+
+Implementation methods:
+
+### 1. Separate state files
+
+```
+dev.tfstate
+prod.tfstate
+```
+
+---
+
+### 2. Separate variable files
+
+```
+terraform apply -var-file=dev.tfvars
+terraform apply -var-file=prod.tfvars
+```
+
+---
+
+### 3. Separate workspaces
+
+```
+terraform workspace new dev
+terraform workspace new prod
+```
+
+---
+
+# Terraform Versioning
+
+Define version in Terraform block.
+
+Example:
+
+```
+terraform {
+ required_version = ">= 1.5"
+}
+```
+
+For providers:
+
+```
+required_providers {
+ aws = {
+   version = "~> 4.0"
+ }
+}
+```
+
+Prevents version mismatch.
+
+---
+
+# Terraform Upgrade Strategy
+
+Steps:
+
+1. Backup state
+2. Check compatibility
+3. Upgrade terraform
+
+```
+terraform init -upgrade
+```
+
+4. Run plan
+
+```
+terraform plan
+```
+
+5. Apply
+
+Best practice:
+
+Upgrade gradually.
+
+---
+
+# Terraform Ternary Operator
+
+Used for **conditional values**.
+
+Syntax:
+
+```
+condition ? true_value : false_value
+```
+
+Example:
+
+```
+instance_type = var.env == "prod" ? "t3.large" : "t2.micro"
+```
+
+
+Managing Terraform for multiple environments (like dev, staging, and prod) is a common challenge, and there are several well established patterns to keep things clean, consistent, and safe.
+________________________________________
+🌍 Approaches to Multi Environment Management
+1. Workspaces
+•	Terraform has built in workspaces that let you reuse the same configuration for different environments.
+•	Each workspace has its own state file.
+•	Example: 
+•	terraform workspace new dev
+•	terraform workspace new prod
+•	terraform workspace select dev
+•	Good for small projects, but can get messy with many environments.
+________________________________________
+2. Separate State Backends
+•	Use separate state files (often stored in S3, Azure Blob, or GCS) for each environment.
+•	Keeps environments isolated and avoids accidental cross environment changes.
+•	Example backend config: 
+•	terraform {
+•	  backend "s3" {
+•	    bucket = "tf-state"
+•	    key    = "prod/terraform.tfstate"
+•	    region = "us-east-1"
+•	  }
+•	}
+________________________________________
+3. Directory Structure
+•	Create separate directories for each environment, each with its own variables and backend.
+•	Example: 
+•	/terraform
+•	  /modules
+•	  /envs
+•	    /dev
+•	      main.tf
+•	      variables.tf
+•	    /staging
+•	    /prod
+•	Keeps configs clear and version controlled.
+________________________________________
+4. Variable Files (.tfvars)
+•	Use different variable files for each environment.
+•	Example: 
+•	terraform apply -var-file=dev.tfvars
+•	terraform apply -var-file=prod.tfvars
+•	Keeps environment specific values (like instance sizes, regions, tags) separate.
+________________________________________
+5. Modules + Environment Wrappers
+•	Write reusable modules for infrastructure components (VPC, EC2, DB).
+•	Wrap them in environment specific configs that pass different variables.
+•	Example: 
+•	module "vpc" {
+•	  source = "../modules/vpc"
+•	  cidr_block = var.cidr_block
+•	}
+________________________________________
+⚡ Best Practices
+•	Isolate state per environment → never share state between dev and prod.
+•	Use consistent naming/tagging → makes resources easier to identify.
+•	Automate with CI/CD → run Terraform plans/applies per environment pipeline.
+•	Lock state → use remote backends with locking (like DynamoDB for S3) to prevent race conditions.
+•	Keep secrets out of code → use environment variables or secret managers.
+________________________________________
+👉 A practical setup often combines separate directories + remote state + tfvars files. Workspaces are fine for small projects, but teams usually prefer explicit directories for clarity.
+Would you like me to sketch out a sample folder structure for a multi environment Terraform project (with dev, staging, prod) so you can see how everything fits together?
+A Terraform CI/CD pipeline in Azure DevOps (ADO) typically looks like this:
+________________________________________
+🔄 High-Level Flow
+1.	Code Commit (Git Repo)
+o	Terraform configuration files (.tf) stored in Azure Repos (or GitHub).
+o	Developers push changes → triggers pipeline.
+2.	Pipeline Stages
+o	Lint/Validate: Run terraform fmt and terraform validate to check syntax and formatting.
+o	Init: Run terraform init to set up providers and backend.
+o	Plan: Run terraform plan to preview changes. 
+	Often stored as an artifact for approval.
+o	Manual Approval (Optional): Approvers review the plan before apply.
+o	Apply: Run terraform apply to provision infrastructure.
+o	Destroy (Optional): Separate pipeline for tearing down environments.
+3.	State Management
+o	Store Terraform state in Azure Storage Account (Blob container).
+o	Use Azure Key Vault for secrets (like provider credentials).
+o	Enable state locking with blob leases to prevent race conditions.
+4.	Environment Separation
+o	Use separate pipelines or stages for dev, staging, prod.
+o	Each environment points to its own backend state file.
+o	Variables managed via *.tfvars files or Azure DevOps variable groups.
+________________________________________
+📘 Example Azure DevOps Pipeline (YAML)
+trigger:
+  branches:
+    include:
+      - main
+
+stages:
+- stage: Validate
+  jobs:
+  - job: TerraformValidate
+    steps:
+    - script: terraform fmt -check
+    - script: terraform validate
+
+- stage: Plan
+  jobs:
+  - job: TerraformPlan
+    steps:
+    - script: terraform init -backend-config=backend.tfvars
+    - script: terraform plan -var-file=dev.tfvars -out=tfplan
+
+- stage: Apply
+  dependsOn: Plan
+  jobs:
+  - job: TerraformApply
+    steps:
+    - script: terraform apply tfplan
+________________________________________
+⚡ Best Practices
+•	Separate pipelines per environment (dev/staging/prod).
+•	Approval gates before applying to production.
+•	Remote state in Azure Storage with Key Vault for secrets.
+•	Automated testing (lint, validate, security scans).
+•	Rollback strategy (destroy pipeline or manual intervention).
+________________________________________
+👉 In practice, teams often use multi-stage pipelines in ADO with approvals between stages, so infrastructure changes are tested in dev, reviewed in staging, and only then applied to prod.
+Would you like me to sketch a visual diagram of this pipeline flow (Git → Validate → Plan → Approval → Apply → State Storage), so you can see the stages at a glance?
+
+
+# Azure DevOps Pipeline – Multi EC2 / EKS Deployment Flow
+
+Typical pipeline:
+
+```
+Trigger (Git Push)
+
+Stage 1
+Build
+
+Stage 2
+Terraform Init
+
+Stage 3
+Terraform Plan
+
+Stage 4
+Terraform Apply
+
+Stage 5
+Deploy App to EC2
+
+Stage 6
+Deploy to EKS
+```
+
+Example tasks:
+
+```
+TerraformInstaller
+TerraformTask
+Kubectl
+Helm
+```
+
+---
+
+# PowerShell Scripts
+
+## Add two numbers
+
+```powershell
+$a = 10
+$b = 20
+
+$sum = $a + $b
+
+Write-Output "Sum is $sum"
+```
+
+---
+
+## Division Script
+
+```powershell
+$a = 20
+$b = 5
+
+$result = $a / $b
+
+Write-Output "Result is $result"
+```
+
+---
+
+# PowerShell Common Resource / Command
+
+Very common in automation:
+
+```
+Get-ChildItem
+```
+
+Example:
+
+```
+Get-ChildItem C:\Temp
+```
+
+Used to list files.
+
+Other common commands:
+
+```
+Copy-Item
+Remove-Item
+New-Item
+Test-Path
+```
+
+---
+
+# CI/CD Challenge Example (Real Interview Answer)
+
+## Challenge
+
+Terraform state conflict when multiple pipelines ran simultaneously.
+
+### Problem
+
+Two developers triggered pipeline at same time.
+
+Both pipelines tried to update **same state file**.
+
+Result:
+
+```
+State corruption risk
+```
+
+---
+
+## Solution
+
+1. Moved state to **remote backend (Azure Blob)**
+2. Enabled **state locking**
+3. Implemented **pipeline approvals**
+
+---
+
+## Another Challenge
+
+Environment variables mismatch between Dev and Prod.
+
+Solution:
+
+Used
+
+```
+tfvars files
+```
+
+and environment-specific pipelines.
+
+---
+
+# Short Interview Summary You Can Say
+
+Example answer:
+
+> In our project we used Azure DevOps pipelines integrated with Terraform. Service principals were used for secure authentication through service connections. The pipeline followed a multi-stage approach with build, terraform plan, apply, and deployment stages. Terraform modules were used to standardize infrastructure like EC2 and EKS clusters. State files were stored in Azure Blob storage with locking enabled to prevent conflicts. We also implemented multi-environment deployment using tfvars files. For Git operations we commonly used reset, revert, merge, and rebase depending on the situation.
+
+---
+
+If you want, I can also give **30 MOST ASKED ADO + Terraform Interview Questions with answers**.
+These are **very frequently asked in DevOps interviews**.
+
+
+## 2) ADO Pipelines: **Single-Stage** vs **Multi-Stage** with Deployment Strategy
+
+### Single-Stage (simple build+deploy)
+
+*   Useful for small apps or non‑prod.
+
+```yaml
+# azure-pipelines.yml
+trigger: [ main ]
+pool: vmImage: 'ubuntu-latest'
+
+stages:
+- stage: BuildAndDeploy
+  jobs:
+  - job: Build
+    steps:
+    - script: echo "Build app"; npm ci && npm run build
+    - publish: $(Build.SourcesDirectory)/dist
+      artifact: drop
+
+  - deployment: DeployToDev
+    environment: dev
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+          - script: echo "Deploy to Dev using artifact"
+```
+
+### Multi-Stage (Dev → QA → Prod with gates)
+
+*   Allows **approvals**, **checks**, and **deployment strategies** per environment.
+
+```yaml
+trigger: [ main ]
+
+stages:
+- stage: Build
+  jobs:
+  - job: BuildJob
+    steps:
+    - script: dotnet build
+    - publish: $(Build.SourcesDirectory)/bin/Release
+      artifact: web
+
+- stage: Deploy_Dev
+  dependsOn: Build
+  jobs:
+  - deployment: Dev
+    environment: dev
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: web
+          - script: ./deploy-dev.sh
+
+- stage: Deploy_Prod
+  dependsOn: Deploy_Dev
+  condition: succeeded()
+  jobs:
+  - deployment: Prod
+    environment: prod
+    strategy:
+      runOnce:
+        preDeploy:
+          steps:
+          - script: echo "Health checks / backups"
+        deploy:
+          steps:
+          - download: current
+            artifact: web
+          - script: ./deploy-prod.sh
+        routeTraffic:
+          steps:
+          - script: echo "Route traffic if using blue-green"
+        postRouteTraffic:
+          steps:
+          - script: ./post-traffic-checks.sh
+```
+
+### Deployment Strategies
+
+*   **runOnce**: default single pass.
+*   **rolling**: phased rollout across targets.
+*   **canary**: % traffic gradually.
+*   **blueGreen**: swap slots/targets after validation.
+
+***
+
+## 3) How You Keep and Upload **Artifacts** in ADO
+
+*   Use `PublishPipelineArtifact`/`publish` to store build outputs.
+*   Download artifacts in later stages/jobs with `DownloadPipelineArtifact`.
+
+```yaml
+steps:
+- task: PublishPipelineArtifact@1
+  inputs:
+    artifactName: drop
+    targetPath: '$(Build.ArtifactStagingDirectory)/output'
+
+# Later
+- task: DownloadPipelineArtifact@2
+  inputs:
+    artifact: drop
+    path: '$(Pipeline.Workspace)/drop'
+```
+
+**Tips**
+
+*   Version artifacts using `Build.BuildNumber` or git sha.
+*   Keep artifacts small; exclude node\_modules if rebuilding is cheap.
+
+***
+
+## 4) Git: reset, revert, merge, rebase & other commonly asked commands
+
+Here is the easiest way to explain in interviews. Think in terms of history change vs safe undo.
+________________________________________
+1️⃣ git reset vs git revert
+🔹 git reset
+Meaning: Move the branch pointer back to an older commit.
+👉 It changes history.
+Example:
+A --- B --- C --- D (HEAD)
+Run:
+git reset --hard B
+Result:
+A --- B (HEAD)
+Commits C and D disappear from history.
+Types
+Command	What it does
+--soft	keeps code changes staged
+--mixed	keeps code changes but unstaged
+--hard	deletes commits + code
+When used
+✔ Fix local commits
+✔ Before pushing to remote
+❌ Avoid on shared branches
+________________________________________
+🔹 git revert
+Meaning: Create a new commit that cancels an old commit.
+👉 History is preserved
+Example:
+A --- B --- C --- D
+Run:
+git revert C
+Result:
+A --- B --- C --- D --- E
+Commit E undoes changes of C.
+When used
+✔ Safe for shared branches
+✔ Used in production repos
+________________________________________
+🎯 Simple Interview Line
+Reset rewrites history, revert preserves history.
+________________________________________
+2️⃣ git merge vs git rebase
+🔹 git merge
+Meaning: Combine branches while keeping history intact.
+Example:
+main:     A --- B
+              \
+feature:       C --- D
+Run:
+git checkout main
+git merge feature
+Result:
+A --- B -------- M
+      \        /
+       C ---- D
+M = merge commit
+Pros
+✔ Safe
+✔ Keeps full history
+Cons
+❌ History becomes messy
+________________________________________
+🔹 git rebase
+Meaning: Move feature branch commits on top of main.
+Example:
+main:     A --- B
+              \
+feature:       C --- D
+Run:
+git checkout feature
+git rebase main
+Result:
+A --- B --- C' --- D'
+Commits are replayed, so history becomes linear.
+Pros
+✔ Clean history
+✔ Easier to read logs
+Cons
+❌ Rewrites history
+________________________________________
+🎯 Simple Interview Line
+Merge keeps history with a merge commit, rebase rewrites history to make it linear.
+________________________________________
+⚡ Super Short Interview Answer (Best)
+git reset → moves HEAD back and rewrites history
+
+git revert → creates a new commit to undo changes safely
+
+git merge → combines branches and keeps full history
+
+git rebase → moves commits to another base to create a linear history
+________________________________________
+✅ If you want, I can also give 5 tricky Git interview questions (with diagrams) that companies like EPAM, UST, TCS, Deloitte ask in DevOps interviews.
+*   **`git cherry-pick`**: apply specific commit(s).
+    ```bash
+    git cherry-pick <sha1> <sha2>
+    ```
+*   **`git stash`**: save uncommitted work temporarily.
+    ```bash
+    git stash push -m "wip"
+    git stash pop
+    ```
+*   **`git log --oneline --graph --decorate --all`**: visualize history.
+*   **`git bisect`**: binary search to find bad commit.
+
+***
+
+## 5) Terraform: **module blocks**, **locals vs dynamic**, **provisioners**, **moved blocks**
+
+### Module Blocks
+
+*   Reusable units of infrastructure.
+
+```hcl
+module "vpc" {
+  source = "terraform-aws-modules/vpc/aws"
+  version = "5.0.0"
+  name = "main"
+  cidr = "10.0.0.0/16"
+}
+```
+
+### `locals` vs `dynamic` blocks
+
+*   **`locals`**: compute values once and reuse to DRY code.
+
+```hcl
+locals {
+  env          = var.env
+  name_prefix  = "${var.app}-${local.env}"
+}
+resource "aws_s3_bucket" "b" {
+  bucket = "${local.name_prefix}-data"
+}
+```
+
+In Terraform, locals are not truly global across modules, but they behave like global variables inside a module. Interviewers often ask this.
+I'll explain in simple interview language.
+________________________________________
+1️⃣ Are locals global in Terraform?
+❌ No — not global across the whole project
+✔ They are global only within a module
+Meaning:
+•	Any resource in the same module can use the local value.
+•	But child modules cannot access it automatically.
+Example:
+locals {
+  app_name = "payment-service"
+  env      = "dev"
+}
+Use anywhere in that module:
+resource "aws_s3_bucket" "bucket" {
+  bucket = "${local.app_name}-${local.env}-bucket"
+}
+________________________________________
+2️⃣ How to create a "global" variable in Terraform?
+Terraform doesn't have true global variables, but there are 3 common ways to simulate it.
+________________________________________
+Method 1️⃣ Use a locals block in root module
+Root module structure:
+project
+ ├── main.tf
+ ├── locals.tf
+ ├── modules
+      ├── vpc
+      ├── ec2
+Example:
+locals {
+  env = "dev"
+  project = "myapp"
+}
+Then pass it to modules:
+module "ec2" {
+  source = "./modules/ec2"
+
+  env     = local.env
+  project = local.project
+}
+Inside module:
+variable "env" {}
+variable "project" {}
+👉 This is the recommended way.
+________________________________________
+Method 2️⃣ Use variables with tfvars
+variables.tf
+variable "env" {}
+variable "project" {}
+dev.tfvars
+env = "dev"
+project = "myapp"
+Run:
+terraform apply -var-file=dev.tfvars
+________________________________________
+Method 3️⃣ Use terraform.tfvars (auto loaded)
+Example:
+env = "prod"
+project = "billing"
+Terraform loads it automatically.
+________________________________________
+3️⃣ Best Practice (Interview Answer)
+Say this:
+In Terraform, locals are scoped to the module where they are defined.
+To share values across modules, we define locals in the root module and pass them as input variables to child modules.
+________________________________________
+4️⃣ Example Architecture (Real DevOps usage)
+Root Module
+ ├── locals.tf
+ ├── main.tf
+ ├── modules
+       ├── vpc
+       ├── eks
+       ├── rds
+locals.tf
+locals {
+  env = "dev"
+  owner = "devops-team"
+}
+Pass to modules:
+module "vpc" {
+  source = "./modules/vpc"
+  env    = local.env
+  owner  = local.owner
+}
+________________________________________
+🎯 One-line Interview Answer
+Locals are module-scoped in Terraform. To make values global, we define locals in the root module and pass them to child modules using input variables.
+________________________________________
+If you're preparing for Terraform interviews, I can also explain one very confusing question interviewers ask:
+👉 locals vs variables vs outputs vs data sources (with real DevOps examples).
+
+
+*   **`dynamic`**: generate nested blocks **conditionally or iteratively**.
+
+```hcl
+resource "aws_security_group" "web" {
+  name = "web-sg"
+  dynamic "ingress" {
+    for_each = var.ports
+    content {
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  }
+}
+```
+
+**When/Why**
+
+*   Use **locals** for naming, tags, computed maps/lists.
+*   Use **dynamic** when the **count/attributes of nested blocks vary** based on input.
+
+### Provisioners (use sparingly)
+
+*   Last-resort for bootstrapping when user data/CM tool (Ansible) cannot be used.
+
+```hcl
+resource "aws_instance" "ec2" {
+  # ...
+  provisioner "remote-exec" {
+    inline = ["sudo systemctl restart nginx"]
+  }
+}
+```
+
+*   Prefer **cloud-init/user\_data** (EC2), or config management. Provisioners complicate idempotency.
+
+### `moved` blocks (state refactoring)
+
+*   Renames resources/modules without recreation.
+
+```hcl
+moved {
+  from = aws_instance.old_name
+  to   = aws_instance.new_name
+}
+```
+
+***
+
+## 6) Terraform **Versioning**, **State in Blob**, **Upgrade Strategy**
+
+### Versioning
+
+*   Pin provider and Terraform versions.
+
+```hcl
+terraform {
+  required_version = "~> 1.7.0" # example
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.49"
+    }
+  }
+}
+```
+
+### Remote State in Azure Blob (recommended for teams)
+
+```hcl
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "rg-tfstate"
+    storage_account_name = "tfstateprod123"
+    container_name       = "tfstate"
+    key                  = "network/prod.tfstate"
+  }
+}
+```
+
+*   Enable **state locking** using Azure Blob + **leases** (built-in).
+*   Secure with Storage firewall and **SAS or managed identity**.
+
+### Upgrade Strategy
+
+1.  Read release notes (Terraform & provider).
+2.  Upgrade minor first, run `terraform init -upgrade`.
+3.  Fix deprecations; run `terraform validate`.
+4.  Use **`-refresh-only`** plan to see drift.
+5.  `terraform plan` in non-prod; peer review.
+6.  Apply in lower envs first; promote.
+
+***
+
+## 7) Multi‑Environment Deployment Strategy
+
+*   Separate **workspaces** (e.g., `dev`, `qa`, `prod`) OR separate state files per env.
+*   Parameterize with `tfvars` per env.
+*   Use **separate Azure DevOps environments** with approvals.
+*   **Naming/Tagging convention**, per-env accounts/projects if strong isolation needed.
+*   Promote artifacts/modules versions through environments (immutable artifact).
+
+Example Workspaces:
+
+```bash
+terraform workspace new dev
+terraform workspace select dev
+terraform apply -var-file=dev.tfvars
+```
+
+***
+
+## 8) Ternary Operation in Terraform
+
+```hcl
+# condition ? true_val : false_val
+resource_count = var.enable ? 1 : 0
+
+instance_type = var.env == "prod" ? "t3.large" : "t3.small"
+```
+
+***
+
+## 9) ADO Pipeline: Multi deployment to **AWS EC2** and **EKS**
+
+### Pre-req
+
+*   Create AWS **service connection** in ADO (Access key/secret or OIDC).
+*   Store kubeconfig or generate via `aws eks update-kubeconfig`.
+*   Build app; publish artifacts.
+
+```yaml
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  appName: sample
+  awsRegion: ap-south-1
+  eksCluster: my-eks
+  namespace: default
+
+stages:
+- stage: Build
+  jobs:
+  - job: build
+    steps:
+    - task: NodeTool@0
+      inputs: { versionSpec: '18.x' }
+    - script: npm ci && npm run build
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: 'dist'
+        artifact: 'web'
+
+- stage: Deploy_EC2
+  dependsOn: Build
+  jobs:
+  - deployment: EC2
+    environment: aws-dev
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadPipelineArtifact@2
+            inputs: { artifact: 'web', path: '$(Pipeline.Workspace)/web' }
+          - task: AWSCLI@1
+            inputs:
+              awsCredentials: 'aws-sc-dev'  # service connection name
+              regionName: '$(awsRegion)'
+              awsCommand: |
+                aws ssm send-command \
+                  --document-name "AWS-RunShellScript" \
+                  --parameters commands="sudo systemctl restart myapp" \
+                  --instance-ids i-0123456789abcdef0
+
+- stage: Deploy_EKS
+  dependsOn: Deploy_EC2
+  jobs:
+  - deployment: EKS
+    environment: aws-dev
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AWSCLI@1
+            inputs:
+              awsCredentials: 'aws-sc-dev'
+              regionName: '$(awsRegion)'
+              awsCommand: |
+                aws eks update-kubeconfig --name $(eksCluster) --region $(awsRegion)
+          - script: |
+              kubectl set image deploy/$(appName) $(appName)=<your-ecr-repo>:$(Build.BuildId) -n $(namespace)
+              kubectl rollout status deploy/$(appName) -n $(namespace)
+            displayName: 'Rolling update on EKS'
+```
+
+**Notes**
+
+*   Prefer **blue/green** via Kubernetes **Deployment** with two ReplicaSets and traffic managed by Service or use canary (progressive delivery with Argo Rollouts/Flagger).
+
+***
+
+## 10) PowerShell: add two numbers, divide, and one often-used resource
+
+**Add two numbers (one line):**
+
+```powershell
+(5 + 7)
+# or using inputs
+[int]$a = Read-Host "Enter first number"; [int]$b = Read-Host "Enter second number"; $a + $b
+```
+
+**Divide two numbers (one line):**
+
+```powershell
+(10 / 2)
+[int]$a = Read-Host "Enter first number"; [int]$b = Read-Host "Enter second number"; $a / $b
+```
+
+**One frequently used resource in PowerShell**: `Get-Help` and `Get-Command`
+
+```powershell
+Get-Help Get-Process -Full
+Get-Command -Noun Service
+Get-Module -ListAvailable
+```
+
+Also invaluable: `Get-Content`, `ConvertFrom-Json`, `Invoke-RestMethod`, `Start-Process`, `Test-Connection`.
+
+***
+
+## 11) Challenges faced in CI/CD (ADO/Terraform) & How to overcome
+
+1.  **Credential sprawl & secret rotation**
+
+*   **Solution**: Use **OIDC** / federated identity for cloud auth; store secrets in **Key Vault**; reference via ADO Variable Groups; short-lived tokens.
+
+2.  **State file locks / drift in Terraform**
+
+*   **Solution**: Use **remote backend** (Azure Blob) with locking; run `terraform plan -refresh-only` regularly; implement drift checks as a scheduled pipeline; enforce PR plans with `terraform fmt`, `validate`, `tflint`.
+
+3.  **Unpredictable environments**
+
+*   **Solution**: Treat infrastructure as code fully; **immutable artifacts**; use **modules**; pin versions; maintain environment-specific `tfvars`; document tagging and naming standards.
+
+4.  **Long plan/apply times**
+
+*   **Solution**: Split stacks by domain (network, data, app); parallelize with multiple pipelines; cache providers; avoid unnecessary data sources.
+
+5.  **Breaking provider/TF upgrades**
+
+*   **Solution**: Introduce **version pinning**, run **`init -upgrade`** in feature branches, test in **dev** first, add automated **integration tests** (Terratest/kitchen) if possible.
+
+6.  **Blue/Green/Canary coordination**
+
+*   **Solution**: Make strategies explicit in pipeline with **environments** and **approvals**; for Kubernetes, use **rollouts** and health checks; for VMs, use **ASGs** and rolling updates.
+
+7.  **Artifact bloat**
+
+*   **Solution**: Build once, store minimal artifact; cleanup policies; compress; avoid embedding secrets.
+
+***
+
+### Want this turned into a **PDF/Word** quick-reference with diagrams (pipeline flow, TF state layout)?
+
+I can generate and share a downloadable file. Also, if you have a specific stack (Azure vs AWS) and versions, I’ll tailor the pipeline and Terraform snippets to your exact setup.
+
+Got it, Naman! Here’s a concise comparison of Azure DevOps Classic vs YAML pipelines, followed by one end to end YAML pipeline that does exactly what you asked: checkout → Sonar scan → unit tests → publish test results & coverage → build Docker image → push to ECR → deploy to EKS.
+________________________________________
+Azure Classic vs YAML pipelines (quick view)
+•	Where it lives
+o	YAML: pipeline is code in your repo (azure-pipelines.yml), versioned, reviewed, and branched like any other code. Microsoft recommends starting with YAML. [learn.microsoft.com]
+o	Classic: configured in the Azure DevOps web UI; not stored with source by default. [learn.microsoft.com]
+•	Multi stage CI/CD
+o	YAML: fully supports multi stage (build/test/deploy) in one file with schema features such as stages, jobs, and steps. [learn.microsoft.com], [learn.microsoft.com]
+o	Classic: typically split between Classic Build + Classic Release. Easier to start but less flexible for IaC workflows. [learn.microsoft.com]
+•	Change history & collaboration
+o	YAML: changes tracked in Git with PRs and code reviews (better “why” traceability). [learn.microsoft.com]
+o	Classic: has a UI history, but collaboration/PR workflows are limited vs. YAML. [organicdevops.com]
+If you’re new or migrating, Microsoft’s guidance and most labs focus on YAML first. [learn.microsoft.com], [microsoftl....github.io]
+________________________________________
+Prereqs (what you’ll need once)
+•	SonarQube: Install the SonarQube Azure DevOps extension and create a SonarQube service connection. The three tasks are Prepare, Analyze, and Publish—keep the same major version across all three. (V6 and V7 exist; organizations often standardize on one.) [docs.sonarsource.com], [learn.microsoft.com], [learn.microsoft.com], [community....source.com]
+•	AWS: 
+o	ECR: permissions to log in (via aws ecr get-login-password) and push images. [docs.aws.amazon.com], [docs.aws.amazon.com]
+o	EKS: permissions to run aws eks update-kubeconfig and use kubectl for deploy/rollout. [docs.aws.amazon.com]
+o	Optional: Use the AWS Toolkit for Azure DevOps tasks (e.g., ECR Push) instead of raw CLI if you prefer. [docs.aws.amazon.com]
+•	Unit tests & reports: we’ll publish JUnit results and Jacoco coverage using built-in tasks. [learn.microsoft.com]
+If your EKS API is private, deploy with a self-hosted agent inside your VPC—AWS has a prescriptive pattern for that. [docs.aws.amazon.com]
+________________________________________
+One pipeline to do it all (Java/Maven example)
+Swap Maven for dotnet test, npm test, etc., if your stack differs. The Sonar steps stay (scanner mode just changes).
+# azure-pipelines.yml
+trigger:
+  branches:
+    include:
+      - main
+
+name: $(Date:yyyyMMdd)$(Rev:.r)
+
+variables:
+  # ---- General ----
+  vmImage: 'ubuntu-latest'
+
+  # ---- SonarQube ----
+  sonarServiceConnection: 'SONARQUBE_SERVICE_CONNECTION_NAME'
+  sonarProjectKey: 'my.company.app'
+  sonarProjectName: 'my-company-app'
+  sonarProjectVersion: '$(Build.BuildNumber)'
+
+  # ---- AWS/ECR/EKS ----
+  awsRegion: 'ap-south-1'
+  awsAccountId: '123456789012'
+  ecrRepository: 'my-company-app'
+  eksClusterName: 'prod-eks'
+  k8sNamespace: 'default'
+  k8sDeployment: 'my-company-app'
+  k8sContainer: 'app'
+
+  # Computed
+  imageTag: '$(Build.BuildId)'
+  imageRepo: '$(awsAccountId).dkr.ecr.$(awsRegion).amazonaws.com/$(ecrRepository)'
+  dockerfilePath: 'Dockerfile'
+
+stages:
+
+# =======================
+# 1) Build + Test + Scan
+# =======================
+- stage: Build_Test_Scan
+  displayName: Build, Unit Test, SonarQube
+  jobs:
+  - job: build
+    pool:
+      vmImage: $(vmImage)
+    steps:
+      - checkout: self
+        clean: true
+
+      # Cache Maven repo (optional)
+      - task: Cache@2
+        inputs:
+          key: 'maven | "$(Agent.OS)" | /pom.xml'
+          path: ~/.m2/repository
+          restoreKeys: |
+            maven | "$(Agent.OS)"
+        displayName: Cache Maven
+
+      # Prepare SonarQube analysis (Maven/Gradle mode -> scannerMode: other)
+      # Use the same major version across Prepare/Analyze/Publish (6 or 7) per your extension.
+      - task: SonarQubePrepare@7
+        displayName: 'SonarQube: Prepare Analysis'
+        inputs:
+          SonarQube: '$(sonarServiceConnection)'
+          scannerMode: 'other'
+          configMode: 'manual'
+          cliProjectKey: '$(sonarProjectKey)'
+          cliProjectName: '$(sonarProjectName)'
+          cliProjectVersion: '$(sonarProjectVersion)'
+          extraProperties: |
+            sonar.sources=src
+            sonar.tests=src
+            sonar.test.inclusions=/Test.java
+            sonar.java.binaries=/target/classes
+            sonar.junit.reportPaths=/target/surefire-reports
+            sonar.jacoco.reportPaths=/target/jacoco.exec
+
+      # Build + Unit tests (Maven). Generates surefire (JUnit) & jacoco coverage.
+      - task: Maven@4
+        displayName: 'Maven: clean verify (with tests)'
+        inputs:
+          mavenPomFile: 'pom.xml'
+          goals: 'clean verify'
+          publishJUnitResults: false
+          options: '-DskipTests=false'
+
+      # Run Sonar analysis (uploads results to SonarQube)
+      - task: SonarQubeAnalyze@7
+        displayName: 'SonarQube: Run Code Analysis'
+
+      # Publish the Quality Gate to the pipeline summary
+      - task: SonarQubePublish@7
+        displayName: 'SonarQube: Publish Quality Gate'
+        inputs:
+          pollingTimeoutSec: '300'
+
+      # Publish test results (JUnit)
+      - task: PublishTestResults@2
+        displayName: 'Publish Unit Test Results (JUnit)'
+        inputs:
+          testResultsFormat: 'JUnit'
+          testResultsFiles: '/target/surefire-reports/TEST-.xml'
+          mergeTestResults: true
+          failTaskOnFailedTests: true
+
+      # Publish code coverage (Jacoco)
+      - task: PublishCodeCoverageResults@2
+        displayName: 'Publish Code Coverage (Jacoco)'
+        inputs:
+          codeCoverageTool: 'JaCoCo'
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/target/site/jacoco/jacoco.xml'
+          pathToSources: '$(System.DefaultWorkingDirectory)/src'
+
+      # (Optional) Publish build artifacts (e.g., k8s manifests/Helm chart)
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish artifact: manifests'
+        inputs:
+          PathtoPublish: 'manifests'
+          ArtifactName: 'manifests'
+
+# =======================
+# 2) Build & Push Docker
+# =======================
+- stage: Docker_Build_Push
+  displayName: Docker Build & Push to ECR
+  dependsOn: Build_Test_Scan
+  condition: succeeded()
+  jobs:
+  - job: docker
+    pool:
+      vmImage: $(vmImage)
+    steps:
+      - checkout: self
+        clean: true
+
+      # Login to ECR using AWS CLI (token valid ~12h)
+      - bash: |
+          aws --version
+          aws ecr get-login-password --region $(awsRegion) </span>
+            | docker login --username AWS --password-stdin $(awsAccountId).dkr.ecr.$(awsRegion).amazonaws.com
+
+          # Create repo if it doesn't exist (idempotent)
+          aws ecr describe-repositories --repository-names $(ecrRepository) --region $(awsRegion) >/dev/null 2>&1 </span>
+            || aws ecr create-repository --repository-name $(ecrRepository) --region $(awsRegion)
+        displayName: 'AWS ECR: Login & Ensure repository'
+
+      # Build & tag
+      - bash: |
+          DOCKER_BUILDKIT=1 docker build -f $(dockerfilePath) -t $(imageRepo):$(imageTag) .
+          docker tag $(imageRepo):$(imageTag) $(imageRepo):latest
+        displayName: 'Docker build & tag'
+
+      # Push image
+      - bash: |
+          docker push $(imageRepo):$(imageTag)
+          docker push $(imageRepo):latest
+        displayName: 'Docker push to ECR'
+
+# =======================
+# 3) Deploy to EKS
+# =======================
+- stage: Deploy_EKS
+  displayName: Deploy to Amazon EKS
+  dependsOn: Docker_Build_Push
+  condition: succeeded()
+  jobs:
+  - job: deploy
+    pool:
+      vmImage: $(vmImage)
+    steps:
+      # Configure kubeconfig for EKS
+      - bash: |
+          aws eks update-kubeconfig --name $(eksClusterName) --region $(awsRegion)
+          kubectl version --client=true
+          kubectl get ns
+        displayName: 'EKS: update kubeconfig & sanity check'
+
+      # Update deployment image (in-place)
+      - bash: |
+          kubectl -n $(k8sNamespace) set image deployment/$(k8sDeployment) $(k8sContainer)=$(imageRepo):$(imageTag)
+          kubectl -n $(k8sNamespace) rollout status deployment/$(k8sDeployment) --timeout=5m
+        displayName: 'K8s: set image & wait for rollout'
+
+      # (Alternative) Apply manifests if you package them as artifacts
+      # - download: current
+      #   artifact: manifests
+      # - bash: |
+      #     kubectl -n $(k8sNamespace) apply -f $(Pipeline.Workspace)/manifests
+      #     kubectl -n $(k8sNamespace) rollout status deployment/$(k8sDeployment) --timeout=5m
+      #   displayName: 'K8s: apply manifests + rollout'
+Notes on the YAML above
+•	SonarQube tasks and versions: Use either v6 or v7 consistently for SonarQubePrepare, SonarQubeAnalyze, and SonarQubePublish. Mixing majors can break builds; this is a known gotcha in the extension. [community....source.com] 
+o	Analyze task example and JDK options (v7) are documented. [learn.microsoft.com]
+o	Publish Quality Gate behavior (v6 doc; v7 is similar) is documented. [learn.microsoft.com]
+o	General SonarQube extension & task modes (dotnet/other/cli) are documented by Sonar. [docs.sonarsource.com], [docs.sonarsource.com]
+•	Publish test results: The PublishTestResults@2 task supports JUnit/NUnit/TRX/XUnit, etc.—we used JUnit patterns from Maven Surefire. [learn.microsoft.com]
+•	ECR login & push: aws ecr get-login-password | docker login --username AWS --password-stdin <account>.dkr.ecr.<region>.amazonaws.com is the standard and token lasts ~12 hours. [docs.aws.amazon.com], [docs.aws.amazon.com] 
+o	If you prefer a no bash approach, the AWS Toolkit “ECR Push” task handles tagging & auth for you. [docs.aws.amazon.com]
+•	EKS deploy: aws eks update-kubeconfig sets kubeconfig for the cluster; then we do kubectl set image + rollout status. [docs.aws.amazon.com] 
+o	Azure DevOps also provides KubernetesManifest & Kubectl tasks as alternatives, documented here. [learn.microsoft.com]
+•	Why YAML for this: Multi stage pipeline in one file with traceability & templates support—recommended starting point by Microsoft. [learn.microsoft.com], [learn.microsoft.com]
+________________________________________
+Common gotchas (so you don’t get stuck)
+1.	Keep Sonar task majors aligned (@6 or @7 on all three). Mixing versions can fail analysis or Quality Gate publish. [community....source.com]
+2.	Hosted agent permissions to AWS: Provide AWS credentials via a secured variable group or an AWS service connection (Toolkit). If your EKS endpoint is private, use a self hosted agent inside AWS. [docs.aws.amazon.com]
+3.	JUnit paths: Surefire results are typically **/target/surefire-reports/TEST-*.xml. Verify patterns if you customize Maven. [learn.microsoft.com]
+4.	ECR auth: If docker login fails, confirm the region, account id, and that your user/role has ECR push permissions, and that you’re running the latest AWS CLI for get-login-password. [docs.aws.amazon.com], [docs.aws.amazon.com]
+________________________________________
+If you prefer .NET or Node.js instead of Maven, tell me your stack and I’ll adapt the pipeline (keeping the same flow). Want a Helm based EKS deploy instead of kubectl set image? I can drop in a Helm stage too.
+
+Great question, Naman. Here’s a ready to run Azure DevOps multi stage YAML pipeline that provisions cloud resources with Terraform, plus a clear explanation of what gets created and how to see the full list of resources before and after apply.
+Since our last pipeline targeted AWS (ECR/EKS), I’m giving you an AWS focused example that provisions typical infra for container workloads:
+•	Backend for state & locking: S3 bucket + DynamoDB table
+•	Networking: VPC, public/private subnets, route tables, IGW, NAT
+•	Security/Identity: Security groups, IAM roles/policies, EKS OIDC provider
+•	Container platform: ECR repo, EKS cluster, managed node group
+You can swap modules to target Azure/GCP similarly. (If you want an Azure version—RG, VNets, AKS, ACR, KV—say the word and I’ll translate the pipeline.)
+________________________________________
+🧰 Repo layout (suggested)
+/infra
+  /envs/prod
+    backend.tf         # remote state (S3+Dynamo)
+    providers.tf       # AWS provider + region
+    versions.tf        # TF + providers versions
+    main.tf            # calls modules (vpc, ecr, eks, etc.)
+    variables.tf       # input variables
+    terraform.tfvars   # prod values
+    outputs.tf         # outputs you care about
+Tip: Keep “envs” (dev/qa/prod) in separate folders with the same module stack and different tfvars.
+________________________________________
+🔁 Azure DevOps pipeline (Terraform end to end)
+This pipeline does: fmt → init → validate → plan (export resources list) → manual approval → apply → post apply export.
+# azure-pipelines.yml
+trigger:
+  branches:
+    include: [ main ]
+
+name: tf_$(Date:yyyyMMdd)$(Rev:.r)
+
+variables:
+  vmImage: 'ubuntu-latest'
+  # AWS settings (use a secure variable group or an AWS service connection)
+  awsRegion: 'ap-south-1'
+  # Terraform working directory (per environment)
+  tfWorkDir: 'infra/envs/prod'
+
+stages:
+# =========================
+# 1) Validate & Plan
+# =========================
+- stage: Plan
+  displayName: Terraform Validate & Plan
+  jobs:
+  - job: plan
+    displayName: plan
+    pool:
+      vmImage: $(vmImage)
+    steps:
+      - checkout: self
+        clean: true
+
+      # Install Terraform (pin if you want a specific version)
+      - script: |
+          sudo apt-get update -y
+          sudo apt-get install -y unzip jq
+          curl -fsSL https://releases.hashicorp.com/terraform/1.8.5/terraform_1.8.5_linux_amd64.zip -o tf.zip
+          sudo unzip -o tf.zip -d /usr/local/bin
+          terraform -version
+        displayName: Install Terraform
+
+      # Configure AWS credentials (Option A: env vars from Variable Group)
+      # Make sure to mark these as secrets in a library variable group:
+      # AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN (if using STS)
+      - script: |
+          echo "Using AWS region $(awsRegion)"
+          aws --version || pipx install awscli || python3 -m pip install --user awscli
+        displayName: Verify AWS CLI
+
+      - script: |
+          cd $(tfWorkDir)
+          terraform fmt -check -recursive
+        displayName: 'terraform fmt (check)'
+
+      - script: |
+          cd $(tfWorkDir)
+          terraform init -upgrade
+        displayName: 'terraform init (remote backend)'
+
+      - script: |
+          cd $(tfWorkDir)
+          terraform validate
+        displayName: 'terraform validate'
+
+      # Create a binary plan file and human-readable summary
+      - script: |
+          cd $(tfWorkDir)
+          terraform plan -var-file="terraform.tfvars" -out=tfplan.bin -input=false
+          # Export a human-readable plan
+          terraform show tfplan.bin > tfplan.txt
+          # Export machine-readable JSON (we'll parse created/changed/destroyed)
+          terraform show -json tfplan.bin > tfplan.json
+
+          # Quick summary to console: what resources are to be created/changed/destroyed
+          echo "======= Planned Resource Changes (by action) ======="
+          cat tfplan.json | jq -r '
+            .resource_changes[]
+            | {address, action: .change.actions}
+            | @tsv' | column -t
+        displayName: 'terraform plan (+ export tfplan.json)'
+
+      # Publish artifacts so approvers can download & review
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact: tfplan'
+        inputs:
+          PathtoPublish: '$(tfWorkDir)'
+          ArtifactName: 'tfplan'
+
+# =========================
+# 2) Manual approval gate
+# =========================
+- stage: Approval
+  displayName: Approval (Manual)
+  dependsOn: Plan
+  jobs:
+  - job: wait_for_approval
+    pool:
+      vmImage: $(vmImage)
+    steps:
+      - script: echo "Waiting for manual approval in Environments or Checks..."
+        displayName: 'Info'
+    # Tip: Use an Environment with approvals or a Manual Validation task if you prefer.
+    # You can also omit this stage if you want auto-apply.
+
+# =========================
+# 3) Apply
+# =========================
+- stage: Apply
+  displayName: Terraform Apply
+  dependsOn: Approval
+  condition: succeeded()
+  jobs:
+  - job: apply
+    pool:
+      vmImage: $(vmImage)
+    steps:
+      - checkout: self
+        clean: true
+
+      - script: |
+          sudo apt-get update -y
+          sudo apt-get install -y unzip jq
+          curl -fsSL https://releases.hashicorp.com/terraform/1.8.5/terraform_1.8.5_linux_amd64.zip -o tf.zip
+          sudo unzip -o tf.zip -d /usr/local/bin
+          terraform -version
+        displayName: Install Terraform
+
+      # Download plan artifact to ensure we apply exactly what was reviewed
+      - task: DownloadBuildArtifacts@1
+        displayName: 'Download tfplan artifact'
+        inputs:
+          buildType: 'current'
+          downloadType: 'single'
+          artifactName: 'tfplan'
+          downloadPath: '$(Pipeline.Workspace)'
+
+      - script: |
+          cd "$(Pipeline.Workspace)/tfplan"
+          terraform init -upgrade
+          # Apply the exact reviewed plan (binary)
+          terraform apply -input=false tfplan.bin
+
+          # Post-apply: export state resources list for auditing
+          terraform show -json > post_apply_state.json
+
+          echo "======= Post-Apply State Resources ======="
+          cat post_apply_state.json | jq -r '
+            .values.root_module.resources[]
+            | .address' | sort
+        displayName: 'terraform apply (+ export state resources)'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact: post-apply'
+        inputs:
+          PathtoPublish: '$(Pipeline.Workspace)/tfplan'
+          ArtifactName: 'post-apply'
+Why these steps?
+•	terraform plan -out=tfplan.bin captures the exact actions to be approved, then terraform apply tfplan.bin guarantees you apply the same plan that reviewers saw.
+•	We export tfplan.json (pre apply) and post_apply_state.json (post apply) so you can diff planned vs actual resources easily, or archive them.
+________________________________________
+📦 What resources are created?
+Below is a representative AWS EKS + ECR + VPC stack (you can comment out modules you don’t need):
+1.	Remote state & locking (recommended)
+o	S3 bucket for Terraform state (server side encryption, versioning, bucket policy)
+o	DynamoDB table for state locking and consistency
+These keep your team from clobbering each other’s state and allow concurrent safety.
+2.	Networking
+o	VPC (CIDR, DNS hostnames/support)
+o	Subnets: multiple public and private subnets across AZs
+o	Internet Gateway and NAT Gateway(s)
+o	Route tables and routes (public routes to IGW, private to NAT)
+o	Subnet route table associations
+3.	Security & Identity
+o	Security Groups for workers and control plane endpoints as appropriate
+o	IAM Roles & Policies: 
+	EKS Cluster role
+	Node group role(s) & policies (e.g., AmazonEKSWorkerNodePolicy, AmazonEC2ContainerRegistryReadOnly, CNI)
+o	EKS OIDC Provider for IRSA (IAM Roles for Service Accounts) so Pods can assume fine grained IAM roles
+4.	Container Registry
+o	ECR Repository (with optional lifecycle rules, scan on push, immutable tags)
+5.	Kubernetes Control Plane
+o	EKS Cluster (version, logging, endpoint access, encryption, tags)
+6.	Compute for workloads
+o	EKS Managed Node Group (instance type, scaling min/max/desired, labels/taints, AMI family, SSH options)
+This mirrors standard AWS guidance for CI/CD deployments to EKS/ECR, including how your CI runner authenticates to ECR (get-login-password) and how you access EKS (update-kubeconfig)—the same commands we used in your earlier pipeline. [docs.aws.amazon.com], [docs.aws.amazon.com], [docs.aws.amazon.com]
+________________________________________
+🔎 How to list “what all resources are created”
+You have three helpful “views” baked into the pipeline:
+1.	Before apply (review stage)
+o	tfplan.json → planned changes.
+Quick inventory: 
+# show address + action (create/change/destroy)
+jq -r '.resource_changes[] | [.address, (.change.actions|join(","))] | @tsv' tfplan.json
+Or only the creates: jq -r '.resource_changes[] | select(.change.actions|index("create")) | .address' tfplan.json
+2.	After apply (actual state)
+o	post_apply_state.json from terraform show -json lists all resources in state: jq -r '.values.root_module.resources[].address' post_apply_state.json
+3.	Outputs
+o	Define friendly outputs.tf (e.g., cluster_name, ecr_url, vpc_id, private_subnets) to surface key IDs/URLs in logs.
+________________________________________
+🔧 Terraform snippets (modules wiring)
+Here’s a minimal main.tf you can adapt (uses popular community modules):
+# providers.tf
+provider "aws" {
+  region = var.region
+}
+
+# backend.tf (first run without backend, then move state; or pre-create S3/DDB)
+terraform {
+  backend "s3" {
+    bucket         = "my-tf-state-prod"
+    key            = "eks/terraform.tfstate"
+    region         = "ap-south-1"
+    dynamodb_table = "my-tf-locks"
+    encrypt        = true
+  }
+}
+
+# versions.tf
+terraform {
+  required_version = ">= 1.6.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "> 5.0"
+    }
+  }
+}
+
+# main.tf
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "> 5.0"
+
+  name = "prod-vpc"
+  cidr = var.vpc_cidr
+
+  azs             = var.azs
+  private_subnets = var.private_subnets
+  public_subnets  = var.public_subnets
+
+  enable_nat_gateway = true
+  single_nat_gateway = false
+}
+
+module "ecr" {
+  source  = "terraform-aws-modules/ecr/aws"
+  version = "> 1.0"
+
+  repository_name                 = var.ecr_name
+  create_lifecycle_policy         = true
+  repository_image_scan_on_push   = true
+  repository_image_tag_mutability = "IMMUTABLE"
+}
+
+module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "> 20.0"
+
+  cluster_name    = var.cluster_name
+  cluster_version = "1.29"
+
+  vpc_id                         = module.vpc.vpc_id
+  subnet_ids                     = module.vpc.private_subnets
+  cluster_endpoint_public_access = true
+
+  eks_managed_node_groups = {
+    default = {
+      instance_types = ["t3.medium"]
+      min_size       = 2
+      max_size       = 5
+      desired_size   = 3
+    }
+  }
+}
+In your pipeline, the ECR push step will use aws ecr get-login-password … | docker login … to authenticate, and the EKS deploy step will use aws eks update-kubeconfig + kubectl—exactly as per AWS docs. [docs.aws.amazon.com], [docs.aws.amazon.com], [docs.aws.amazon.com]
+________________________________________
+✅ Next steps (tell me what to tailor)
+•	Cloud? Stick with AWS or do you want an Azure flavor (RG, VNet, AKS, ACR, Key Vault) with the same pipeline?
+•	Do you want me to pre wire the S3/DynamoDB backend creation (bootstrap) and show how to migrate local state to remote?
+•	Want Helm or KubernetesManifest tasks after Terraform to bootstrap cluster add ons (Ingress, ALB, CSI, Karpenter, etc.)? I can append a post Terraform stage.
+I can also drop this into your repo and push a PR with all the files so you can run it immediately.
+
+
+
+
+
